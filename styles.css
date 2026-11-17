@@ -29,3 +29,26 @@
 .gallery-tile>button{position:absolute;top:13px;right:13px;border:0;background:#101719c9;color:#fff;width:24px;height:24px;cursor:pointer}
 .gallery-empty{font-size:11px;color:#77847c}
 @media(max-width:520px){.pixel-workbench{padding:11px}.pixel-stage{min-height:260px;padding:16px 3px}.pixel-bottom{align-items:flex-start}.pixel-bottom>div{width:100%}.pixel-bottom button{flex:1}.pixel-options{gap:12px}}
+
+/* Archive collections */
+.archive-card{cursor:pointer;transition:transform .22s,border-color .22s,background .22s;outline:none}
+.archive-card:hover,.archive-card:focus-visible,.archive-card.selected{transform:translateY(-3px);border-color:#82917d;background:linear-gradient(135deg,#293632,#182124)}
+.archive-card.selected .card-foot{color:#d2d8c4}
+.collection-panel{margin-top:24px;border:1px solid var(--line);background:#151e21;padding:22px}
+.collection-panel-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:18px}
+.collection-panel-head .eyebrow{margin-bottom:7px}
+.collection-panel-head h2{font:25px var(--serif);font-weight:500;margin:0;color:#dce0d2}
+.collection-panel-head>span{font:8px var(--mono);letter-spacing:.13em;color:#8b988d}
+.collection-form{display:grid;grid-template-columns:1fr auto;gap:10px}
+.collection-form input,.collection-form textarea{background:#1b2729;border:1px solid var(--line);padding:12px;color:#e5e5d9;font:11px var(--sans);outline:none;min-width:0}
+.collection-form input:focus,.collection-form textarea:focus{border-color:#8d9c85}
+.collection-form textarea{grid-column:1/-1;resize:vertical;line-height:1.7}
+.collection-form button{grid-column:2}
+.collection-items{display:grid;gap:8px;margin-top:17px}
+.collection-item{display:flex;justify-content:space-between;gap:15px;padding:15px;background:#1b2527;border:1px solid #ffffff0d}
+.collection-item small{font:8px var(--mono);color:#87948a}
+.collection-item h3{font:16px var(--serif);font-weight:500;margin:5px 0;color:#e0e0d4}
+.collection-item p{font-size:11px;line-height:1.7;color:#9aa59b;margin:0;white-space:pre-wrap}
+.collection-item button{align-self:start;background:none;border:1px solid var(--line);color:#aab3a7;width:27px;height:27px;cursor:pointer}
+.collection-empty{font-size:11px;color:#7d8980;padding:5px 0}
+@media(max-width:520px){.collection-panel{padding:14px}.collection-form{grid-template-columns:1fr}.collection-form button{grid-column:1}.collection-panel-head h2{font-size:21px}}
