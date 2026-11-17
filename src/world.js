@@ -181,25 +181,61 @@ export function createWorld(parent) {
     }
 
     createPlayer() {
-      this.player = this.add.container(820, 620);
-      this.player.setDepth(620);
-      const shadow = this.add.ellipse(0, 15, 24, 9, 0x17251e, 0.48);
-      const body = this.add.container(0, 0);
-      const cape = this.add.rectangle(0, -1, 15, 19, 0x6c7560);
-      const torso = this.add.rectangle(0, -4, 12, 15, 0xc0aa83);
-      const head = this.add.rectangle(0, -17, 11, 11, 0xd7b995);
-      const hair = this.add.rectangle(0, -22, 12, 5, 0x393a31);
-      const legs = this.add.rectangle(0, 8, 11, 6, 0x333b37);
-      const scarf = this.add.rectangle(5, -8, 4, 10, 0xb17e69);
-      body.add([cape, torso, head, hair, legs, scarf]);
-      this.player.add([shadow, body]);
+      const frames = [
+        [
+          "......HHHH......",".....HHHHHH.....","....HHHHHHHH....","...HHHHHHHHHH...",
+          "...HHSSSSSSHH...","..HHSSSSSSSSHH..","..HHSSSESSSSHH..","..HHSSSSSSSSHH..",
+          "...HHSSSSSSHH...","....RRRRRRRR....","...RRRRRRRRRR...","...CCCTTTCCC....",
+          "..CCCCCTTTCCCC..","..CCCCCttCCCCC..","...CCCTTTCCC....","...CCCTTTCCC....",
+          "....PPPPPP......","...PPPPPPPP.....","...PPPP..PPP.....","...PPPP..PPP.....",
+          "....BB....BB....","....BBBBBBBB....","....BB....BB....","................"
+        ],
+        [
+          "......HHHH......",".....HHHHHH.....","....HHHHHHHH....","...HHHHHHHHHH...",
+          "...HHSSSSSSHH...","..HHSSSSSSSSHH..","..HHSSSESSSSHH..","..HHSSSSSSSSHH..",
+          "...HHSSSSSSHH...","....RRRRRRRR....","...RRRRRRRRRR...","...CCCTTTCCC....",
+          "..CCCCCTTTCCCC..","..CCCCCttCCCCC..","...CCCTTTCCC....","...CCCTTTCCC....",
+          "....PPPPPP......","...PPPPPPPP.....","...PPP...PPP.....","...PPP...PPP.....",
+          "...BBB...BBB....","...BBBB..BBBB...","....BB....BB....","................"
+        ]
+      ];
+      const colors = {
+        H:"#302d2a", h:"#51483a", S:"#d5b995", E:"#332c2a",
+        C:"#53665a", c:"#788a70", T:"#c1aa83", t:"#e0c99d",
+        P:"#343d3b", B:"#242b2a", R:"#a96f68", r:"#d19a83"
+      };
+      const texture = this.textures.createCanvas("muse-wanderer", 32, 24);
+      const context = texture.getContext();
+      context.imageSmoothingEnabled = false;
+      frames.forEach((rows, frameIndex) => {
+        rows.forEach((row, y) => {
+          [...row].forEach((pixel, x) => {
+            if (colors[pixel]) {
+              context.fillStyle = colors[pixel];
+              context.fillRect(frameIndex * 16 + x, y, 1, 1);
+            }
+          });
+        });
+      });
+      texture.add("idle", 0, 0, 0, 16, 24);
+      texture.add("step", 0, 16, 0, 16, 24);
+      texture.refresh();
+      this.anims.create({
+        key:"wanderer-walk",
+        frames:[{key:"muse-wanderer",frame:"idle"},{key:"muse-wanderer",frame:"step"}],
+        frameRate:7,
+        repeat:-1
+      });
+
+      this.playerShadow = this.add.ellipse(820, 620, 27, 9, 0x17251e, 0.48).setDepth(619);
+      this.player = this.add.sprite(820, 620, "muse-wanderer", "idle");
+      this.player.setOrigin(.5, .88).setScale(2.25).setDepth(620);
       this.physics.add.existing(this.player);
       this.player.body.setCollideWorldBounds(true);
-      this.player.body.setSize(15, 15).setOffset(-7, -1);
+      this.player.body.setSize(8, 7).setOffset(4, 16);
       this.player.body.setDrag(900, 900);
       this.player.body.setMaxVelocity(145, 145);
-      this.playerVisual = body;
-      this.tweens.add({targets:body,y:-2,duration:680,yoyo:true,repeat:-1,ease:"Sine.easeInOut"});
+      this.player.setFrame("idle");
     }
 
     createBirds() {
