@@ -38,7 +38,7 @@ function renderMusic(){
  list.innerHTML=items.length?items.map(item=>{
   let link="";
   try{const url=new URL(item.link);if(["http:","https:"].includes(url.protocol))link=`<a class="music-listen-link" href="${escapeHTML(url.href)}" target="_blank" rel="noopener noreferrer">OPEN LISTENING LINK ↗</a>`;}catch{}
-  return `<article class="music-track"><div class="track-art"><span>♫</span><i></i></div><div class="track-main"><div class="track-meta">${escapeHTML(item.artist||"ARTIST UNKNOWN")}${item.album?" · "+escapeHTML(item.album):""}</div><h3>${escapeHTML(item.title)}</h3>${item.mood?`<span class="track-mood">${escapeHTML(item.mood)}</span>`:""}${item.note?`<p>${escapeHTML(item.note)}</p>`:""}<div class="track-actions">${link}<span>ADDED ${new Date(item.createdAt).toLocaleDateString()}</span></div></div><button type="button" class="track-delete" data-delete-track="${escapeHTML(item.id)}" aria-label="Remove track">×</button></article>`;
+  return `<article class="music-track"><div class="track-art">${item.cover?`<img src="${escapeHTML(item.cover)}" alt="" loading="lazy">`:'<span>♫</span><i></i>'}</div><div class="track-main"><div class="track-meta">${escapeHTML(item.artist||"ARTIST UNKNOWN")}${item.album?" · "+escapeHTML(item.album):""}</div><h3>${escapeHTML(item.title)}</h3>${item.mood?`<span class="track-mood">${escapeHTML(item.mood)}</span>`:""}${item.note?`<p>${escapeHTML(item.note)}</p>`:""}<div class="track-actions">${link}<span>ADDED ${new Date(item.createdAt).toLocaleDateString()}</span></div>${item.audioUrl?`<audio class="track-audio" controls preload="none" src="${escapeHTML(item.audioUrl)}"></audio>`:""}</div><button type="button" class="track-delete" data-delete-track="${escapeHTML(item.id)}" aria-label="Remove track">×</button></article>`;
  }).join(""):'<p class="empty-state">The first song is waiting to be added.</p>';
 }
 export function initInnerWorld(){
@@ -65,13 +65,15 @@ export function initInnerWorld(){
   const button=event.target.closest("[data-delete-checkin]");if(!button)return;
   write(CHECKIN_KEY,read(CHECKIN_KEY).filter(item=>item.id!==button.dataset.deleteCheckin));renderCheckins();
  });
- $("#music-form").addEventListener("submit",event=>{
+ $("#music-form").addEventListener("submit",async event=>{
   event.preventDefault();
   const title=$("#music-title").value.trim();if(!title)return;
   const rawLink=$("#music-link").value.trim();let link="";
   if(rawLink){try{const url=new URL(rawLink);if(!["http:","https:"].includes(url.protocol))throw new Error();link=url.href;}catch{$("#music-link").setCustomValidity("Enter a valid http or https link.");$("#music-link").reportValidity();return;}}
   $("#music-link").setCustomValidity("");
-  const items=read(MUSIC_KEY);items.unshift({id:makeId(),title,artist:$("#music-artist").value.trim(),album:$("#music-album").value.trim(),mood:$("#music-mood").value,note:$("#music-note").value.trim(),link,createdAt:Date.now()});
+  const coverFile=$("#music-cover").files?.[0];let cover="";if(coverFile){if(!coverFile.type.startsWith("image/")||coverFile.size>5*1024*1024){$("#music-cover").setCustomValidity("Choose an image smaller than 5 MB.");$("#music-cover").reportValidity();return;}try{cover=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>{const img=new Image();img.onload=()=>{const canvas=document.createElement("canvas"),size=420;canvas.width=size;canvas.height=size;const scale=Math.max(size/img.width,size/img.height),w=img.width*scale,h=img.height*scale;canvas.getContext("2d").drawImage(img,(size-w)/2,(size-h)/2,w,h);resolve(canvas.toDataURL("image/jpeg",.78));};img.onerror=reject;img.src=reader.result;};reader.onerror=reject;reader.readAsDataURL(coverFile);});}catch{return;}}
+  const rawAudio=$("#music-audio").value.trim();let audioUrl="";if(rawAudio){try{const url=new URL(rawAudio);if(!["http:","https:"].includes(url.protocol))throw new Error();audioUrl=url.href;}catch{$("#music-audio").setCustomValidity("Enter a valid direct audio URL.");$("#music-audio").reportValidity();return;}}
+  const items=read(MUSIC_KEY);items.unshift({id:makeId(),title,artist:$("#music-artist").value.trim(),album:$("#music-album").value.trim(),mood:$("#music-mood").value,note:$("#music-note").value.trim(),link,audioUrl,cover,createdAt:Date.now()});
   try{write(MUSIC_KEY,items);$("#music-form").reset();renderMusic();window.dispatchEvent(new CustomEvent("muse:toast",{detail:"TRACK ADDED TO YOUR MUSIC ROOM"}));}
   catch{window.dispatchEvent(new CustomEvent("muse:toast",{detail:"STORAGE IS FULL — EXPORT A BACKUP"}));}
  });
