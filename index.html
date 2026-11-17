@@ -117,13 +117,13 @@
             <label>CONNECTED FEELING<select id="music-mood"><option value="">Choose a feeling (optional)</option><option>Bright</option><option>Calm</option><option>Curious</option><option>Tender</option><option>Restless</option><option>Heavy</option><option>Hopeful</option><option>Uncertain</option><option>Nostalgic</option><option>Other</option></select></label>
             <label class="music-wide">LISTENING LINK <span class="field-optional">A PAGE LINK OR DIRECT AUDIO FILE URL</span><input id="music-link" type="url" inputmode="url" placeholder="https://…"></label>
             <label>ALBUM ART <span class="field-optional">OPTIONAL · IMAGE FILE</span><input id="music-cover" type="file" accept="image/*"></label>
-            <label>AUDIO FILE URL <span class="field-optional">DIRECT MP3 / OGG / WAV LINK</span><input id="music-audio" type="url" inputmode="url" placeholder="https://…"></label>
+            <label>AUDIO FILE <span class="field-optional">MP3 · WAV · OGG · M4A · UP TO 40 MB</span><input id="music-audio-file" type="file" accept="audio/*"></label>
             <label class="music-wide">WHY THIS ONE? <span class="field-optional">A MEMORY, A LYRIC FRAGMENT, A MOMENT…</span><textarea id="music-note" rows="3" maxlength="1200" placeholder="What makes this song yours?"></textarea></label>
           </div>
           <div class="music-form-foot"><span>STORED PRIVATELY ON THIS DEVICE</span><button class="primary-button" type="submit">ADD TO MUSIC ROOM ↗</button></div>
         </form>
         <div class="music-library-head"><div><p class="eyebrow">YOUR PERSONAL SOUNDTRACK</p><h2>Saved tracks.</h2></div><span id="music-count">0 TRACKS</span></div>
-        <div id="music-list" class="music-list"><p class="empty-state">The first song is waiting to be added.</p></div>
+        <section class="music-player-panel" aria-label="Music player"><div class="player-now"><div class="player-art" id="player-art">♫</div><div><p class="eyebrow">NOW PLAYING</p><h3 id="player-title">Choose a song from your library</h3><span id="player-artist">YOUR MUSIC, YOUR SPACE</span></div></div><audio id="music-player" controls preload="metadata"></audio><div class="player-queue-controls"><button type="button" id="player-prev" aria-label="Previous track">PREVIOUS</button><button type="button" id="player-shuffle" aria-pressed="false">SHUFFLE OFF</button><button type="button" id="player-next" aria-label="Next track">NEXT</button></div></section><div id="music-list" class="music-list"><p class="empty-state">The first song is waiting to be added.</p></div>
       </section>
 
       <section class="content-view hidden" id="studio-view">
