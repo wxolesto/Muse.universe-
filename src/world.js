@@ -27,9 +27,16 @@ export function createWorld(parent) {
       this.keys = this.input.keyboard.addKeys("W,A,S,D,UP,DOWN,LEFT,RIGHT,SHIFT,E");
       this.game.events.on("touch-move", this.onTouchMove, this);
       this.game.events.on("interact", this.inspectNearby, this);
+      this.game.events.on("builder:start", this.startBuilding, this);
+      this.game.events.on("builder:cancel", this.cancelBuilding, this);
+      this.loadPlacedObjects();
+      this.input.on("pointerdown", this.handleBuildPointer, this);
       this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
         this.game.events.off("touch-move", this.onTouchMove, this);
         this.game.events.off("interact", this.inspectNearby, this);
+        this.game.events.off("builder:start", this.startBuilding, this);
+        this.game.events.off("builder:cancel", this.cancelBuilding, this);
+        this.input.off("pointerdown", this.handleBuildPointer, this);
       });
       this.updateLighting();
       this.time.addEvent({ delay: 60000, loop: true, callback: () => this.updateLighting() });
@@ -609,6 +616,85 @@ export function createWorld(parent) {
       }).setOrigin(.5).setScrollFactor(0).setDepth(2200).setAlpha(0);
       this.scale.on("resize",size=>this.interactionPrompt?.setPosition(size.width/2,66));
       this.showingInteractionPrompt=false;
+    }
+
+
+    startBuilding(type) {
+      if (!["tree","lantern","flowers","stone"].includes(type)) return;
+      this.buildMode = type;
+      this.touchDirections.clear();
+      window.dispatchEvent(new CustomEvent("muse:toast",{detail:"PLACE "+type.toUpperCase()+" · TAP AN OPEN PATCH OF LAND"}));
+    }
+
+    cancelBuilding() {
+      this.buildMode = null;
+      window.dispatchEvent(new CustomEvent("muse:builder-mode",{detail:{active:false}}));
+    }
+
+    handleBuildPointer(pointer) {
+      if (!this.buildMode || !this.landPolygon) return;
+      const point = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
+      if (!Phaser.Geom.Polygon.Contains(this.landPolygon, point.x, point.y)) {
+        window.dispatchEvent(new CustomEvent("muse:toast",{detail:"CHOOSE A SPOT ON THE ISLAND"}));
+        return;
+      }
+      const item = {id:"prop-"+Date.now()+"-"+Math.floor(Math.random()*10000),type:this.buildMode,x:Math.round(point.x),y:Math.round(point.y)};
+      const objects = this.readPlacedObjects();
+      objects.push(item);
+      try { localStorage.setItem("muse.world.objects.v1",JSON.stringify(objects)); }
+      catch { window.dispatchEvent(new CustomEvent("muse:toast",{detail:"WORLD STORAGE IS FULL"})); return; }
+      this.drawPlacedObject(item);
+      window.dispatchEvent(new CustomEvent("muse:object-placed",{detail:{type:item.type,count:objects.length}}));
+    }
+
+    readPlacedObjects() {
+      try {
+        const value=JSON.parse(localStorage.getItem("muse.world.objects.v1")||"[]");
+        return Array.isArray(value)?value.filter(item=>item&&["tree","lantern","flowers","stone"].includes(item.type)&&Number.isFinite(item.x)&&Number.isFinite(item.y)): [];
+      } catch { return []; }
+    }
+
+    loadPlacedObjects() {
+      this.placedObjects=[];
+      this.readPlacedObjects().forEach(item=>this.drawPlacedObject(item));
+    }
+
+    drawPlacedObject(item) {
+      const {x,y,type}=item;
+      const g=this.add.graphics().setDepth(y+2);
+      if(type==="tree"){
+        g.fillStyle(0x263b30,.34);g.fillEllipse(x,y+12,40,13);
+        g.fillStyle(0x594b39,1);g.fillRect(x-3,y-13,6,22);
+        g.fillStyle(0x344b39,1);g.fillRect(x-15,y-31,30,20);
+        g.fillStyle(0x506b48,1);g.fillRect(x-19,y-27,38,13);
+        g.fillStyle(0x819066,1);g.fillRect(x-10,y-35,17,8);
+        g.fillStyle(0xa2a477,.8);g.fillRect(x-7,y-32,5,3);
+      } else if(type==="lantern"){
+        g.fillStyle(0x26352d,.35);g.fillEllipse(x,y+9,19,7);
+        g.fillStyle(0x4b4030,1);g.fillRect(x-2,y-17,4,25);
+        g.fillStyle(0x756447,1);g.fillRect(x-6,y-23,12,9);
+        g.fillStyle(0xe7c98c,.9);g.fillRect(x-3,y-21,6,5);
+        g.fillStyle(0xe9c98b,.12);g.fillCircle(x,y-18,17);
+      } else if(type==="flowers"){
+        g.fillStyle(0x36513d,.8);g.fillRect(x-1,y-9,2,11);g.fillRect(x+5,y-6,2,8);
+        [[x-5,y-11,0xd6b9a0],[x+1,y-15,0xe0cf9a],[x+8,y-9,0xb7a6c6],[x+1,y-6,0xe5d9c1]].forEach(([fx,fy,color])=>{g.fillStyle(color,1);g.fillRect(fx,fy,4,4);});
+      } else {
+        g.fillStyle(0x283b34,.35);g.fillEllipse(x,y+5,25,9);
+        g.fillStyle(0x777b69,1);g.fillRect(x-9,y-7,18,10);
+        g.fillStyle(0xa4a18a,1);g.fillRect(x-6,y-10,11,4);
+        g.fillStyle(0x505f50,1);g.fillRect(x-7,y+3,14,2);
+      }
+      g.setData("museObjectId",item.id);
+      if(type==="lantern"){
+        const glow=this.add.circle(x,y-18,23,0xe8c88b,.06).setDepth(y+1);
+        this.tweens.add({targets:glow,alpha:{from:.03,to:.14},scale:{from:.85,to:1.18},duration:1800,yoyo:true,repeat:-1,ease:"Sine.easeInOut"});
+      }
+      if(type==="tree") {
+        const sway=this.add.rectangle(x,y-25,1,1,0xffffff,0).setDepth(y+3);
+        this.tweens.add({targets:g,angle:{from:-1,to:1},duration:2600,yoyo:true,repeat:-1,ease:"Sine.easeInOut"});
+        sway.destroy();
+      }
+      return g;
     }
 
     getNearbyDiscovery() {
