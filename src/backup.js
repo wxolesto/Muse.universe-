@@ -12,7 +12,9 @@ export async function exportBackup() {
     archive: readJSON(ARCHIVE_KEY, {}),
     pixelGallery: readJSON(ART_KEY, []),
     discoveries: readJSON("muse.discoveries.v1", []),
-    worldObjects: readJSON("muse.world.objects.v1", [])
+    worldObjects: readJSON("muse.world.objects.v1", []),
+    innerCheckins: readJSON("muse.inner.checkins.v1", []),
+    musicTracks: readJSON("muse.music.tracks.v1", [])
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
   const url = URL.createObjectURL(blob);
@@ -40,12 +42,16 @@ export async function importBackup(file) {
   localStorage.setItem(ART_KEY, JSON.stringify(payload.pixelGallery));
   if (Array.isArray(payload.discoveries)) localStorage.setItem("muse.discoveries.v1", JSON.stringify(payload.discoveries));
   if (Array.isArray(payload.worldObjects)) localStorage.setItem("muse.world.objects.v1", JSON.stringify(payload.worldObjects));
+  if (Array.isArray(payload.innerCheckins)) localStorage.setItem("muse.inner.checkins.v1", JSON.stringify(payload.innerCheckins));
+  if (Array.isArray(payload.musicTracks)) localStorage.setItem("muse.music.tracks.v1", JSON.stringify(payload.musicTracks));
   return {
     journal: payload.journal.length,
     archive: Object.values(payload.archive).reduce((sum, items) => sum + (Array.isArray(items) ? items.length : 0), 0),
     artwork: payload.pixelGallery.length,
     discoveries: Array.isArray(payload.discoveries) ? payload.discoveries.length : 0,
-    worldObjects: Array.isArray(payload.worldObjects) ? payload.worldObjects.length : 0
+    worldObjects: Array.isArray(payload.worldObjects) ? payload.worldObjects.length : 0,
+    innerCheckins: Array.isArray(payload.innerCheckins) ? payload.innerCheckins.length : 0,
+    musicTracks: Array.isArray(payload.musicTracks) ? payload.musicTracks.length : 0
   };
 }
 
