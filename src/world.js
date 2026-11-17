@@ -20,7 +20,7 @@ export function createWorld(parent) {
       this.cameras.main.startFollow(this.player, true, 0.075, 0.075);
       this.cameras.main.setZoom(1.08);
       this.cameras.main.setDeadzone(110, 70);
-      this.keys = this.input.keyboard.addKeys("W,A,S,D,UP,DOWN,LEFT,RIGHT,SHIFT");
+      this.keys = this.input.keyboard.addKeys("W,A,S,D,UP,DOWN,LEFT,RIGHT,SHIFT,E");
       this.game.events.on("touch-move", this.onTouchMove, this);
       this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.game.events.off("touch-move", this.onTouchMove, this));
       this.updateLighting();
@@ -63,6 +63,7 @@ export function createWorld(parent) {
         new Phaser.Geom.Point(630,900),new Phaser.Geom.Point(440,825),new Phaser.Geom.Point(290,735),
         new Phaser.Geom.Point(190,600)
       ];
+      this.landPolygon = new Phaser.Geom.Polygon(points);
       const g = this.add.graphics();
       g.fillStyle(0x0a1b20, 0.55);
       g.fillPoints(points.map(p => new Phaser.Geom.Point(p.x + 0, p.y + 18)), true);
@@ -238,6 +239,15 @@ export function createWorld(parent) {
       this.tweens.add({targets:this.shade,alpha,duration:5000,ease:"Sine.easeInOut"});
     }
 
+    inspectNearby() {
+      const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, 1050, 365);
+      if (distance < 145) {
+        window.dispatchEvent(new CustomEvent("muse:toast", { detail: "THE OLD WAYFARER — A small house with a light left on." }));
+      } else {
+        window.dispatchEvent(new CustomEvent("muse:toast", { detail: "Only wind, grass and the sound of the sea." }));
+      }
+    }
+
     update() {
       if (!this.player?.body) return;
       const keys = this.keys;
@@ -249,7 +259,14 @@ export function createWorld(parent) {
       let vx = (right ? 1 : 0) - (left ? 1 : 0);
       let vy = (down ? 1 : 0) - (up ? 1 : 0);
       if (vx && vy) { vx *= 0.707; vy *= 0.707; }
+      const nextX = this.player.x + vx * speed * (this.game.loop.delta / 1000);
+      const nextY = this.player.y + vy * speed * (this.game.loop.delta / 1000);
+      if (!Phaser.Geom.Polygon.Contains(this.landPolygon, nextX, nextY)) {
+        vx = 0;
+        vy = 0;
+      }
       this.player.body.setVelocity(vx * speed, vy * speed);
+      if (Phaser.Input.Keyboard.JustDown(keys.E)) this.inspectNearby();
       if (vx < 0) this.playerVisual.setScale(-1, 1);
       else if (vx > 0) this.playerVisual.setScale(1, 1);
       this.playerVisual.alpha = (vx || vy) ? 0.98 : 1;
