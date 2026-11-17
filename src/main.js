@@ -128,6 +128,11 @@ $("#world-builder-button").addEventListener("click",()=>{updateBuilderStatus();b
 $("#builder-edit").addEventListener("click",()=>{builderDialog.close();emitWorldEvent("builder:edit");});
 $("#builder-delete").addEventListener("click",()=>emitWorldEvent("builder:delete"));
 window.addEventListener("muse:builder-selection",event=>{$("#builder-delete").disabled=!event.detail?.selected;$("#builder-delete").textContent=event.detail?.selected?"DELETE SELECTED":"DELETE SELECTED";});
+const worldEditToolbar=$("#world-edit-toolbar");
+$("#world-edit-delete").addEventListener("click",()=>emitWorldEvent("builder:delete"));
+$("#world-edit-exit").addEventListener("click",()=>{worldEditToolbar.hidden=true;emitWorldEvent("builder:cancel");});
+window.addEventListener("muse:builder-selection",event=>{worldEditToolbar.hidden=!event.detail?.selected;});
+window.addEventListener("muse:builder-mode",event=>{if(!event.detail?.active)worldEditToolbar.hidden=true;});
 $("#builder-close").addEventListener("click",()=>{builderDialog.close();emitWorldEvent("builder:cancel");});
 $("#builder-finish").addEventListener("click",()=>{builderDialog.close();game?.events.emit("builder:cancel");});
 builderDialog.addEventListener("click",event=>{if(event.target===builderDialog){builderDialog.close();game?.events.emit("builder:cancel");}});
