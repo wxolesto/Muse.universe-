@@ -33,7 +33,8 @@ function renderCheckins(){
  renderCalendar();
  list.innerHTML=items.length?items.map(item=>`<article class="mood-entry"><div class="mood-entry-symbol">${MOOD_SYMBOLS[item.mood]||"✧"}</div><div class="mood-entry-main"><div class="mood-entry-meta">${new Date(item.createdAt).toLocaleString()} · ${MOOD_LABELS[item.mood]||"A moment"}</div><p>${escapeHTML(item.note)||'<span class="quiet-note">No words needed.</span>'}</p></div><button type="button" data-delete-checkin="${escapeHTML(item.id)}" aria-label="Delete check-in">×</button></article>`).join(""):'<p class="empty-state">Your first check-in will appear here whenever you\'re ready.</p>';
 }
-let musicQueue=[],musicIndex=-1,shuffleMusic=false;
+let musicQueue=[],musicIndex=-1,shuffleMusic=false,selectedPlaylistId="";
+const PLAYLIST_KEY="muse.music.playlists.v1";
 const audioUrls=new Map();
 function playQueueIndex(index){
  const player=$("#music-player");if(!musicQueue.length)return;
@@ -46,7 +47,10 @@ function playQueueIndex(index){
 }
 function playNext(){if(!musicQueue.length)return;if(shuffleMusic&&musicQueue.length>1){let next=musicIndex;while(next===musicIndex)next=Math.floor(Math.random()*musicQueue.length);playQueueIndex(next);}else playQueueIndex(musicIndex+1);}
 async function renderMusic(){
- const items=read(MUSIC_KEY),list=$("#music-list");
+ const allItems=read(MUSIC_KEY),list=$("#music-list"),playlists=read(PLAYLIST_KEY);
+ const filter=$("#music-playlist-filter");
+ if(filter){const current=filter.value;filter.innerHTML='<option value="">ALL TRACKS</option>'+playlists.map(p=>'<option value="'+escapeHTML(p.id)+'">'+escapeHTML(p.name)+'</option>').join("");filter.value=playlists.some(p=>p.id===current)?current:"";selectedPlaylistId=filter.value;}
+ const items=selectedPlaylistId?allItems.filter(item=>playlists.some(p=>p.id===selectedPlaylistId&&(p.trackIds||[]).includes(item.id))):allItems;
  $("#music-count").textContent=items.length+" TRACK"+(items.length===1?"":"S");
  const cards=await Promise.all(items.map(async item=>{
   let audioUrl=audioUrls.get(item.id)||"";
@@ -54,7 +58,7 @@ async function renderMusic(){
   let link="";
   try{const url=new URL(item.link);if(["http:","https:"].includes(url.protocol))link='<a class="music-listen-link" href="'+escapeHTML(url.href)+'" target="_blank" rel="noopener noreferrer">OPEN LISTENING LINK ↗</a>';}catch{}
   const playable=!!audioUrl||!!item.audioUrl;
-  return '<article class="music-track"><div class="track-art">'+(item.cover?'<img src="'+escapeHTML(item.cover)+'" alt="" loading="lazy">':'<span>♫</span><i></i>')+'</div><div class="track-main"><div class="track-meta">'+escapeHTML(item.artist||"ARTIST UNKNOWN")+(item.album?" · "+escapeHTML(item.album):"")+'</div><h3>'+escapeHTML(item.title)+'</h3>'+(item.mood?'<span class="track-mood">'+escapeHTML(item.mood)+'</span>':"")+(item.note?'<p>'+escapeHTML(item.note)+'</p>':"")+'<div class="track-actions">'+(playable?'<button type="button" class="music-play-button" data-play-track="'+escapeHTML(item.id)+'">▶ PLAY</button>':'<span>NO AUDIO FILE ATTACHED</span>')+link+'<span>ADDED '+new Date(item.createdAt).toLocaleDateString()+'</span></div></div><button type="button" class="track-delete" data-delete-track="'+escapeHTML(item.id)+'" aria-label="Remove track">×</button></article>';
+  return '<article class="music-track"><div class="track-art">'+(item.cover?'<img src="'+escapeHTML(item.cover)+'" alt="" loading="lazy">':'<span>♫</span><i></i>')+'</div><div class="track-main"><div class="track-meta">'+escapeHTML(item.artist||"ARTIST UNKNOWN")+(item.album?" · "+escapeHTML(item.album):"")+'</div><h3>'+escapeHTML(item.title)+'</h3>'+(item.mood?'<span class="track-mood">'+escapeHTML(item.mood)+'</span>':"")+(item.note?'<p>'+escapeHTML(item.note)+'</p>':"")+'<label class="track-playlist-label">PLAYLIST <select data-track-playlist="'+escapeHTML(item.id)+'"><option value="">NOT IN A PLAYLIST</option>'+playlists.map(p=>'<option value="'+escapeHTML(p.id)+'" '+((p.trackIds||[]).includes(item.id)?"selected":"")+'">'+escapeHTML(p.name)+'</option>').join("")+'</select></label><div class="track-actions">'+(playable?'<button type="button" class="music-play-button" data-play-track="'+escapeHTML(item.id)+'">▶ PLAY</button>':'<span>NO AUDIO FILE ATTACHED</span>')+link+'<span>ADDED '+new Date(item.createdAt).toLocaleDateString()+'</span></div></div><button type="button" class="track-delete" data-delete-track="'+escapeHTML(item.id)+'" aria-label="Remove track">×</button></article>';
  }));
  list.innerHTML=cards.length?cards.join(""):'<p class="empty-state">The first song is waiting to be added.</p>';
  musicQueue=items.filter(item=>audioUrls.has(item.id)||item.audioUrl);
@@ -113,6 +117,17 @@ export function initInnerWorld(){
   const url=audioUrls.get(id);if(url){URL.revokeObjectURL(url);audioUrls.delete(id);}
   write(MUSIC_KEY,read(MUSIC_KEY).filter(item=>item.id!==id));try{await deleteAudioFile(id);}catch{}
   await renderMusic();
+ });
+ $("#music-playlist-filter").addEventListener("change",event=>{selectedPlaylistId=event.target.value;musicIndex=-1;$("#music-player").pause();renderMusic();});
+ $("#music-create-playlist").addEventListener("click",()=>{
+  const name=window.prompt("Name your playlist:");if(!name||!name.trim())return;
+  const playlists=read(PLAYLIST_KEY);playlists.push({id:makeId(),name:name.trim().slice(0,60),trackIds:[],createdAt:Date.now()});write(PLAYLIST_KEY,playlists);renderMusic();
+ });
+ $("#music-list").addEventListener("change",event=>{
+  const select=event.target.closest("[data-track-playlist]");if(!select)return;
+  const playlists=read(PLAYLIST_KEY),trackId=select.dataset.trackPlaylist;
+  playlists.forEach(p=>{p.trackIds=(p.trackIds||[]).filter(id=>id!==trackId);if(p.id===select.value)p.trackIds.push(trackId);});
+  write(PLAYLIST_KEY,playlists);renderMusic();
  });
  $("#player-prev").addEventListener("click",()=>playQueueIndex(musicIndex-1));
  $("#player-next").addEventListener("click",playNext);
