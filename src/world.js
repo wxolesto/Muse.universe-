@@ -29,6 +29,8 @@ export function createWorld(parent) {
       this.game.events.on("interact", this.inspectNearby, this);
       this.game.events.on("builder:start", this.startBuilding, this);
       this.game.events.on("builder:cancel", this.cancelBuilding, this);
+      this.game.events.on("builder:edit", this.startEditing, this);
+      this.game.events.on("builder:delete", this.deleteSelectedObject, this);
       this.loadPlacedObjects();
       this.input.on("pointerdown", this.handleBuildPointer, this);
       this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
@@ -36,6 +38,8 @@ export function createWorld(parent) {
         this.game.events.off("interact", this.inspectNearby, this);
         this.game.events.off("builder:start", this.startBuilding, this);
         this.game.events.off("builder:cancel", this.cancelBuilding, this);
+        this.game.events.off("builder:edit", this.startEditing, this);
+        this.game.events.off("builder:delete", this.deleteSelectedObject, this);
         this.input.off("pointerdown", this.handleBuildPointer, this);
       });
       this.updateLighting();
@@ -621,30 +625,92 @@ export function createWorld(parent) {
 
     startBuilding(type) {
       if (!["tree","lantern","flowers","stone"].includes(type)) return;
+      this.editMode = false;
       this.buildMode = type;
+      this.clearObjectSelection();
       this.touchDirections.clear();
       window.dispatchEvent(new CustomEvent("muse:toast",{detail:"PLACE "+type.toUpperCase()+" · TAP AN OPEN PATCH OF LAND"}));
     }
 
+    startEditing() {
+      this.buildMode = null;
+      this.editMode = true;
+      this.clearObjectSelection();
+      window.dispatchEvent(new CustomEvent("muse:toast",{detail:"EDIT MODE · TAP AN OBJECT TO SELECT IT"}));
+    }
+
     cancelBuilding() {
       this.buildMode = null;
+      this.editMode = false;
+      this.clearObjectSelection();
+      window.dispatchEvent(new CustomEvent("muse:builder-selection",{detail:{selected:false}}));
       window.dispatchEvent(new CustomEvent("muse:builder-mode",{detail:{active:false}}));
     }
 
+    clearObjectSelection() {
+      this.selectedWorldObject = null;
+      this.selectionOutline?.destroy();
+      this.selectionOutline = null;
+    }
+
     handleBuildPointer(pointer) {
-      if (!this.buildMode || !this.landPolygon) return;
+      if (!this.buildMode && !this.editMode) return;
       const point = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
-      if (!Phaser.Geom.Polygon.Contains(this.landPolygon, point.x, point.y)) {
+      if (this.editMode) {
+        const objects = this.readPlacedObjects();
+        if (this.selectedWorldObject) {
+          if (!Phaser.Geom.Polygon.Contains(this.landPolygon, point.x, point.y)) return;
+          const selected = objects.find(item => item.id === this.selectedWorldObject);
+          if (!selected) { this.clearObjectSelection(); return; }
+          selected.x = Math.round(point.x);
+          selected.y = Math.round(point.y);
+          this.persistWorldObjects(objects);
+          this.loadPlacedObjects();
+          this.selectedWorldObject = selected.id;
+          this.drawSelectionOutline(selected);
+          window.dispatchEvent(new CustomEvent("muse:toast",{detail:"OBJECT MOVED"}));
+          return;
+        }
+        const nearest = objects.map(item=>({...item,distance:Phaser.Math.Distance.Between(point.x,point.y,item.x,item.y)}))
+          .filter(item=>item.distance<48).sort((a,b)=>a.distance-b.distance)[0];
+        if (!nearest) return;
+        this.selectedWorldObject = nearest.id;
+        this.drawSelectionOutline(nearest);
+        window.dispatchEvent(new CustomEvent("muse:builder-selection",{detail:{selected:true,type:nearest.type}}));
+        window.dispatchEvent(new CustomEvent("muse:toast",{detail:nearest.type.toUpperCase()+" SELECTED · TAP ANOTHER SPOT TO MOVE"}));
+        return;
+      }
+      if (!this.buildMode || !Phaser.Geom.Polygon.Contains(this.landPolygon, point.x, point.y)) {
         window.dispatchEvent(new CustomEvent("muse:toast",{detail:"CHOOSE A SPOT ON THE ISLAND"}));
         return;
       }
       const item = {id:"prop-"+Date.now()+"-"+Math.floor(Math.random()*10000),type:this.buildMode,x:Math.round(point.x),y:Math.round(point.y)};
       const objects = this.readPlacedObjects();
       objects.push(item);
-      try { localStorage.setItem("muse.world.objects.v1",JSON.stringify(objects)); }
-      catch { window.dispatchEvent(new CustomEvent("muse:toast",{detail:"WORLD STORAGE IS FULL"})); return; }
+      if (!this.persistWorldObjects(objects)) return;
       this.drawPlacedObject(item);
       window.dispatchEvent(new CustomEvent("muse:object-placed",{detail:{type:item.type,count:objects.length}}));
+    }
+
+    persistWorldObjects(objects) {
+      try { localStorage.setItem("muse.world.objects.v1",JSON.stringify(objects)); return true; }
+      catch { window.dispatchEvent(new CustomEvent("muse:toast",{detail:"WORLD STORAGE IS FULL"})); return false; }
+    }
+
+    drawSelectionOutline(item) {
+      this.selectionOutline?.destroy();
+      this.selectionOutline=this.add.circle(item.x,item.y-8,35).setStrokeStyle(2,0xe5d6a5,.95).setFillStyle(0xe5d6a5,.08).setDepth(3000);
+      this.tweens.add({targets:this.selectionOutline,alpha:{from:.45,to:1},scale:{from:.92,to:1.08},duration:850,yoyo:true,repeat:-1,ease:"Sine.easeInOut"});
+    }
+
+    deleteSelectedObject() {
+      if (!this.selectedWorldObject) return;
+      const objects=this.readPlacedObjects().filter(item=>item.id!==this.selectedWorldObject);
+      if (!this.persistWorldObjects(objects)) return;
+      this.clearObjectSelection();
+      this.loadPlacedObjects();
+      window.dispatchEvent(new CustomEvent("muse:builder-selection",{detail:{selected:false}}));
+      window.dispatchEvent(new CustomEvent("muse:toast",{detail:"OBJECT REMOVED FROM YOUR SHORE"}));
     }
 
     readPlacedObjects() {
