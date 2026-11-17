@@ -53,7 +53,7 @@ MUSE uses Capacitor to package the Vite app as an installable Android applicatio
 5. Open that workflow run, scroll to **Artifacts**, and download `MUSE-Android-APK`.
 6. Extract the ZIP and install `app-debug.apk` on your Android phone.
 
-The workflow runs the automated tests, builds the web app, generates the Android project and creates a debug APK. The artifact is retained by GitHub for 14 days. The current workflow creates a debug-signed APK for personal installation.
+The workflow runs automated tests, builds the web app, generates the Android project and creates an APK. If stable release-signing secrets are configured, it creates a signed release APK; otherwise it creates a debug APK for testing. Artifacts are retained by GitHub for 14 days. See [Android release signing](./docs/ANDROID_SIGNING.md) to configure a stable signing key for in-place updates.
 
 ### Build locally
 
@@ -75,7 +75,7 @@ cd android
 
 The APK will be at `android/app/build/outputs/apk/debug/app-debug.apk`.
 
-**Signing note:** the GitHub workflow currently produces a debug-signed APK for personal testing. A stable private release-signing key is needed for seamless in-place updates across future APK builds; do not publish or commit that private key. Until release signing is configured, Android may require uninstalling an older build before installing a debug APK signed with a different key. Back up MUSE data before reinstalling.
+**Signing note:** keep the release keystore and its passwords private and backed up. Never commit them to this repository. Until release signing is configured and the first release-signed APK is installed, debug builds may require uninstalling an older build before installation. Back up MUSE data before reinstalling.
 
 ## Privacy and data
 
