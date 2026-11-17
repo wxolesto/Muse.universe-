@@ -3,6 +3,7 @@ import { getEntries, saveEntry, deleteEntry, createId } from "./storage.js";
 import { initPixelStudio } from "./pixel-studio.js";
 import { initArchive } from "./archive.js";
 import { exportBackup, importBackup } from "./backup.js";
+import { createShoreAmbience } from "./ambience.js";
 
 const $ = (selector) => document.querySelector(selector);
 const toast = (message) => {
@@ -109,7 +110,22 @@ $("#backup-file").addEventListener("change", async event => {
 settingsDialog.addEventListener("click", event => {
   if (event.target === settingsDialog) settingsDialog.close();
 });
-$("#sound-toggle").addEventListener("click", () => toast("AMBIENT SOUND SYSTEM — IN DEVELOPMENT"));
+const ambience = createShoreAmbience();
+const soundButton = $("#sound-toggle");
+soundButton.setAttribute("aria-pressed","false");
+soundButton.addEventListener("click", async () => {
+  try {
+    const enabled = await ambience.toggle();
+    soundButton.classList.toggle("sound-on",enabled);
+    soundButton.setAttribute("aria-pressed",String(enabled));
+    soundButton.title = enabled ? "Mute shore ambience" : "Enable shore ambience";
+    toast(enabled ? "THE SHORE IS ALIVE WITH SOUND" : "AMBIENT SOUND MUTED");
+  } catch (error) {
+    console.warn("MUSE ambience unavailable:",error);
+    toast("AUDIO COULD NOT START IN THIS BROWSER");
+  }
+});
+$("#ambience-volume").addEventListener("input",event=>ambience.setVolume(event.target.value));
 
 document.querySelectorAll(".touch-pad button").forEach(button => {
   const start = event => { event.preventDefault(); game?.events.emit("touch-move", button.dataset.dir, true); };
