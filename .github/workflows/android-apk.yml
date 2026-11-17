@@ -9,6 +9,11 @@ on:
       - 'capacitor.config.json'
       - 'package.json'
       - 'README.md'
+      - 'index.html'
+      - 'styles.css'
+      - 'src/**'
+      - 'assets/**'
+      - 'public/**'
 
 permissions:
   contents: read
