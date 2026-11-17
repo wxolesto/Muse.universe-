@@ -128,7 +128,7 @@ export function createWorld(parent) {
       const hut = this.add.container(1050, 365);
       const shadow = this.add.ellipse(0, 43, 180, 36, 0x1b2925, 0.35);
       const base = this.add.rectangle(0, 0, 112, 72, 0xb3a17b).setStrokeStyle(3, 0x544c3a);
-      const roof = this.add.triangle(0, -42, -75, 18, 75, 18, 0x4a4036).setStrokeStyle(3, 0x302e29);
+      const roof = this.add.triangle(0, -42, -75, 18, 75, 18, 0, -40, 0x4a4036).setStrokeStyle(3, 0x302e29);
       const door = this.add.rectangle(0, 18, 19, 34, 0x41382d);
       const window = this.add.rectangle(32, -4, 17, 16, 0xd3bd81).setStrokeStyle(3, 0x625a43);
       const glow = this.add.rectangle(32, -4, 10, 9, 0xf2d49a, 0.8);
