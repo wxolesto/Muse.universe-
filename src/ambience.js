@@ -5,6 +5,7 @@ export class ShoreAmbience {
     this.nodes = [];
     this.enabled = false;
     this.volume = 0.32;
+    this.layerGains = null;
   }
 
   async toggle() {
@@ -91,6 +92,7 @@ export class ShoreAmbience {
     this.nodes.push(windLfo, windMotion);
 
     const mix = this.volume;
+    this.layerGains = {ocean,wind,distantAir};
     ocean.gain.setValueAtTime(.72 * mix, this.context.currentTime);
     wind.gain.setValueAtTime(.28 * mix, this.context.currentTime);
     distantAir.gain.setValueAtTime(.045 * mix, this.context.currentTime);
@@ -100,14 +102,11 @@ export class ShoreAmbience {
 
   setVolume(value) {
     this.volume = Math.max(0, Math.min(1, Number(value) || 0));
-    if (!this.context || !this.enabled) return;
+    if (!this.context || !this.enabled || !this.layerGains) return;
     const now = this.context.currentTime;
-    const gains = this.nodes.filter(node => node instanceof GainNode);
-    if (gains.length >= 4) {
-      gains[2].gain.setTargetAtTime(.72 * this.volume, now, .15);
-      gains[3].gain.setTargetAtTime(.28 * this.volume, now, .15);
-      gains[4]?.gain?.setTargetAtTime(.045 * this.volume, now, .15);
-    }
+    this.layerGains.ocean.gain.setTargetAtTime(.72 * this.volume, now, .15);
+    this.layerGains.wind.gain.setTargetAtTime(.28 * this.volume, now, .15);
+    this.layerGains.distantAir.gain.setTargetAtTime(.045 * this.volume, now, .15);
   }
 
   async stop() {
@@ -125,6 +124,7 @@ export class ShoreAmbience {
     });
     this.nodes = [];
     this.master = null;
+    this.layerGains = null;
     await context.suspend();
   }
 }
