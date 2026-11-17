@@ -20,6 +20,7 @@ export function createWorld(parent) {
       this.createBirds();
       this.createAtmosphere();
       this.createWeather();
+      this.createInteractionPrompt();
       this.cameras.main.startFollow(this.player, true, 0.075, 0.075);
       this.cameras.main.setZoom(1.08);
       this.cameras.main.setDeadzone(110, 70);
@@ -601,17 +602,30 @@ export function createWorld(parent) {
       });
     }
 
-    inspectNearby() {
-      const discoveries = [
+    createInteractionPrompt() {
+      this.interactionPrompt=this.add.text(this.scale.width/2,66,"A LANDMARK IS NEARBY",{
+        fontFamily:"monospace",fontSize:"9px",color:"#e8dfc3",
+        backgroundColor:"#172521d9",padding:{x:12,y:8},letterSpacing:1
+      }).setOrigin(.5).setScrollFactor(0).setDepth(2200).setAlpha(0);
+      this.scale.on("resize",size=>this.interactionPrompt?.setPosition(size.width/2,66));
+      this.showingInteractionPrompt=false;
+    }
+
+    getNearbyDiscovery() {
+      const discoveries=[
         {id:"wayfarer",title:"THE OLD WAYFARER",x:1050,y:365,r:145,description:"A small house with a light left on. Someone once lived here."},
         {id:"marker",title:"THE WEATHERED MARKER",x:690,y:455,r:92,description:"Its symbols have almost disappeared beneath the moss."},
         {id:"low-tide",title:"LOW TIDE",x:1380,y:665,r:110,description:"The sea has left tiny shells and glass-smooth stones along the pier."},
         {id:"quiet-grove",title:"THE QUIET GROVE",x:760,y:780,r:95,description:"The leaves move even when the air feels still."}
       ];
-      const nearby=discoveries
+      return discoveries
         .map(item=>({...item,distance:Phaser.Math.Distance.Between(this.player.x,this.player.y,item.x,item.y)}))
         .filter(item=>item.distance<item.r)
-        .sort((a,b)=>a.distance-b.distance)[0];
+        .sort((a,b)=>a.distance-b.distance)[0] || null;
+    }
+
+    inspectNearby() {
+      const nearby=this.getNearbyDiscovery();
       if(nearby){
         window.dispatchEvent(new CustomEvent("muse:discovery",{detail:{id:nearby.id,title:nearby.title,description:nearby.description}}));
       }else{
@@ -650,6 +664,16 @@ export function createWorld(parent) {
       if (this.time.now > (this.nextMapUpdate || 0)) {
         this.nextMapUpdate = this.time.now + 250;
         window.dispatchEvent(new CustomEvent("muse:position", {detail:{x:this.player.x,y:this.player.y}}));
+      }
+      const nearby=this.getNearbyDiscovery();
+      if(Boolean(nearby)!==this.showingInteractionPrompt){
+        this.showingInteractionPrompt=Boolean(nearby);
+        this.tweens.add({targets:this.interactionPrompt,alpha:nearby?1:0,duration:220,ease:"Sine.easeOut"});
+      }
+      if(nearby && this.interactionPrompt.text!==nearby.title+"  ·  INTERACT"){
+        this.interactionPrompt.setText(nearby.title+"  ·  INTERACT");
+      }else if(!nearby && this.interactionPrompt.text!=="A LANDMARK IS NEARBY"){
+        this.interactionPrompt.setText("A LANDMARK IS NEARBY");
       }
       if (Phaser.Input.Keyboard.JustDown(keys.E)) this.inspectNearby();
       this.birds.forEach(({bird,shadow,previousX},i)=>{
