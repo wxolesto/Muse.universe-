@@ -39,8 +39,10 @@ The current CI workflow verifies that the production bundle can be built. It doe
 ### Medium priority — no automated feature tests
 
 - `package.json` currently defines `dev`, `build`, and `preview`, but no `test` or lint script.
-- The GitHub Actions workflow installs dependencies and runs only `npm run build`.
-- Recommendation: add tests for storage, backup validation, and critical pure functions; then add browser-level smoke tests for core flows.
+- The repository has no committed `package-lock.json`, so `npm install` does not guarantee an identical dependency tree on every build.
+- CI initially reported four high-severity findings: `fdir`, `picomatch`, `tinyglobby`, and the Vite dependency chain. The advisory path includes picomatch versions up to 4.0.7; the newly updated advisory for CVE-2026-112366 has no upstream fixed version stated as of this audit. These are build-tool dependencies, not application features. Do not apply the audit's suggested Vite downgrade blindly; review the complete dependency paths and retest before changing versions.
+- The CI workflow now prints dependency-audit details on every run without blocking the production build.
+- Recommendation: add tests for storage, backup validation, and critical pure functions; then browser-level smoke tests for core flows. Add a lockfile and switch CI to `npm ci` once the lockfile is generated and verified.
 
 ### Medium priority — editing and recovery gaps
 
@@ -59,6 +61,7 @@ The current CI workflow verifies that the production bundle can be built. It doe
 
 - Focus-visible styling exists, but there is no reduced-motion preference handling in the stylesheet.
 - Responsive CSS breakpoints exist, but there are no automated mobile layout or touch interaction tests.
+- The latest successful build emits a minified JavaScript bundle of about 1.54 MB (about 361 kB gzip), above Vite's 500 kB chunk warning threshold. Phaser is statically imported by the main entry path, so code splitting should be evaluated.
 - Recommendation: add reduced-motion support, keyboard-flow checks, and mobile browser smoke tests.
 
 ## Phase 00 action order
