@@ -25,7 +25,11 @@ export function createWorld(parent) {
       this.cameras.main.setDeadzone(110, 70);
       this.keys = this.input.keyboard.addKeys("W,A,S,D,UP,DOWN,LEFT,RIGHT,SHIFT,E");
       this.game.events.on("touch-move", this.onTouchMove, this);
-      this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.game.events.off("touch-move", this.onTouchMove, this));
+      this.game.events.on("interact", this.inspectNearby, this);
+      this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+        this.game.events.off("touch-move", this.onTouchMove, this);
+        this.game.events.off("interact", this.inspectNearby, this);
+      });
       this.updateLighting();
       this.time.addEvent({ delay: 60000, loop: true, callback: () => this.updateLighting() });
     }
@@ -434,7 +438,7 @@ export function createWorld(parent) {
       this.player.body.setCollideWorldBounds(true);
       this.player.body.setSize(8, 7).setOffset(4, 16);
       this.player.body.setDrag(900, 900);
-      this.player.body.setMaxVelocity(145, 145);
+      this.player.body.setMaxVelocity(190, 190);
       this.player.setFrame("idle");
     }
 
