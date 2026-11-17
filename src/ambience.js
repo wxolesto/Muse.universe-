@@ -111,23 +111,23 @@ export class ShoreAmbience {
 
   async stop() {
     if (!this.context || !this.enabled) return;
-    const context = this.context;
-    const master = this.master;
-    this.enabled = false;
-    master.gain.setTargetAtTime(0, context.currentTime, .18);
-    await new Promise(resolve => setTimeout(resolve, 650));
-    this.nodes.forEach(node => {
-      try {
-        if (typeof node.stop === "function") node.stop();
+    const context=this.context;
+    const master=this.master;
+    const nodes=this.nodes.slice();
+    this.enabled=false;
+    this.nodes=[];
+    this.master=null;
+    this.layerGains=null;
+    master.gain.setTargetAtTime(0,context.currentTime,.18);
+    await new Promise(resolve=>setTimeout(resolve,650));
+    nodes.forEach(node=>{
+      try{
+        if(typeof node.stop==="function") node.stop();
         node.disconnect();
-      } catch {}
+      }catch{}
     });
-    this.nodes = [];
-    this.master = null;
-    this.layerGains = null;
-    await context.suspend();
-  }
-}
+    if(!this.enabled && context.state==="running") await context.suspend();
+  }}
 
 export function createShoreAmbience() {
   return new ShoreAmbience();
