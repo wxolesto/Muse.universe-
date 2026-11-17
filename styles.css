@@ -97,3 +97,23 @@
 .ambience-volume small{display:block;margin-top:5px;color:#738279;font:7px var(--mono)}
 .ambience-volume input{width:min(210px,52%);accent-color:#a7b697;cursor:pointer}
 .icon-button.sound-on{color:#e3d6a8;border-color:#c8b27c88;background:#28362f;box-shadow:0 0 18px #b9ad7622}
+
+/* Explorer's field notes */
+.field-notes-dialog{width:min(680px,calc(100% - 28px));max-height:min(82vh,760px);overflow:auto;padding:25px;background:#172326;color:var(--ink);border:1px solid #9aa99155;box-shadow:0 25px 90px #000c}
+.field-notes-dialog::backdrop{background:#070d10dd;backdrop-filter:blur(8px)}
+.field-notes-dialog .dialog-head{margin-bottom:10px}
+.field-notes-dialog .dialog-head h2{font:30px var(--serif);font-weight:500}
+.field-notes-progress{display:flex;justify-content:space-between;gap:12px;padding:13px 2px;border-top:1px solid #a6b59b25;border-bottom:1px solid #a6b59b25;color:#9eae9e;font:8px var(--mono);letter-spacing:.12em}
+.field-notes-list{display:grid;gap:12px;padding-top:14px}
+.field-notes-empty{min-height:190px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:25px;color:#a7b1a4}
+.field-notes-empty>span{font-size:28px;color:#c7b68d;margin-bottom:12px}
+.field-notes-empty strong{font:18px var(--serif);color:#e0dfd0;font-weight:500}
+.field-notes-empty p{max-width:340px;font-size:10px;line-height:1.8;color:#89988e}
+.field-note-card{display:grid;grid-template-columns:42px 1fr;gap:13px;padding:17px;background:linear-gradient(120deg,#243331,#1b292b);border:1px solid #a9b69a20}
+.field-note-index{font:11px var(--mono);color:#c5b78d;padding-top:3px}
+.field-note-meta{font:8px var(--mono);letter-spacing:.1em;color:#8f9f91}
+.field-note-content h3{margin:8px 0 9px;color:#e5e1d2;font:19px var(--serif);font-weight:500}
+.field-note-summary{margin:0 0 12px;color:#b8c1b2;font-size:10px;line-height:1.8}
+.field-note-lore{margin:0 0 9px;color:#8f9d91;font-size:10px;line-height:1.9;white-space:normal}
+.game-actions #field-notes-button{border-color:#c2b58a66;color:#e1d5b3}
+@media(max-width:560px){.field-notes-dialog{padding:17px}.field-notes-progress{font-size:7px}.field-note-card{grid-template-columns:26px 1fr;gap:8px;padding:13px}}
