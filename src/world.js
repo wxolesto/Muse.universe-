@@ -216,16 +216,76 @@ export function createWorld(parent) {
     }
 
     drawPath() {
-      const g = this.add.graphics().setDepth(4);
-      const path = new Phaser.Curves.Path(430, 730);
-      path.lineTo(520, 675).lineTo(610, 620).lineTo(700, 590).lineTo(790, 540).lineTo(900, 500).lineTo(1010, 450).lineTo(1110, 410);
-      g.lineStyle(34, 0x6b654f, 0.65);
-      path.draw(g);
-      g.lineStyle(20, 0xb5a47b, 0.78);
-      path.draw(g);
-      g.lineStyle(2, 0xd2bd8e, 0.22);
-      path.draw(g);
+      const g=this.add.graphics().setDepth(4);
+      const paths=[
+        new Phaser.Curves.Path(430,730).lineTo(520,675).lineTo(610,620).lineTo(700,590).lineTo(790,540).lineTo(900,500).lineTo(1010,450).lineTo(1110,410),
+        new Phaser.Curves.Path(790,540).lineTo(760,470).lineTo(790,405).lineTo(850,350),
+        new Phaser.Curves.Path(700,590).lineTo(625,650).lineTo(590,730).lineTo(620,795),
+        new Phaser.Curves.Path(1010,450).lineTo(1110,505).lineTo(1200,565).lineTo(1285,635)
+      ];
+      paths.forEach((path,i)=>{
+        g.lineStyle(i===0?36:23,0x514e3d,.48);path.draw(g);
+        g.lineStyle(i===0?23:13,0xb5a47b,.76);path.draw(g);
+        g.lineStyle(2,0xe0cca0,.24);path.draw(g);
+      });
+      const stones=[[470,704],[510,681],[556,653],[602,628],[650,609],[700,588],[750,565],[804,535],[858,516],[912,493],[965,469],[1018,447],[1068,427],[1110,410],[780,457],[793,414],[832,370],[628,679],[602,727],[608,770],[1095,493],[1160,532],[1215,575],[1260,617]];
+      stones.forEach(([x,y],i)=>{
+        const width=Phaser.Math.Between(8,14),height=Phaser.Math.Between(4,7);
+        this.add.rectangle(x+(i%3-1)*3,y+(i%2)*2,width,height,i%3===0?0xaaa080:0x77745d,.34).setRotation((i%4-1.5)*.09).setDepth(4.2);
+        this.add.rectangle(x,y-1,width*.55,1,0xd4c49a,.18).setDepth(4.3);
+      });
       g.destroy();
+    }
+
+    drawBiomeDetails() {
+      // Fern Hollow: layered canopy shadows, mature trees and dense understory.
+      const grove=this.add.graphics().setDepth(7);
+      [[410,390,180,92],[490,430,210,112],[565,365,145,80],[690,790,190,86]].forEach(([x,y,w,h],i)=>{
+        grove.fillStyle(i%2?0x425d43:0x263d31,.12);grove.fillEllipse(x,y,w,h);
+        grove.fillStyle(0x829064,.07);grove.fillEllipse(x-8,y-7,w*.62,h*.56);
+      });
+      grove.destroy();
+      [[420,365,1.15],[500,410,.94],[555,350,.82],[640,390,.72],[700,770,.86],[735,815,.74],[820,330,.68]].forEach(([x,y,s])=>this.createTree(x,y,s));
+      [[440,455],[475,470],[530,455],[590,420],[650,430],[690,820],[745,845],[790,810],[825,365],[860,390]].forEach(([x,y],i)=>this.createFern(x,y,.72+(i%4)*.13));
+
+      // Wildflower meadow: hand-scattered pixel clusters with varied petal tones.
+      const meadow=this.add.graphics().setDepth(8);
+      const patches=[[930,700,110,48],[1010,745,95,42],[880,760,80,36],[1180,350,72,35],[1240,390,88,42]];
+      const petals=[0xd8c7a0,0xc99fa0,0xe2d7b4,0xb5b6a0,0xd1b17c];
+      patches.forEach(([cx,cy,rx,ry],p)=>{
+        for(let i=0;i<78;i++){
+          const angle=i*2.399963,radius=Math.sqrt((i+.5)/78);
+          const x=Math.round(cx+Math.cos(angle)*rx*radius),y=Math.round(cy+Math.sin(angle)*ry*radius);
+          meadow.fillStyle(i%3?0x456343:0x718253,.78);meadow.fillRect(x,y+2,1,3);
+          meadow.fillStyle(petals[(i+p)%petals.length],.72+(i%3)*.09);meadow.fillRect(x-1,y+(i%4)-1,3,2);
+          meadow.fillStyle(0xe5d5a1,.85);meadow.fillRect(x,y-2,1,1);
+          if(i%5===0){meadow.fillStyle(0xeee0bd,.55);meadow.fillRect(x+3,y+2,2,1);}
+        }
+      });
+      meadow.destroy();
+
+      // Saltstone Cove: layered weathered boulders, pools and reed details.
+      [[330,555,.92],[365,590,.72],[1400,555,1.08],[1350,600,.8],[1430,640,.68],[1260,785,.78]].forEach(([x,y,s])=>this.createRock(x,y,s));
+      [[310,590,.58],[1450,560,.52],[1370,655,.46]].forEach(([x,y,s])=>this.createTidePool(x,y,s));
+      const reeds=this.add.graphics().setDepth(9);
+      [[300,625],[320,640],[1385,690],[1410,705],[1330,720]].forEach(([x,y],i)=>{
+        reeds.fillStyle(0x3d5a43,.85);reeds.fillRect(x,y-8,2,10);
+        reeds.fillStyle(i%2?0x8b9a68:0x6f8157,.9);reeds.fillRect(x-2,y-13,2,5);reeds.fillRect(x+2,y-16,2,6);
+      });
+      reeds.destroy();
+
+      // Pebble seams, tiny mushrooms and lichen flecks.
+      const accents=this.add.graphics().setDepth(10);
+      [[555,485],[575,490],[595,483],[1080,790],[1100,796],[1120,788],[845,825],[865,830]].forEach(([x,y],i)=>{
+        accents.fillStyle(i%2?0x4e5946:0x77755e,.55);accents.fillRect(x,y,3,2);
+        accents.fillStyle(0xb3a889,.35);accents.fillRect(x+1,y-1,2,1);
+      });
+      [[680,455],[705,470],[1115,735],[1140,720]].forEach(([x,y],i)=>{
+        accents.fillStyle(0x6e8060,.9);accents.fillRect(x,y,2,5);
+        accents.fillStyle(i%2?0xd4c6aa:0xb7a4a0,.9);accents.fillRect(x-2,y-2,5,3);
+        accents.fillStyle(0xe5d7bc,.8);accents.fillRect(x-1,y-3,2,1);
+      });
+      accents.destroy();
     }
 
     drawWorldDetails() {
@@ -289,6 +349,7 @@ export function createWorld(parent) {
       pier.add(this.add.rectangle(36, 15, 4, 25, 0x554b3b));
       pier.setDepth(700);
       this.add.text(1435, 735, "LOW TIDE", {fontFamily:"monospace",fontSize:"8px",color:"#c2c7b4",letterSpacing:2}).setOrigin(0.5).setAlpha(0.7);
+      this.drawBiomeDetails();
     }
 
     createTree(x, y, scale = 1) {
