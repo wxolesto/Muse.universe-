@@ -4,6 +4,7 @@ import { initPixelStudio } from "./pixel-studio.js";
 import { initArchive } from "./archive.js";
 import { exportBackup, importBackup } from "./backup.js";
 import { createShoreAmbience } from "./ambience.js";
+import { initInnerWorld } from "./inner-world.js";
 
 const $ = (selector) => document.querySelector(selector);
 const toast = (message) => {
@@ -14,7 +15,7 @@ const toast = (message) => {
   toast.timer = setTimeout(() => node.classList.remove("show"), 2200);
 };
 
-const views = ["world", "journal", "archive", "studio"];
+const views = ["world", "journal", "archive", "inner", "music", "studio"];
 document.querySelectorAll(".rail-item[data-view]").forEach(button => {
   button.addEventListener("click", () => {
     const target = button.dataset.view;
@@ -36,6 +37,7 @@ setInterval(updateClock, 15000);
 
 initPixelStudio();
 initArchive();
+initInnerWorld();
 
 let game;
 try {
