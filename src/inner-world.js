@@ -1,3 +1,4 @@
+import {saveAudioFile,getAudioFile,deleteAudioFile} from "./music-storage.js";
 const MOOD_LABELS={bright:"Bright",calm:"Calm",curious:"Curious",tender:"Tender",restless:"Restless",heavy:"Heavy",hopeful:"Hopeful",uncertain:"Uncertain"};
 const MOOD_SYMBOLS={bright:"☀",calm:"◒",curious:"✧",tender:"❀",restless:"〰",heavy:"☁",hopeful:"✦",uncertain:"◇"};
 const CHECKIN_KEY="muse.inner.checkins.v1",MUSIC_KEY="muse.music.tracks.v1";
@@ -32,15 +33,33 @@ function renderCheckins(){
  renderCalendar();
  list.innerHTML=items.length?items.map(item=>`<article class="mood-entry"><div class="mood-entry-symbol">${MOOD_SYMBOLS[item.mood]||"✧"}</div><div class="mood-entry-main"><div class="mood-entry-meta">${new Date(item.createdAt).toLocaleString()} · ${MOOD_LABELS[item.mood]||"A moment"}</div><p>${escapeHTML(item.note)||'<span class="quiet-note">No words needed.</span>'}</p></div><button type="button" data-delete-checkin="${escapeHTML(item.id)}" aria-label="Delete check-in">×</button></article>`).join(""):'<p class="empty-state">Your first check-in will appear here whenever you\'re ready.</p>';
 }
-function renderMusic(){
+let musicQueue=[],musicIndex=-1,shuffleMusic=false;
+const audioUrls=new Map();
+function playQueueIndex(index){
+ const player=$("#music-player");if(!musicQueue.length)return;
+ musicIndex=(index+musicQueue.length)%musicQueue.length;
+ const item=musicQueue[musicIndex];let source=audioUrls.get(item.id)||item.audioUrl||"";
+ if(!source){window.dispatchEvent(new CustomEvent("muse:toast",{detail:"THIS TRACK HAS NO AUDIO FILE ATTACHED"}));return;}
+ player.src=source;$("#player-title").textContent=item.title;$("#player-artist").textContent=item.artist||"ARTIST UNKNOWN";
+ $("#player-art").innerHTML=item.cover?'<img src="'+escapeHTML(item.cover)+'" alt="">':"♫";
+ player.play().catch(()=>window.dispatchEvent(new CustomEvent("muse:toast",{detail:"TAP PLAY TO START THIS TRACK"})));
+}
+function playNext(){if(!musicQueue.length)return;if(shuffleMusic&&musicQueue.length>1){let next=musicIndex;while(next===musicIndex)next=Math.floor(Math.random()*musicQueue.length);playQueueIndex(next);}else playQueueIndex(musicIndex+1);}
+async function renderMusic(){
  const items=read(MUSIC_KEY),list=$("#music-list");
  $("#music-count").textContent=items.length+" TRACK"+(items.length===1?"":"S");
- list.innerHTML=items.length?items.map(item=>{
+ const cards=await Promise.all(items.map(async item=>{
+  let audioUrl=audioUrls.get(item.id)||"";
+  if(!audioUrl){try{const saved=await getAudioFile(item.id);if(saved?.blob){audioUrl=URL.createObjectURL(saved.blob);audioUrls.set(item.id,audioUrl);}}catch{}}
   let link="";
-  try{const url=new URL(item.link);if(["http:","https:"].includes(url.protocol))link=`<a class="music-listen-link" href="${escapeHTML(url.href)}" target="_blank" rel="noopener noreferrer">OPEN LISTENING LINK ↗</a>`;}catch{}
-  return `<article class="music-track"><div class="track-art">${item.cover?`<img src="${escapeHTML(item.cover)}" alt="" loading="lazy">`:'<span>♫</span><i></i>'}</div><div class="track-main"><div class="track-meta">${escapeHTML(item.artist||"ARTIST UNKNOWN")}${item.album?" · "+escapeHTML(item.album):""}</div><h3>${escapeHTML(item.title)}</h3>${item.mood?`<span class="track-mood">${escapeHTML(item.mood)}</span>`:""}${item.note?`<p>${escapeHTML(item.note)}</p>`:""}<div class="track-actions">${link}<span>ADDED ${new Date(item.createdAt).toLocaleDateString()}</span></div>${item.audioUrl?`<audio class="track-audio" controls preload="none" src="${escapeHTML(item.audioUrl)}"></audio>`:""}</div><button type="button" class="track-delete" data-delete-track="${escapeHTML(item.id)}" aria-label="Remove track">×</button></article>`;
- }).join(""):'<p class="empty-state">The first song is waiting to be added.</p>';
+  try{const url=new URL(item.link);if(["http:","https:"].includes(url.protocol))link='<a class="music-listen-link" href="'+escapeHTML(url.href)+'" target="_blank" rel="noopener noreferrer">OPEN LISTENING LINK ↗</a>';}catch{}
+  const playable=!!audioUrl||!!item.audioUrl;
+  return '<article class="music-track"><div class="track-art">'+(item.cover?'<img src="'+escapeHTML(item.cover)+'" alt="" loading="lazy">':'<span>♫</span><i></i>')+'</div><div class="track-main"><div class="track-meta">'+escapeHTML(item.artist||"ARTIST UNKNOWN")+(item.album?" · "+escapeHTML(item.album):"")+'</div><h3>'+escapeHTML(item.title)+'</h3>'+(item.mood?'<span class="track-mood">'+escapeHTML(item.mood)+'</span>':"")+(item.note?'<p>'+escapeHTML(item.note)+'</p>':"")+'<div class="track-actions">'+(playable?'<button type="button" class="music-play-button" data-play-track="'+escapeHTML(item.id)+'">▶ PLAY</button>':'<span>NO AUDIO FILE ATTACHED</span>')+link+'<span>ADDED '+new Date(item.createdAt).toLocaleDateString()+'</span></div></div><button type="button" class="track-delete" data-delete-track="'+escapeHTML(item.id)+'" aria-label="Remove track">×</button></article>';
+ }));
+ list.innerHTML=cards.length?cards.join(""):'<p class="empty-state">The first song is waiting to be added.</p>';
+ musicQueue=items.filter(item=>audioUrls.has(item.id)||item.audioUrl);
 }
+
 export function initInnerWorld(){
  let selectedMood="";
  const choices=$("#mood-choices");
@@ -71,15 +90,33 @@ export function initInnerWorld(){
   const rawLink=$("#music-link").value.trim();let link="";
   if(rawLink){try{const url=new URL(rawLink);if(!["http:","https:"].includes(url.protocol))throw new Error();link=url.href;}catch{$("#music-link").setCustomValidity("Enter a valid http or https link.");$("#music-link").reportValidity();return;}}
   $("#music-link").setCustomValidity("");
-  const coverFile=$("#music-cover").files?.[0];let cover="";if(coverFile){if(!coverFile.type.startsWith("image/")||coverFile.size>5*1024*1024){$("#music-cover").setCustomValidity("Choose an image smaller than 5 MB.");$("#music-cover").reportValidity();return;}try{cover=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>{const img=new Image();img.onload=()=>{const canvas=document.createElement("canvas"),size=420;canvas.width=size;canvas.height=size;const scale=Math.max(size/img.width,size/img.height),w=img.width*scale,h=img.height*scale;canvas.getContext("2d").drawImage(img,(size-w)/2,(size-h)/2,w,h);resolve(canvas.toDataURL("image/jpeg",.78));};img.onerror=reject;img.src=reader.result;};reader.onerror=reject;reader.readAsDataURL(coverFile);});}catch{return;}}
-  const rawAudio=$("#music-audio").value.trim();let audioUrl="";if(rawAudio){try{const url=new URL(rawAudio);if(!["http:","https:"].includes(url.protocol))throw new Error();audioUrl=url.href;}catch{$("#music-audio").setCustomValidity("Enter a valid direct audio URL.");$("#music-audio").reportValidity();return;}}
-  const items=read(MUSIC_KEY);items.unshift({id:makeId(),title,artist:$("#music-artist").value.trim(),album:$("#music-album").value.trim(),mood:$("#music-mood").value,note:$("#music-note").value.trim(),link,audioUrl,cover,createdAt:Date.now()});
-  try{write(MUSIC_KEY,items);$("#music-form").reset();renderMusic();window.dispatchEvent(new CustomEvent("muse:toast",{detail:"TRACK ADDED TO YOUR MUSIC ROOM"}));}
-  catch{window.dispatchEvent(new CustomEvent("muse:toast",{detail:"STORAGE IS FULL — EXPORT A BACKUP"}));}
+  const coverFile=$("#music-cover").files?.[0];let cover="";
+  if(coverFile){$("#music-cover").setCustomValidity("");if(!coverFile.type.startsWith("image/")||coverFile.size>5*1024*1024){$("#music-cover").setCustomValidity("Choose an image smaller than 5 MB.");$("#music-cover").reportValidity();return;}
+   try{cover=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>{const img=new Image();img.onload=()=>{const canvas=document.createElement("canvas"),size=420;canvas.width=size;canvas.height=size;const scale=Math.max(size/img.width,size/img.height),w=img.width*scale,h=img.height*scale;canvas.getContext("2d").drawImage(img,(size-w)/2,(size-h)/2,w,h);resolve(canvas.toDataURL("image/jpeg",.78));};img.onerror=reject;img.src=reader.result;};reader.onerror=reject;reader.readAsDataURL(coverFile);});}catch{return;}
+  }
+  const audioFile=$("#music-audio-file").files?.[0];
+  if(audioFile&&(!audioFile.type.startsWith("audio/")||audioFile.size>40*1024*1024)){$("#music-audio-file").setCustomValidity("Choose an audio file smaller than 40 MB.");$("#music-audio-file").reportValidity();return;}
+  const id=makeId(),item={id,title,artist:$("#music-artist").value.trim(),album:$("#music-album").value.trim(),mood:$("#music-mood").value,note:$("#music-note").value.trim(),link,cover,hasAudio:!!audioFile,createdAt:Date.now()};
+  try{
+   if(audioFile)await saveAudioFile(id,audioFile);
+   const items=read(MUSIC_KEY);items.unshift(item);write(MUSIC_KEY,items);
+   $("#music-form").reset();await renderMusic();
+   window.dispatchEvent(new CustomEvent("muse:toast",{detail:"TRACK ADDED TO YOUR MUSIC ROOM"}));
+  }catch(error){if(audioFile)try{await deleteAudioFile(id);}catch{}window.dispatchEvent(new CustomEvent("muse:toast",{detail:"TRACK COULD NOT BE SAVED — CHECK DEVICE STORAGE"}));}
  });
- $("#music-list").addEventListener("click",event=>{
+ $("#music-list").addEventListener("click",async event=>{
+  const play=event.target.closest("[data-play-track]");
+  if(play){const id=play.dataset.playTrack;const index=musicQueue.findIndex(item=>item.id===id);if(index>=0)playQueueIndex(index);return;}
   const button=event.target.closest("[data-delete-track]");if(!button)return;
-  write(MUSIC_KEY,read(MUSIC_KEY).filter(item=>item.id!==button.dataset.deleteTrack));renderMusic();
+  const id=button.dataset.deleteTrack;
+  const player=$("#music-player");if(musicQueue[musicIndex]?.id===id){player.pause();player.removeAttribute("src");musicIndex=-1;}
+  const url=audioUrls.get(id);if(url){URL.revokeObjectURL(url);audioUrls.delete(id);}
+  write(MUSIC_KEY,read(MUSIC_KEY).filter(item=>item.id!==id));try{await deleteAudioFile(id);}catch{}
+  await renderMusic();
  });
+ $("#player-prev").addEventListener("click",()=>playQueueIndex(musicIndex-1));
+ $("#player-next").addEventListener("click",playNext);
+ $("#player-shuffle").addEventListener("click",event=>{shuffleMusic=!shuffleMusic;event.currentTarget.setAttribute("aria-pressed",String(shuffleMusic));event.currentTarget.textContent=shuffleMusic?"SHUFFLE ON":"SHUFFLE OFF";});
+ $("#music-player").addEventListener("ended",playNext);
  renderCheckins();renderMusic();
 }
