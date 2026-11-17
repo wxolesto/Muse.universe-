@@ -121,3 +121,33 @@ document.querySelectorAll(".touch-pad button").forEach(button => {
 });
 
 window.addEventListener("muse:toast", event => toast(event.detail));
+
+
+const discoveryKey = "muse.discoveries.v1";
+function readDiscoveries() {
+  try {
+    const value = JSON.parse(localStorage.getItem(discoveryKey) || "[]");
+    return Array.isArray(value) ? value : [];
+  } catch { return []; }
+}
+function updateDiscoveryCount() {
+  const node = $("#discovery-count");
+  if (!node) return;
+  const count = readDiscoveries().length;
+  node.innerHTML = `${String(count).padStart(2,"0")} <i>/ 04</i>`;
+}
+updateDiscoveryCount();
+window.addEventListener("muse:discovery", event => {
+  const item = event.detail;
+  if (!item?.id || !item?.title) return;
+  const discoveries = readDiscoveries();
+  if (discoveries.some(saved => saved.id === item.id)) {
+    toast(item.description || item.title);
+    return;
+  }
+  discoveries.push({id:item.id,title:item.title,discoveredAt:Date.now()});
+  try { localStorage.setItem(discoveryKey, JSON.stringify(discoveries)); }
+  catch { toast("DISCOVERY FOUND — STORAGE IS FULL"); return; }
+  updateDiscoveryCount();
+  toast(`NEW DISCOVERY · ${item.title}`);
+});
