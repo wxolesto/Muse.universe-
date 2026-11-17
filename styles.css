@@ -173,3 +173,21 @@
 .track-actions{display:flex;flex-wrap:wrap;align-items:center;gap:13px;margin-top:10px}.track-actions span{font:7px var(--mono);color:#748278;letter-spacing:.08em}
 .music-listen-link{font:8px var(--mono);letter-spacing:.08em;color:#c0cba8;text-decoration:none}.music-listen-link:hover{text-decoration:underline}
 @media(max-width:650px){.mood-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.inner-checkin,.music-form{padding:15px}.music-fields{grid-template-columns:1fr}.music-wide{grid-column:1}.mood-form-foot,.music-form-foot{align-items:flex-start;flex-direction:column}.mood-form-foot button,.music-form-foot button{width:100%}.music-intro-card{gap:13px;padding:16px}.music-orbit{width:48px;height:48px;font-size:22px}.music-intro-card h2{font-size:20px}}
+
+
+/* Inner World calendar and Music Room playback */
+.mood-calendar-panel{margin:28px 0;padding:20px;background:linear-gradient(145deg,#192729,#141e20);border:1px solid var(--line)}
+.calendar-heading{display:flex;justify-content:space-between;align-items:end;gap:12px;margin-bottom:20px}.calendar-heading h2{font:23px var(--serif);font-weight:500;color:#e1e2d6;margin:0}
+.calendar-controls{display:flex;align-items:center;gap:10px}.calendar-controls span{min-width:115px;text-align:center;font:8px var(--mono);letter-spacing:.08em;color:#c1cbb6}
+.calendar-controls button{width:29px;height:29px;background:#22302f;border:1px solid var(--line);color:#d4ddca;cursor:pointer}
+.mood-calendar-weekdays,.mood-calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.mood-calendar-weekdays{margin-bottom:7px}.mood-calendar-weekdays span{text-align:center;font:7px var(--mono);letter-spacing:.1em;color:#7f8e84;padding:6px 0}
+.calendar-day{min-height:66px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:6px;padding:8px 2px;background:#1e2a2b;border:1px solid #ffffff0c;color:#c8d0c1;cursor:pointer}
+.calendar-day>span{font:11px var(--mono)}.calendar-day small{min-height:12px;font-size:9px;letter-spacing:1px;color:#c0cba7}
+.calendar-day.has-moments{background:#293a34;border-color:#aebc8c35}.calendar-day.today{box-shadow:inset 0 0 0 1px #c9c59a}.calendar-day.selected{border-color:#d4d7b0;background:#34443b}
+.calendar-empty-day{min-height:66px;background:#121b1d55}
+.calendar-legend{display:flex;justify-content:space-between;gap:10px;margin:12px 0 15px;font:7px var(--mono);letter-spacing:.08em;color:#859389}
+.calendar-selected{display:grid;gap:7px}.calendar-moment{display:flex;gap:12px;align-items:flex-start;padding:12px;background:#202d2d;border:1px solid #ffffff0c}.calendar-moment>span{font-size:19px;color:#c4cda9}.calendar-moment small{font:8px var(--mono);color:#8d9c8f}.calendar-moment p{font-size:10px;line-height:1.7;color:#c2cbbd;margin:5px 0 0;white-space:pre-wrap}.calendar-moment i{color:#7d8a80}
+.track-art img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.track-audio{display:block;width:min(100%,360px);height:34px;margin-top:10px;filter:sepia(.12) saturate(.65)}
+@media(max-width:520px){.mood-calendar-panel{padding:12px}.calendar-heading{align-items:flex-start;flex-direction:column}.calendar-day{min-height:52px;padding-top:6px}.calendar-empty-day{min-height:52px}.calendar-day small{font-size:7px}.calendar-legend{font-size:6px}}
