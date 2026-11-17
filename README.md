@@ -9,13 +9,13 @@ A private, expandable digital universe: a richly atmospheric pixel-art world con
 - Keyboard controls (WASD / arrow keys), sprint and mobile touch controls.
 - Original procedural island scenery: shoreline, grass, old path, trees, flowers, wayfarer hut and pier.
 - Mina and Toto appear as ambient flying myna companions.
-- Real-device-clock day/night lighting.
+- Real-device-clock day/night lighting.\n- A live archipelago map with a player-location marker and unexplored island silhouettes.
 - Seasonal weather pass with rain, snow, fog and autumn leaves. Weather is currently a deterministic game-world simulation, not a live weather forecast.
 
 ### Library Mode
 - Private local journal with IndexedDB storage and localStorage fallback.
 - Archive collections for Soundtrack, People, Curiosities and Memories.
-- Interactive Pixel Studio: 16×16, 32×32 and 64×64 canvases, pencil, eraser, fill, eyedropper, palette, undo/redo, PNG export and local gallery.
+- Interactive Pixel Studio: 16×16, 32×32 and 64×64 canvases, pencil, eraser, fill, eyedropper, palette, undo/redo, PNG export and local gallery.\n- Local JSON backup and restore for journal entries, archive collections and pixel artwork.
 - Responsive editorial interface designed to complement the pixel-art world.
 
 ## Run locally
@@ -43,7 +43,7 @@ MUSE currently stores journal entries, archive records and pixel-art gallery dat
 Important limitations:
 - Local browser storage is not encrypted in this prototype.
 - Clearing site data or changing browser/device can remove or strand local content.
-- There is not yet a complete export/restore or encrypted backup system.
+- JSON backup and restore are now available from Settings, but backups are not encrypted.
 - Do not use the current prototype as a secure vault for highly sensitive information.
 
 ## Quality direction
