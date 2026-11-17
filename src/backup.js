@@ -18,7 +18,7 @@ export async function exportBackup() {
   link.href = url;
   link.download = "muse-backup-" + new Date().toISOString().slice(0,10) + ".json";
   link.click();
-  URL.revokeObjectURL(url);
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
   return payload;
 }
 
@@ -28,7 +28,7 @@ export async function importBackup(file) {
   if (payload?.format !== "muse-backup" || payload?.version !== 1) {
     throw new Error("This file is not a supported MUSE backup.");
   }
-  if (!Array.isArray(payload.journal) || typeof payload.archive !== "object" || !Array.isArray(payload.pixelGallery)) {
+  if (!Array.isArray(payload.journal) || !payload.archive || typeof payload.archive !== "object" || Array.isArray(payload.archive) || !Array.isArray(payload.pixelGallery)) {
     throw new Error("The backup file is incomplete or invalid.");
   }
   for (const entry of payload.journal) {
