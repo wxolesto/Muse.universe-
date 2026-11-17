@@ -31,6 +31,7 @@ export function createWorld(parent) {
       this.game.events.on("builder:cancel", this.cancelBuilding, this);
       this.game.events.on("builder:edit", this.startEditing, this);
       this.game.events.on("builder:delete", this.deleteSelectedObject, this);
+      this.game.events.on("builder:transform", this.transformSelectedObject, this);
       this.loadPlacedObjects();
       this.input.on("pointerdown", this.handleBuildPointer, this);
       this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
@@ -40,6 +41,7 @@ export function createWorld(parent) {
         this.game.events.off("builder:cancel", this.cancelBuilding, this);
         this.game.events.off("builder:edit", this.startEditing, this);
         this.game.events.off("builder:delete", this.deleteSelectedObject, this);
+        this.game.events.off("builder:transform", this.transformSelectedObject, this);
         this.input.off("pointerdown", this.handleBuildPointer, this);
       });
       this.updateLighting();
@@ -713,6 +715,21 @@ export function createWorld(parent) {
       window.dispatchEvent(new CustomEvent("muse:toast",{detail:"OBJECT REMOVED FROM YOUR SHORE"}));
     }
 
+    transformSelectedObject(change = {}) {
+      if (!this.selectedWorldObject) return;
+      const objects=this.readPlacedObjects();
+      const selected=objects.find(item=>item.id===this.selectedWorldObject);
+      if (!selected) return;
+      const rotationDelta=Number(change.rotationDelta)||0;
+      const scaleDelta=Number(change.scaleDelta)||0;
+      selected.rotation=((Number(selected.rotation)||0)+rotationDelta+360)%360;
+      selected.scale=Phaser.Math.Clamp((Number(selected.scale)||1)+scaleDelta,.55,1.8);
+      if (!this.persistWorldObjects(objects)) return;
+      this.loadPlacedObjects();
+      this.drawSelectionOutline(selected);
+      window.dispatchEvent(new CustomEvent("muse:toast",{detail:"OBJECT TRANSFORM UPDATED"}));
+    }
+
     readPlacedObjects() {
       try {
         const value=JSON.parse(localStorage.getItem("muse.world.objects.v1")||"[]");
@@ -728,42 +745,40 @@ export function createWorld(parent) {
 
     drawPlacedObject(item) {
       const {x,y,type}=item;
-      const g=this.add.graphics().setDepth(y+2);
+      const object=this.add.container(x,y).setDepth(y+2);
+      const g=this.add.graphics();
+      object.add(g);
       this.placedObjects ||= [];
-      this.placedObjects.push(g);
+      this.placedObjects.push(object);
       if(type==="tree"){
-        g.fillStyle(0x263b30,.34);g.fillEllipse(x,y+12,40,13);
-        g.fillStyle(0x594b39,1);g.fillRect(x-3,y-13,6,22);
-        g.fillStyle(0x344b39,1);g.fillRect(x-15,y-31,30,20);
-        g.fillStyle(0x506b48,1);g.fillRect(x-19,y-27,38,13);
-        g.fillStyle(0x819066,1);g.fillRect(x-10,y-35,17,8);
-        g.fillStyle(0xa2a477,.8);g.fillRect(x-7,y-32,5,3);
-      } else if(type==="lantern"){
-        g.fillStyle(0x26352d,.35);g.fillEllipse(x,y+9,19,7);
-        g.fillStyle(0x4b4030,1);g.fillRect(x-2,y-17,4,25);
-        g.fillStyle(0x756447,1);g.fillRect(x-6,y-23,12,9);
-        g.fillStyle(0xe7c98c,.9);g.fillRect(x-3,y-21,6,5);
-        g.fillStyle(0xe9c98b,.12);g.fillCircle(x,y-18,17);
-      } else if(type==="flowers"){
-        g.fillStyle(0x36513d,.8);g.fillRect(x-1,y-9,2,11);g.fillRect(x+5,y-6,2,8);
-        [[x-5,y-11,0xd6b9a0],[x+1,y-15,0xe0cf9a],[x+8,y-9,0xb7a6c6],[x+1,y-6,0xe5d9c1]].forEach(([fx,fy,color])=>{g.fillStyle(color,1);g.fillRect(fx,fy,4,4);});
-      } else {
-        g.fillStyle(0x283b34,.35);g.fillEllipse(x,y+5,25,9);
-        g.fillStyle(0x777b69,1);g.fillRect(x-9,y-7,18,10);
-        g.fillStyle(0xa4a18a,1);g.fillRect(x-6,y-10,11,4);
-        g.fillStyle(0x505f50,1);g.fillRect(x-7,y+3,14,2);
-      }
-      g.setData("museObjectId",item.id);
-      if(type==="lantern"){
-        const glow=this.add.circle(x,y-18,23,0xe8c88b,.06).setDepth(y+1);
-        this.tweens.add({targets:glow,alpha:{from:.03,to:.14},scale:{from:.85,to:1.18},duration:1800,yoyo:true,repeat:-1,ease:"Sine.easeInOut"});
-      }
-      if(type==="tree") {
-        const sway=this.add.rectangle(x,y-25,1,1,0xffffff,0).setDepth(y+3);
+        g.fillStyle(0x263b30,.34);g.fillEllipse(0,12,40,13);
+        g.fillStyle(0x594b39,1);g.fillRect(-3,-13,6,22);
+        g.fillStyle(0x344b39,1);g.fillRect(-15,-31,30,20);
+        g.fillStyle(0x506b48,1);g.fillRect(-19,-27,38,13);
+        g.fillStyle(0x819066,1);g.fillRect(-10,-35,17,8);
+        g.fillStyle(0xa2a477,.8);g.fillRect(-7,-32,5,3);
         this.tweens.add({targets:g,angle:{from:-1,to:1},duration:2600,yoyo:true,repeat:-1,ease:"Sine.easeInOut"});
-        sway.destroy();
+      } else if(type==="lantern"){
+        g.fillStyle(0x26352d,.35);g.fillEllipse(0,9,19,7);
+        g.fillStyle(0x4b4030,1);g.fillRect(-2,-17,4,25);
+        g.fillStyle(0x756447,1);g.fillRect(-6,-23,12,9);
+        g.fillStyle(0xe7c98c,.9);g.fillRect(-3,-21,6,5);
+        const glow=this.add.circle(0,-18,23,0xe8c88b,.08);
+        object.add(glow);
+        this.tweens.add({targets:glow,alpha:{from:.03,to:.14},scale:{from:.85,to:1.18},duration:1800,yoyo:true,repeat:-1,ease:"Sine.easeInOut"});
+      } else if(type==="flowers"){
+        g.fillStyle(0x36513d,.8);g.fillRect(-1,-9,2,11);g.fillRect(5,-6,2,8);
+        [[-5,-11,0xd6b9a0],[1,-15,0xe0cf9a],[8,-9,0xb7a6c6],[1,-6,0xe5d9c1]].forEach(([fx,fy,color])=>{g.fillStyle(color,1);g.fillRect(fx,fy,4,4);});
+      } else {
+        g.fillStyle(0x283b34,.35);g.fillEllipse(0,5,25,9);
+        g.fillStyle(0x777b69,1);g.fillRect(-9,-7,18,10);
+        g.fillStyle(0xa4a18a,1);g.fillRect(-6,-10,11,4);
+        g.fillStyle(0x505f50,1);g.fillRect(-7,3,14,2);
       }
-      return g;
+      object.setRotation(Phaser.Math.DegToRad(Phaser.Math.Wrap(Number(item.rotation)||0,0,360)));
+      object.setScale(Phaser.Math.Clamp(Number(item.scale)||1,.55,1.8));
+      object.setData("museObjectId",item.id);
+      return object;
     }
 
     getNearbyDiscovery() {
