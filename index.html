@@ -61,11 +61,16 @@
       <section class="content-view hidden" id="archive-view">
         <div class="section-intro"><p class="eyebrow">FRAGMENTS OF YOUR UNIVERSE</p><h1>The <em>Archive.</em></h1><p>A little space for everything that matters.</p></div>
         <div class="archive-grid">
-          <article class="archive-card"><span class="archive-symbol">♫</span><small>COLLECTION 01</small><h2>Soundtrack</h2><p>Songs, albums and the moments they hold.</p><span class="card-foot">COMING INTO FOCUS ↗</span></article>
-          <article class="archive-card"><span class="archive-symbol">✧</span><small>COLLECTION 02</small><h2>People</h2><p>The stories, details and memories connected to people.</p><span class="card-foot">COMING INTO FOCUS ↗</span></article>
-          <article class="archive-card"><span class="archive-symbol">⌁</span><small>COLLECTION 03</small><h2>Curiosities</h2><p>Questions, discoveries and things worth keeping.</p><span class="card-foot">COMING INTO FOCUS ↗</span></article>
-          <article class="archive-card"><span class="archive-symbol">◌</span><small>COLLECTION 04</small><h2>Memories</h2><p>Small moments that deserve a place to live.</p><span class="card-foot">COMING INTO FOCUS ↗</span></article>
+          <article class="archive-card" data-collection="soundtrack" tabindex="0" role="button"><span class="archive-symbol">♫</span><small>COLLECTION 01</small><h2>Soundtrack</h2><p>Songs, albums and the moments they hold.</p><span class="card-foot">OPEN COLLECTION ↗</span></article>
+          <article class="archive-card" data-collection="people" tabindex="0" role="button"><span class="archive-symbol">✧</span><small>COLLECTION 02</small><h2>People</h2><p>The stories, details and memories connected to people.</p><span class="card-foot">OPEN COLLECTION ↗</span></article>
+          <article class="archive-card" data-collection="curiosities" tabindex="0" role="button"><span class="archive-symbol">⌁</span><small>COLLECTION 03</small><h2>Curiosities</h2><p>Questions, discoveries and things worth keeping.</p><span class="card-foot">OPEN COLLECTION ↗</span></article>
+          <article class="archive-card" data-collection="memories" tabindex="0" role="button"><span class="archive-symbol">◌</span><small>COLLECTION 04</small><h2>Memories</h2><p>Small moments that deserve a place to live.</p><span class="card-foot">OPEN COLLECTION ↗</span></article>
         </div>
+        <section class="collection-panel" id="collection-panel">
+          <div class="collection-panel-head"><div><p class="eyebrow">YOUR PERSONAL COLLECTION</p><h2 id="collection-title">Choose a collection.</h2></div><span id="collection-count">0 ITEMS</span></div>
+          <form id="collection-form" class="collection-form"><input id="collection-entry-title" maxlength="100" placeholder="Title…" required><textarea id="collection-entry-note" rows="3" placeholder="Add a note, a memory, a detail worth keeping…"></textarea><button class="primary-button" type="submit">ADD TO COLLECTION ↗</button></form>
+          <div id="collection-items" class="collection-items"><p>Select one of the collections above to begin.</p></div>
+        </section>
       </section>
 
       <section class="content-view hidden" id="studio-view">
