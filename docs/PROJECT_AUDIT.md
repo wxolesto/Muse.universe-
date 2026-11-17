@@ -40,7 +40,9 @@ The current CI workflow verifies that the production bundle can be built. It doe
 
 - `package.json` currently defines `dev`, `build`, and `preview`, but no `test` or lint script.
 - The repository has no committed `package-lock.json`, so `npm install` does not guarantee an identical dependency tree on every build.
-- CI initially reported four high-severity findings: `fdir`, `picomatch`, `tinyglobby`, and the Vite dependency chain. The advisory path includes picomatch versions up to 4.0.7; the newly updated advisory for CVE-2026-112366 has no upstream fixed version stated as of this audit. These are build-tool dependencies, not application features. Do not apply the audit's suggested Vite downgrade blindly; review the complete dependency paths and retest before changing versions.
+- CI reports four high-severity package entries: `fdir`, `picomatch`, `tinyglobby`, and `vite`. They share one underlying advisory path: picomatch ReDoS (GHSA-fc5q-39xc-vjpf / CVE-2026-112366), affecting picomatch versions through 4.0.7. The other three entries are dependency-chain effects, not three additional independent root vulnerabilities.
+- At audit time, the advisory lists no upstream fixed picomatch version. The affected packages are in the Vite build-tool dependency tree; Vite is a dev dependency, not a browser runtime feature. The current build still succeeds, but the warning should remain tracked until a patched upstream release is available.
+- npm's suggested Vite remediation points to 6.2.7, an older release line. Do not apply that downgrade blindly; it is not a safe substitute for a patched transitive dependency.
 - The CI workflow now prints dependency-audit details on every run without blocking the production build.
 - Recommendation: add tests for storage, backup validation, and critical pure functions; then browser-level smoke tests for core flows. Add a lockfile and switch CI to `npm ci` once the lockfile is generated and verified.
 
