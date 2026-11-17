@@ -1,6 +1,7 @@
 import { createWorld } from "./world.js";
 import { getEntries, saveEntry, deleteEntry, createId } from "./storage.js";
 import { initPixelStudio } from "./pixel-studio.js";
+import { initArchive } from "./archive.js";
 
 const $ = (selector) => document.querySelector(selector);
 const toast = (message) => {
@@ -32,6 +33,7 @@ updateClock();
 setInterval(updateClock, 15000);
 
 initPixelStudio();
+initArchive();
 
 let game;
 try {
