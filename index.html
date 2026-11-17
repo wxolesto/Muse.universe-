@@ -43,7 +43,7 @@
           <div class="game-location"><span class="location-cross">✳</span><span><strong>THE FIRST SHORE</strong><small>A quiet beginning</small></span></div>
           <div class="game-hint"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><span>TO EXPLORE</span><i></i><span>OR USE ARROW KEYS</span><i></i><kbd>E</kbd><span>TO INTERACT</span></div>
           <div class="touch-pad" aria-label="Movement controls"><button data-dir="up">↑</button><div><button data-dir="left">←</button><button data-dir="down">↓</button><button data-dir="right">→</button></div></div>
-          <div class="game-actions"><button id="map-button">◎ <span>WORLD MAP</span></button><button id="inspect-button">⌕ <span>INTERACT</span></button></div>
+          <div class="game-actions"><button id="map-button">◎ <span>WORLD MAP</span></button><button id="field-notes-button">✧ <span>FIELD NOTES</span></button><button id="inspect-button">⌕ <span>INTERACT</span></button></div>
         </div>
         <div class="below-world">
           <div class="world-note"><span class="note-icon">✦</span><div><strong>A place to begin.</strong><p>This is your first shore. The rest of the world is waiting to be imagined.</p></div></div>
@@ -112,6 +112,12 @@
       <div class="map-legend"><span><i class="legend-dot discovered"></i> DISCOVERED</span><span><i class="legend-dot player-dot"></i> YOU ARE HERE</span><span><i class="legend-dot locked"></i> UNEXPLORED</span></div>
     </div>
     <p class="map-footnote">The world is larger than this map. New shores will appear as your universe grows.</p>
+  </dialog>
+  <dialog class="field-notes-dialog" id="field-notes-dialog">
+    <div class="dialog-head"><div><p class="eyebrow">MUSE / EXPLORER'S LOG</p><h2>Field Notes.</h2></div><button id="field-notes-close" aria-label="Close field notes">×</button></div>
+    <p class="dialog-copy">A record of the places you've found, and the small stories the island has kept.</p>
+    <div class="field-notes-progress"><span id="field-notes-progress">0 OF 4 LANDMARKS FOUND</span><span>THE FIRST SHORE</span></div>
+    <div class="field-notes-list" id="field-notes-list"><div class="field-notes-empty"><span>✧</span><strong>Nothing in the log. Yet.</strong><p>Wander the island and look for places that seem to hold a story. Press E or use INTERACT when you find one.</p></div></div>
   </dialog>
   <dialog class="settings-dialog" id="settings-dialog">
     <div class="dialog-head"><div><p class="eyebrow">MUSE / WORLD SETTINGS</p><h2>Your universe, protected.</h2></div><button id="settings-close" aria-label="Close settings">×</button></div>
