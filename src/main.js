@@ -87,7 +87,7 @@ window.addEventListener("muse:position", event => {
   marker.setAttribute("cx", 122 + ((x - 180) / 1355) * 498);
   marker.setAttribute("cy", 95 + ((y - 185) / 715) * 235);
 });
-$("#inspect-button").addEventListener("click", () => toast("YOU ARE AT THE FIRST SHORE"));
+$("#inspect-button").addEventListener("click", () => game?.events.emit("interact"));
 const settingsDialog = $("#settings-dialog");
 $("#settings-button").addEventListener("click", () => settingsDialog.showModal());
 $("#settings-close").addEventListener("click", () => settingsDialog.close());
