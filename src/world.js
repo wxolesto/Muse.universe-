@@ -347,7 +347,8 @@ export function createWorld(parent) {
         vx = 0;
         vy = 0;
       }
-      this.player.body.setVelocity(vx * speed, vy * speed);\n      this.player.setDepth(this.player.y);
+      this.player.body.setVelocity(vx * speed, vy * speed);
+      this.player.setDepth(this.player.y);
       if (Phaser.Input.Keyboard.JustDown(keys.E)) this.inspectNearby();
       if (vx < 0) this.playerVisual.setScale(-1, 1);
       else if (vx > 0) this.playerVisual.setScale(1, 1);
