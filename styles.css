@@ -132,3 +132,44 @@
 .builder-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;padding-top:14px;border-top:1px solid #ffffff16}
 .builder-footer>span{font:8px var(--mono);letter-spacing:.08em;color:#8f9c90}
 @media(max-width:520px){.builder-dialog{padding:17px}.builder-tools{gap:7px}.builder-tool{min-height:112px;padding:10px}.builder-footer{align-items:flex-start;flex-direction:column}.game-actions{max-width:100%}.game-actions button{font-size:7px;padding:7px 8px}}
+
+
+/* Inner World — gentle private mood journal */
+.inner-checkin,.music-form{background:linear-gradient(145deg,#1b2929,#151e21);border:1px solid var(--line);padding:24px;margin:22px 0;box-shadow:0 18px 50px #080d0e44}
+.inner-checkin-head,.inner-history-head,.music-library-head,.music-form-heading{display:flex;justify-content:space-between;align-items:end;gap:12px}
+.inner-checkin-head h2,.inner-history-head h2,.music-form-heading h2,.music-library-head h2{font:25px var(--serif);font-weight:500;color:#e1e2d6;margin:0}
+.private-stamp,.inner-history-head>span,.music-form-heading>span,.music-library-head>span{font:8px var(--mono);letter-spacing:.12em;color:#8e9c8e}
+.mood-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:22px 0}
+.mood-choice{min-height:104px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:5px;padding:13px;background:#202d2d;border:1px solid #ffffff12;color:#dce0d2;text-align:left;cursor:pointer;transition:.2s}
+.mood-choice>span{font-size:19px;color:#b8c6a2}.mood-choice strong{font:13px var(--serif);font-weight:500}.mood-choice small{font:8px var(--mono);color:#87958a}
+.mood-choice:hover,.mood-choice.selected{border-color:#a8b99a;background:#2a3934;transform:translateY(-2px)}
+.mood-form label,.music-fields label{display:flex;flex-direction:column;gap:8px;font:8px var(--mono);letter-spacing:.12em;color:#aab5a8}
+.mood-form label span,.field-optional{font-size:7px;color:#75847a}
+.mood-form textarea,.music-fields input,.music-fields textarea,.music-fields select{width:100%;background:#111b1d;border:1px solid var(--line);padding:12px;color:#e1e3d8;font:11px var(--sans);outline:none;min-width:0}
+.mood-form textarea,.music-fields textarea{resize:vertical;line-height:1.7}.mood-form textarea:focus,.music-fields input:focus,.music-fields textarea:focus,.music-fields select:focus{border-color:#91a58a}
+.mood-form-foot,.music-form-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:13px}
+.mood-form-foot>span,.music-form-foot>span{font:7px var(--mono);letter-spacing:.1em;color:#819087}
+.inner-history-head,.music-library-head{margin:29px 0 13px}
+.mood-history,.music-list{display:grid;gap:9px}
+.mood-entry{display:flex;gap:14px;align-items:flex-start;padding:16px;background:#182326;border:1px solid var(--line)}
+.mood-entry-symbol{width:38px;height:38px;display:grid;place-items:center;background:#293833;color:#c3cda9;font-size:19px;flex:none}
+.mood-entry-main{flex:1;min-width:0}.mood-entry-meta,.track-meta{font:8px var(--mono);letter-spacing:.08em;color:#8e9c8e}
+.mood-entry-main p{font-size:11px;line-height:1.8;color:#c0c8bc;white-space:pre-wrap;margin:8px 0 0}.quiet-note{color:#7d8a80;font-style:italic}
+.mood-entry>button,.track-delete{width:28px;height:28px;flex:none;border:1px solid var(--line);background:transparent;color:#a6b0a4;cursor:pointer}
+.empty-state{font-size:11px;line-height:1.8;color:#7f8c82;padding:18px;background:#172124;border:1px dashed #ffffff19}
+.music-intro-card{display:flex;align-items:center;gap:20px;padding:23px;background:radial-gradient(ellipse at 12% 50%,#3b4b3b,#1a292a 68%);border:1px solid var(--line)}
+.music-orbit{width:65px;height:65px;display:grid;place-items:center;border:1px solid #c1cba044;border-radius:50%;font-size:29px;color:#d1d7b6;box-shadow:0 0 0 8px #c1cba00a,0 0 35px #c1cba018;flex:none}
+.music-intro-card h2{font:24px var(--serif);font-weight:500;color:#e3e2d6;margin:0 0 5px}.music-intro-card p:last-child{font-size:10px;line-height:1.8;color:#a1ada1;margin:0}
+.music-form{margin-top:15px}.music-form-heading{margin-bottom:18px}.music-form-heading h2{font-size:23px}
+.music-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.music-fields label{gap:7px}.music-fields input,.music-fields select{height:40px}.music-fields select{color-scheme:dark}.music-wide{grid-column:1/-1}
+.music-form-foot{padding-top:15px;border-top:1px solid var(--line)}
+.music-track{display:flex;align-items:flex-start;gap:15px;padding:16px;background:#182326;border:1px solid var(--line)}
+.track-art{width:58px;height:58px;display:grid;place-items:center;position:relative;flex:none;background:linear-gradient(145deg,#59644e,#253d3c);color:#e0dfbd;font-size:24px;overflow:hidden}
+.track-art:before,.track-art:after{content:"";position:absolute;border:1px solid #e3e4c044;border-radius:50%;width:38px;height:38px}.track-art:after{width:19px;height:19px}.track-art i{position:absolute;width:5px;height:5px;border-radius:50%;background:#e2dfbd;z-index:1}
+.track-main{flex:1;min-width:0}.track-main h3{font:18px var(--serif);font-weight:500;color:#e2e2d6;margin:4px 0 7px;overflow-wrap:anywhere}
+.track-mood{display:inline-block;padding:4px 7px;background:#2b3a34;color:#bfc9aa;font:7px var(--mono);letter-spacing:.08em}
+.track-main p{font-size:10px;line-height:1.7;color:#a3ada2;white-space:pre-wrap;margin:9px 0}
+.track-actions{display:flex;flex-wrap:wrap;align-items:center;gap:13px;margin-top:10px}.track-actions span{font:7px var(--mono);color:#748278;letter-spacing:.08em}
+.music-listen-link{font:8px var(--mono);letter-spacing:.08em;color:#c0cba8;text-decoration:none}.music-listen-link:hover{text-decoration:underline}
+@media(max-width:650px){.mood-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.inner-checkin,.music-form{padding:15px}.music-fields{grid-template-columns:1fr}.music-wide{grid-column:1}.mood-form-foot,.music-form-foot{align-items:flex-start;flex-direction:column}.mood-form-foot button,.music-form-foot button{width:100%}.music-intro-card{gap:13px;padding:16px}.music-orbit{width:48px;height:48px;font-size:22px}.music-intro-card h2{font-size:20px}}
