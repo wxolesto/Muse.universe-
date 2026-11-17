@@ -87,8 +87,11 @@ export function createWorld(parent) {
       g.lineStyle(3, 0x354b40, 0.85);
       g.strokePoints(points, true);
       g.destroy();
+      this.applyGroundTexture(points);
+      this.drawCoast(points);
+      this.createCoastGlints(points);
 
-      const grass = this.add.graphics();
+      const grass = this.add.graphics().setDepth(3);
       for (let i = 0; i < 900; i++) {
         const x = 280 + ((i * 97) % 1110);
         const y = 270 + ((i * 61) % 580);
@@ -102,8 +105,100 @@ export function createWorld(parent) {
       this.drawPath();
     }
 
+    applyGroundTexture(points) {
+      if (!this.textures.exists("muse-ground")) {
+        const texture = this.textures.createCanvas("muse-ground", 128, 128);
+        const ctx = texture.getContext();
+        ctx.imageSmoothingEnabled = false;
+        ctx.fillStyle = "#77815d";
+        ctx.fillRect(0, 0, 128, 128);
+        let seed = 918273;
+        const random = () => {
+          seed = (seed * 1664525 + 1013904223) >>> 0;
+          return seed / 4294967296;
+        };
+        const soil = ["#697650","#6f7c55","#849064","#90936a","#596f51","#a19a70"];
+        for (let i = 0; i < 1450; i++) {
+          const x = Math.floor(random() * 128);
+          const y = Math.floor(random() * 128);
+          const size = random() > .88 ? 3 : random() > .56 ? 2 : 1;
+          ctx.globalAlpha = .2 + random() * .42;
+          ctx.fillStyle = soil[Math.floor(random() * soil.length)];
+          ctx.fillRect(x, y, size, size);
+        }
+        // Small clusters of grass create a hand-laid pixel texture.
+        for (let i = 0; i < 115; i++) {
+          const x = Math.floor(random() * 126);
+          const y = Math.floor(random() * 126);
+          ctx.globalAlpha = .72;
+          ctx.fillStyle = random() > .5 ? "#435e45" : "#b0a477";
+          ctx.fillRect(x, y, 1, 3);
+          ctx.fillRect(x + 1, y - 1, 1, 2);
+          if (random() > .6) ctx.fillRect(x - 1, y + 1, 1, 2);
+        }
+        // Weathered earth and tiny stones.
+        for (let i = 0; i < 42; i++) {
+          const x = Math.floor(random() * 124);
+          const y = Math.floor(random() * 124);
+          ctx.globalAlpha = .58;
+          ctx.fillStyle = random() > .5 ? "#b2a17a" : "#465a49";
+          ctx.fillRect(x, y, 3, 2);
+          ctx.fillRect(x + 1, y - 1, 2, 1);
+        }
+        ctx.globalAlpha = 1;
+        texture.refresh();
+      }
+      const maskSource = this.make.graphics({x:0,y:0,add:false});
+      maskSource.fillStyle(0xffffff, 1);
+      maskSource.fillPoints(points, true);
+      const mask = maskSource.createGeometryMask();
+      this.groundMaskSource = maskSource;
+      this.groundTile = this.add.tileSprite(900, 550, WORLD_W, WORLD_H, "muse-ground")
+        .setOrigin(.5).setDepth(1).setMask(mask);
+    }
+
+    drawCoast(points) {
+      const coast = this.add.graphics().setDepth(5);
+      coast.lineStyle(48, 0xb29b70, .92);
+      coast.strokePoints(points, true);
+      coast.lineStyle(30, 0x8f8b62, .96);
+      coast.strokePoints(points, true);
+      coast.lineStyle(5, 0xd1c18d, .5);
+      coast.strokePoints(points, true);
+      coast.lineStyle(3, 0x293f3b, .8);
+      coast.strokePoints(points, true);
+      coast.destroy();
+    }
+
+    createCoastGlints(points) {
+      let index = 0;
+      for (let edge = 0; edge < points.length; edge++) {
+        const a = points[edge];
+        const b = points[(edge + 1) % points.length];
+        const length = Phaser.Math.Distance.Between(a.x, a.y, b.x, b.y);
+        const steps = Math.max(1, Math.floor(length / 45));
+        for (let step = 0; step < steps; step++) {
+          if (index++ % 2) continue;
+          const t = step / steps;
+          const x = Phaser.Math.Linear(a.x, b.x, t);
+          const y = Phaser.Math.Linear(a.y, b.y, t);
+          const angle = Math.atan2(y - 550, x - 850);
+          const glint = this.add.rectangle(
+            x + Math.cos(angle) * 29,
+            y + Math.sin(angle) * 29,
+            Phaser.Math.Between(5, 12), 2, 0xd4d6b5, .22
+          ).setRotation(angle).setDepth(6);
+          this.tweens.add({
+            targets: glint, alpha: {from:.08,to:.52}, scaleX:{from:.65,to:1.4},
+            duration: Phaser.Math.Between(1700,3200), yoyo:true, repeat:-1,
+            delay: Phaser.Math.Between(0,1800), ease:"Sine.easeInOut"
+          });
+        }
+      }
+    }
+
     drawPath() {
-      const g = this.add.graphics();
+      const g = this.add.graphics().setDepth(4);
       const path = new Phaser.Curves.Path(430, 730);
       path.lineTo(520, 675).lineTo(610, 620).lineTo(700, 590).lineTo(790, 540).lineTo(900, 500).lineTo(1010, 450).lineTo(1110, 410);
       g.lineStyle(34, 0x6b654f, 0.65);
@@ -143,6 +238,19 @@ export function createWorld(parent) {
       this.createTree(390, 620, 0.8);
       this.createTree(1370, 430, 0.9);
       this.createTree(900, 300, 0.72);
+      this.createTree(590, 520, 0.72);
+      this.createTree(1120, 760, 0.94);
+
+      // Ferns, boulders and driftwood make the shore feel less arranged.
+      const fernSpots = [[520,470],[635,360],[850,330],[1215,470],[1310,610],[1080,745],[690,820],[430,700],[980,690],[570,590],[1260,760],[810,420]];
+      fernSpots.forEach(([x,y],i)=>this.createFern(x,y,.72+(i%4)*.12));
+      const rockSpots = [[350,510],[430,460],[650,285],[735,345],[930,330],[1160,520],[1320,600],[1240,750],[920,820],[560,780],[330,680],[1040,760]];
+      rockSpots.forEach(([x,y],i)=>this.createRock(x,y,.72+(i%3)*.16));
+      this.createDriftwood(1320, 790, -.24);
+      this.createDriftwood(510, 835, .18);
+      this.createTidePool(290, 570, .8);
+      this.createTidePool(1460, 510, .68);
+      this.createAncientMarker(690,455);
 
       for (let i = 0; i < 34; i++) {
         const x = 340 + (i * 83) % 1060;
@@ -208,6 +316,68 @@ export function createWorld(parent) {
       tree.add(canopy);
       this.tweens.add({targets:canopy,angle:{from:-1.2,to:1.2},duration:2400 + (x%5)*180,yoyo:true,repeat:-1,ease:"Sine.easeInOut"});
       return tree;
+    }
+
+    createFern(x,y,scale=1) {
+      const fern = this.add.container(x,y).setDepth(y).setScale(scale);
+      fern.add(this.add.ellipse(0,3,28,8,0x273c30,.28));
+      const colors=[0x385b42,0x52734b,0x74865a];
+      for(let i=0;i<5;i++){
+        const side=i%2?1:-1;
+        const stem=this.add.rectangle(side*(3+i*2),-5-i*1.4,2,18-i,0x405e42).setRotation(side*(.28+i*.12));
+        fern.add(stem);
+        for(let j=0;j<3;j++){
+          const leaf=this.add.rectangle(side*(7+i*2+j*2),-9-i*1.3+j*2,7,3,colors[(i+j)%3]).setRotation(side*(.5+j*.18));
+          fern.add(leaf);
+        }
+      }
+      this.tweens.add({targets:fern,angle:{from:-1.1,to:1.1},duration:2100+(x%7)*130,yoyo:true,repeat:-1,ease:"Sine.easeInOut"});
+      return fern;
+    }
+
+    createRock(x,y,scale=1) {
+      const rock=this.add.container(x,y).setDepth(y).setScale(scale);
+      rock.add(this.add.ellipse(1,5,34,11,0x26352e,.34));
+      const body=this.add.polygon(0,0,[-15,4,-11,-8,-4,-14,8,-12,15,-3,12,7,-4,9],0x6b7464);
+      body.setStrokeStyle(2,0x394b40,.9);
+      rock.add(body);
+      rock.add(this.add.polygon(-2,-5,[-8,1,-4,-8,3,-10,7,-5],0x92937b,.7));
+      rock.add(this.add.rectangle(7,-1,3,2,0xb0a88a,.7));
+      return rock;
+    }
+
+    createDriftwood(x,y,rotation=0) {
+      const log=this.add.container(x,y).setDepth(y).setRotation(rotation);
+      log.add(this.add.ellipse(0,5,68,13,0x26362e,.3));
+      log.add(this.add.rectangle(0,0,58,8,0x6e573d).setStrokeStyle(2,0x493d30));
+      log.add(this.add.rectangle(-13,-1,20,2,0xa08056,.75));
+      log.add(this.add.ellipse(28,0,9,8,0x9a805c).setStrokeStyle(2,0x493d30));
+      for(let i=0;i<4;i++) log.add(this.add.rectangle(-20+i*11,-5,2,2,0x3e4836));
+      return log;
+    }
+
+    createTidePool(x,y,scale=1) {
+      const pool=this.add.container(x,y).setDepth(y-1).setScale(scale);
+      pool.add(this.add.ellipse(0,0,82,38,0x263e3d,.5));
+      pool.add(this.add.ellipse(0,-2,70,27,0x557b78,.82));
+      pool.add(this.add.ellipse(-9,-5,31,7,0xb5c7ae,.2));
+      pool.add(this.add.ellipse(15,4,17,5,0x9cbab0,.22));
+      const shimmer=this.add.ellipse(-8,-4,22,3,0xe0dfc2,.28);
+      pool.add(shimmer);
+      this.tweens.add({targets:shimmer,alpha:.05,scaleX:1.8,duration:1900,yoyo:true,repeat:-1,ease:"Sine.easeInOut"});
+      return pool;
+    }
+
+    createAncientMarker(x,y) {
+      const marker=this.add.container(x,y).setDepth(y);
+      marker.add(this.add.ellipse(0,8,48,15,0x26372f,.35));
+      marker.add(this.add.rectangle(0,-13,22,40,0x777a67).setStrokeStyle(2,0x454f43));
+      marker.add(this.add.rectangle(-2,-18,14,4,0x9b9a7b));
+      marker.add(this.add.rectangle(0,-8,3,12,0x4b5c4a));
+      marker.add(this.add.rectangle(0,-2,12,2,0x4b5c4a));
+      marker.add(this.add.rectangle(0,3,7,2,0x4b5c4a));
+      this.tweens.add({targets:marker,alpha:{from:.9,to:1},duration:2600,yoyo:true,repeat:-1});
+      return marker;
     }
 
     createPlayer() {
@@ -388,11 +558,20 @@ export function createWorld(parent) {
     }
 
     inspectNearby() {
-      const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, 1050, 365);
-      if (distance < 145) {
-        window.dispatchEvent(new CustomEvent("muse:toast", { detail: "THE OLD WAYFARER — A small house with a light left on." }));
+      const discoveries = [
+        {x:1050,y:365,r:145,message:"THE OLD WAYFARER — A small house with a light left on. Someone once lived here."},
+        {x:690,y:455,r:92,message:"THE WEATHERED MARKER — Its symbols have almost disappeared beneath the moss."},
+        {x:1380,y:665,r:110,message:"LOW TIDE — The sea has left tiny shells and glass-smooth stones along the pier."},
+        {x:760,y:780,r:95,message:"THE QUIET GROVE — The leaves move even when the air feels still."}
+      ];
+      const nearby = discoveries
+        .map(item => ({...item,distance:Phaser.Math.Distance.Between(this.player.x,this.player.y,item.x,item.y)}))
+        .filter(item => item.distance < item.r)
+        .sort((a,b)=>a.distance-b.distance)[0];
+      if (nearby) {
+        window.dispatchEvent(new CustomEvent("muse:toast", {detail:nearby.message}));
       } else {
-        window.dispatchEvent(new CustomEvent("muse:toast", { detail: "Only wind, grass and the sound of the sea." }));
+        window.dispatchEvent(new CustomEvent("muse:toast", {detail:"Only wind, grass and the sound of the sea."}));
       }
     }
 
@@ -415,16 +594,24 @@ export function createWorld(parent) {
       }
       this.player.body.setVelocity(vx * speed, vy * speed);
       this.player.setDepth(this.player.y);
+      this.playerShadow.setPosition(this.player.x, this.player.y + 13).setDepth(this.player.y - 1);
+      if (vx < 0) this.player.setFlipX(true);
+      else if (vx > 0) this.player.setFlipX(false);
+      if (vx || vy) {
+        if (!this.player.anims.isPlaying) this.player.anims.play("wanderer-walk");
+      } else if (this.player.anims.isPlaying) {
+        this.player.anims.stop();
+        this.player.setFrame("idle");
+      }
       if (this.time.now > (this.nextMapUpdate || 0)) {
         this.nextMapUpdate = this.time.now + 250;
         window.dispatchEvent(new CustomEvent("muse:position", {detail:{x:this.player.x,y:this.player.y}}));
       }
       if (Phaser.Input.Keyboard.JustDown(keys.E)) this.inspectNearby();
-      if (vx < 0) this.playerVisual.setScale(-1, 1);
-      else if (vx > 0) this.playerVisual.setScale(1, 1);
-      this.playerVisual.alpha = (vx || vy) ? 0.98 : 1;
-      this.birds.forEach(({bird}, i) => {
+      this.birds.forEach(({bird,wing}, i) => {
         bird.y += Math.sin(this.time.now / 380 + i * 2) * 0.025;
+        bird.setDepth(bird.y + 220);
+        if (wing) wing.setAlpha(.72 + Math.sin(this.time.now / 90 + i) * .2);
       });
     }
   }
