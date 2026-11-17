@@ -95,8 +95,14 @@
             <div class="mood-form-foot"><span id="mood-selected-label">CHOOSE WHATEVER FEELS CLOSEST — OR SKIP THE LABEL</span><button class="primary-button" type="submit">SAVE CHECK-IN ↗</button></div>
           </form>
         </section>
-        <div class="inner-history-head"><div><p class="eyebrow">A GENTLE RECORD</p><h2>Your check-ins.</h2></div><span id="mood-count">0 MOMENTS</span></div>
-        <div class="mood-history" id="mood-history"><p class="empty-state">Your first check-in will appear here whenever you're ready.</p></div>
+        <section class="mood-calendar-panel">
+          <div class="calendar-heading"><div><p class="eyebrow">YOUR INNER WEATHER, OVER TIME</p><h2>A calendar of moments.</h2></div><div class="calendar-controls"><button type="button" id="mood-prev-month">←</button><span id="mood-calendar-month">MONTH YEAR</span><button type="button" id="mood-next-month">→</button></div></div>
+          <div class="mood-calendar-weekdays"><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span></div>
+          <div class="mood-calendar-grid" id="mood-calendar-grid"></div><div class="calendar-legend"><span>● MOMENT RECORDED</span><span id="calendar-month-count">0 CHECK-INS THIS MONTH</span></div>
+          <div class="calendar-selected" id="calendar-selected"><p class="empty-state">Choose a day to see its moments.</p></div>
+        </section>
+        <div class="inner-history-head"><div><p class="eyebrow">A GENTLE RECORD</p><h2>Recent check-ins.</h2></div><span id="mood-count">0 MOMENTS</span></div>
+        <div class="mood-history" id="mood-history"><p class="empty-state">Your first check-in will appear here.</p></div>
       </section>
 
       <section class="content-view hidden" id="music-view">
@@ -109,7 +115,9 @@
             <label>ARTIST<input id="music-artist" maxlength="100" placeholder="Artist / band"></label>
             <label>ALBUM<input id="music-album" maxlength="120" placeholder="Album name"></label>
             <label>CONNECTED FEELING<select id="music-mood"><option value="">Choose a feeling (optional)</option><option>Bright</option><option>Calm</option><option>Curious</option><option>Tender</option><option>Restless</option><option>Heavy</option><option>Hopeful</option><option>Uncertain</option><option>Nostalgic</option><option>Other</option></select></label>
-            <label class="music-wide">LISTENING LINK <span class="field-optional">OPTIONAL · HTTPS OR HTTP</span><input id="music-link" type="url" inputmode="url" placeholder="https://…"></label>
+            <label class="music-wide">LISTENING LINK <span class="field-optional">A PAGE LINK OR DIRECT AUDIO FILE URL</span><input id="music-link" type="url" inputmode="url" placeholder="https://…"></label>
+            <label>ALBUM ART <span class="field-optional">OPTIONAL · IMAGE FILE</span><input id="music-cover" type="file" accept="image/*"></label>
+            <label>AUDIO FILE URL <span class="field-optional">DIRECT MP3 / OGG / WAV LINK</span><input id="music-audio" type="url" inputmode="url" placeholder="https://…"></label>
             <label class="music-wide">WHY THIS ONE? <span class="field-optional">A MEMORY, A LYRIC FRAGMENT, A MOMENT…</span><textarea id="music-note" rows="3" maxlength="1200" placeholder="What makes this song yours?"></textarea></label>
           </div>
           <div class="music-form-foot"><span>STORED PRIVATELY ON THIS DEVICE</span><button class="primary-button" type="submit">ADD TO MUSIC ROOM ↗</button></div>
