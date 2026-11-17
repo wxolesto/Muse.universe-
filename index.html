@@ -43,7 +43,7 @@
           <div class="game-location"><span class="location-cross">✳</span><span><strong>THE FIRST SHORE</strong><small>A quiet beginning</small></span></div>
           <div class="game-hint"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><span>TO EXPLORE</span><i></i><span>OR USE ARROW KEYS</span><i></i><kbd>E</kbd><span>TO INTERACT</span></div>
           <div class="touch-pad" aria-label="Movement controls"><button data-dir="up">↑</button><div><button data-dir="left">←</button><button data-dir="down">↓</button><button data-dir="right">→</button></div></div>
-          <div class="game-actions"><button id="map-button">◎ <span>WORLD MAP</span></button><button id="field-notes-button">✧ <span>FIELD NOTES</span></button><button id="inspect-button">⌕ <span>INTERACT</span></button></div>
+          <div class="game-actions"><button id="map-button">◎ <span>WORLD MAP</span></button><button id="field-notes-button">✧ <span>FIELD NOTES</span></button><button id="world-builder-button">✚ <span>BUILD</span></button><button id="inspect-button">⌕ <span>INTERACT</span></button></div>
         </div>
         <div class="below-world">
           <div class="world-note"><span class="note-icon">✦</span><div><strong>A place to begin.</strong><p>This is your first shore. The rest of the world is waiting to be imagined.</p></div></div>
@@ -112,6 +112,18 @@
       <div class="map-legend"><span><i class="legend-dot discovered"></i> DISCOVERED</span><span><i class="legend-dot player-dot"></i> YOU ARE HERE</span><span><i class="legend-dot locked"></i> UNEXPLORED</span></div>
     </div>
     <p class="map-footnote">The world is larger than this map. New shores will appear as your universe grows.</p>
+  </dialog>
+
+  <dialog class="builder-dialog" id="builder-dialog">
+    <div class="dialog-head"><div><p class="eyebrow">MUSE / WORLDCRAFT</p><h2>Shape your shore.</h2></div><button id="builder-close" aria-label="Close world builder">×</button></div>
+    <p class="dialog-copy">Add small details to your island. Choose an object, then tap an open patch of land in the world to place it. Your creations stay on this device.</p>
+    <div class="builder-tools">
+      <button class="builder-tool" data-build-item="tree"><span class="builder-preview tree-preview">♣</span><strong>Grove tree</strong><small>ANCIENT GREEN</small></button>
+      <button class="builder-tool" data-build-item="lantern"><span class="builder-preview lantern-preview">✧</span><strong>Shore lantern</strong><small>WARM LIGHT</small></button>
+      <button class="builder-tool" data-build-item="flowers"><span class="builder-preview flower-preview">✿</span><strong>Wildflowers</strong><small>SOFT COLOUR</small></button>
+      <button class="builder-tool" data-build-item="stone"><span class="builder-preview stone-preview">◈</span><strong>Mossy stone</strong><small>OLD FRAGMENTS</small></button>
+    </div>
+    <div class="builder-footer"><span id="builder-status">0 CUSTOM OBJECTS · FIRST SHORE</span><button class="secondary-button" id="builder-finish">DONE PLACING</button></div>
   </dialog>
   <dialog class="field-notes-dialog" id="field-notes-dialog">
     <div class="dialog-head"><div><p class="eyebrow">MUSE / EXPLORER'S LOG</p><h2>Field Notes.</h2></div><button id="field-notes-close" aria-label="Close field notes">×</button></div>
