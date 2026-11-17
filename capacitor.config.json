@@ -1,0 +1,8 @@
+{
+  "appId": "com.wxolesto.muse",
+  "appName": "MUSE",
+  "webDir": "dist",
+  "android": {
+    "allowMixedContent": false
+  }
+}
