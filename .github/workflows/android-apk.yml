@@ -25,6 +25,10 @@ jobs:
     env:
       ANDROID_HOME: /usr/local/lib/android/sdk
       ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+      MUSE_KEYSTORE_BASE64: ${{ secrets.MUSE_ANDROID_KEYSTORE_BASE64 }}
+      MUSE_KEYSTORE_PASSWORD: ${{ secrets.MUSE_ANDROID_KEYSTORE_PASSWORD }}
+      MUSE_KEY_ALIAS: ${{ secrets.MUSE_ANDROID_KEY_ALIAS }}
+      MUSE_KEY_PASSWORD: ${{ secrets.MUSE_ANDROID_KEY_PASSWORD }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -65,16 +69,51 @@ jobs:
       - name: Copy web app into Android project
         run: npx cap sync android
 
-      - name: Build debug APK
+      - name: Configure stable release signing
+        if: ${{ env.MUSE_KEYSTORE_BASE64 != '' && env.MUSE_KEYSTORE_PASSWORD != '' && env.MUSE_KEY_ALIAS != '' && env.MUSE_KEY_PASSWORD != '' }}
+        working-directory: android
+        run: |
+          printf '%s' "$MUSE_KEYSTORE_BASE64" | base64 --decode > app/muse-release.keystore
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const file = 'app/build.gradle';
+          let gradle = fs.readFileSync(file, 'utf8');
+          if (!gradle.includes('buildTypes {')) throw new Error('Could not find Android buildTypes block');
+          const signing = `signingConfigs {\n        release {\n            storeFile file('muse-release.keystore')\n            storePassword System.getenv('MUSE_KEYSTORE_PASSWORD')\n            keyAlias System.getenv('MUSE_KEY_ALIAS')\n            keyPassword System.getenv('MUSE_KEY_PASSWORD')\n        }\n    }\n    `;
+          gradle = gradle.replace('buildTypes {', signing + 'buildTypes {');
+          if (!/buildTypes\\s*\\{\\s*release\\s*\\{/.test(gradle)) throw new Error('Could not find release build type');
+          gradle = gradle.replace(/(buildTypes\\s*\\{\\s*release\\s*\\{)/, '$1\\n            signingConfig signingConfigs.release');
+          fs.writeFileSync(file, gradle);
+          NODE
+
+      - name: Build signed release APK
+        if: ${{ env.MUSE_KEYSTORE_BASE64 != '' && env.MUSE_KEYSTORE_PASSWORD != '' && env.MUSE_KEY_ALIAS != '' && env.MUSE_KEY_PASSWORD != '' }}
+        working-directory: android
+        run: |
+          chmod +x ./gradlew
+          ./gradlew --no-daemon assembleRelease
+
+      - name: Build debug APK (until release signing is configured)
+        if: ${{ env.MUSE_KEYSTORE_BASE64 == '' || env.MUSE_KEYSTORE_PASSWORD == '' || env.MUSE_KEY_ALIAS == '' || env.MUSE_KEY_PASSWORD == '' }}
         working-directory: android
         run: |
           chmod +x ./gradlew
           ./gradlew --no-daemon assembleDebug
 
-      - name: Upload APK artifact
+      - name: Upload signed release APK
+        if: ${{ env.MUSE_KEYSTORE_BASE64 != '' && env.MUSE_KEYSTORE_PASSWORD != '' && env.MUSE_KEY_ALIAS != '' && env.MUSE_KEY_PASSWORD != '' }}
         uses: actions/upload-artifact@v4
         with:
           name: MUSE-Android-APK
+          path: android/app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload debug APK
+        if: ${{ env.MUSE_KEYSTORE_BASE64 == '' || env.MUSE_KEYSTORE_PASSWORD == '' || env.MUSE_KEY_ALIAS == '' || env.MUSE_KEY_PASSWORD == '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: MUSE-Android-APK-debug
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
