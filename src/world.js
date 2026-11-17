@@ -404,46 +404,61 @@ export function createWorld(parent) {
 
     createTree(x, y, scale = 1) {
       if (!this.textures.exists("muse-tree")) {
-        const texture = this.textures.createCanvas("muse-tree", 32, 42);
+        const texture = this.textures.createCanvas("muse-tree", 48, 58);
         const ctx = texture.getContext();
         ctx.imageSmoothingEnabled = false;
-        // Root shadow and branching trunk.
-        ctx.fillStyle = "#3b4032"; ctx.fillRect(13, 22, 7, 18);
-        ctx.fillStyle = "#6e573c"; ctx.fillRect(14, 20, 5, 19);
-        ctx.fillStyle = "#98734a"; ctx.fillRect(15, 23, 2, 13);
-        ctx.fillStyle = "#4b4935"; ctx.fillRect(10, 35, 5, 3); ctx.fillRect(18, 35, 5, 3);
-        ctx.fillStyle = "#5e4c36"; ctx.fillRect(10, 17, 5, 9); ctx.fillRect(18, 15, 5, 11);
+
+        // Exposed roots and a branching, weather-darkened trunk.
+        ctx.fillStyle = "#26372f";
+        ctx.fillRect(19,34,11,20); ctx.fillRect(13,48,10,3); ctx.fillRect(27,49,10,3);
+        ctx.fillRect(16,29,5,13); ctx.fillRect(28,27,5,16);
+        ctx.fillStyle = "#594936";
+        ctx.fillRect(20,29,9,24); ctx.fillRect(16,34,5,12); ctx.fillRect(29,33,4,12);
+        ctx.fillStyle = "#876747";
+        ctx.fillRect(22,32,3,17); ctx.fillRect(18,38,2,7);
+        ctx.fillStyle = "#b18a5d";
+        ctx.fillRect(23,36,1,8); ctx.fillRect(25,45,1,4);
+
+        // Uneven canopy silhouette, built from stepped pixel clusters.
         const rows = [
-          [12,19],[8,23],[5,26],[3,28],[2,29],[1,30],[1,30],[2,29],[3,28],[4,27],
-          [5,26],[6,25],[7,24],[9,22],[11,20]
+          [20,27],[15,32],[11,36],[8,39],[6,41],[4,43],[3,44],
+          [2,45],[2,45],[3,44],[4,43],[5,42],[6,41],[8,39],
+          [10,37],[13,34],[16,31],[19,28]
         ];
-        const leafPalette = ["#293f34","#344e3c","#405b42","#526b48","#64764e","#7c8659"];
-        rows.forEach(([left,right], row) => {
-          const y = 3 + row;
-          for (let x = left; x <= right; x++) {
-            const hash = (x * 17 + y * 31 + (x*y)%13) % 23;
-            const shade = hash < 3 ? 5 : hash < 7 ? 4 : hash < 13 ? 3 : hash < 19 ? 2 : 1;
-            ctx.fillStyle = leafPalette[shade];
-            ctx.fillRect(x, y, 1, 1);
+        const palette = ["#20392f","#294536","#34523c","#426144","#58724a","#718354","#899064"];
+        rows.forEach(([left,right],row) => {
+          const y0=4+row*2;
+          for(let x=left;x<=right;x++){
+            const hash=(x*37+y0*19+(x*y0)%29)%41;
+            const shade=hash<5?0:hash<13?1:hash<21?2:hash<29?3:hash<35?4:hash<39?5:6;
+            ctx.fillStyle=palette[shade];
+            ctx.fillRect(x,y0,1,2);
+            if(hash%7===0){ctx.fillStyle=palette[Math.min(6,shade+1)];ctx.fillRect(x+1,y0,1,1);}
           }
         });
-        // Small pixel clusters catch the light.
-        [[7,8],[9,6],[20,7],[23,11],[11,14],[18,16],[5,13],[25,16]].forEach(([x,y],i) => {
-          ctx.fillStyle = i%2 ? "#87905e" : "#a0a06a";
-          ctx.fillRect(x,y,2,1);
-          ctx.fillRect(x+1,y-1,1,1);
+        // Branch gaps, mossy clusters and directional leaf highlights.
+        [[9,15],[13,10],[34,13],[38,21],[8,29],[29,31],[17,25],[37,34]].forEach(([x,y])=>{
+          ctx.fillStyle="#1e342c";ctx.fillRect(x,y,3,3);
         });
-        // A few darker gaps make the canopy less symmetrical.
-        [[8,12],[22,14],[14,8],[17,18],[5,17]].forEach(([x,y]) => {
-          ctx.fillStyle = "#263b32"; ctx.fillRect(x,y,2,2);
+        [[9,10],[14,7],[28,8],[35,15],[39,23],[12,25],[24,18],[31,27],[18,34]].forEach(([x,y],i)=>{
+          ctx.fillStyle=i%3===0?"#a0a06a":i%3===1?"#87945d":"#748957";
+          ctx.fillRect(x,y,3,2);ctx.fillRect(x+1,y-1,2,1);
+        });
+        // Lichen and tiny warm leaves break up the large dark masses.
+        [[6,22],[11,31],[33,8],[40,29],[26,38]].forEach(([x,y],i)=>{
+          ctx.fillStyle=i%2?"#b0a06b":"#9c9b67";ctx.fillRect(x,y,2,1);
         });
         texture.refresh();
       }
-      const tree = this.add.container(x, y).setScale(scale).setDepth(y);
-      tree.add(this.add.ellipse(2, 19, 66, 17, 0x263b31, 0.35));
-      const canopy = this.add.image(0, -13, "muse-tree").setOrigin(.5,.5).setScale(2.05);
+      const tree=this.add.container(x,y).setScale(scale).setDepth(y);
+      tree.add(this.add.ellipse(2,22,76,19,0x172b25,.38));
+      tree.add(this.add.ellipse(-2,19,48,9,0x526044,.16));
+      const canopy=this.add.image(0,-17,"muse-tree").setOrigin(.5,.5).setScale(1.55);
       tree.add(canopy);
-      this.tweens.add({targets:canopy,angle:{from:-1.2,to:1.2},duration:2400 + (x%5)*180,yoyo:true,repeat:-1,ease:"Sine.easeInOut"});
+      // Trunk roots remain visible below the canopy and anchor the tree to the soil.
+      tree.add(this.add.rectangle(-8,15,5,8,0x594936).setRotation(-.28));
+      tree.add(this.add.rectangle(8,16,5,9,0x594936).setRotation(.3));
+      this.tweens.add({targets:canopy,angle:{from:-.65,to:.65},duration:3100+(x%7)*190,yoyo:true,repeat:-1,ease:"Sine.easeInOut"});
       return tree;
     }
 
@@ -465,13 +480,44 @@ export function createWorld(parent) {
     }
 
     createRock(x,y,scale=1) {
+      if(!this.textures.exists("muse-rock")){
+        const texture=this.textures.createCanvas("muse-rock",48,36);
+        const ctx=texture.getContext();
+        ctx.imageSmoothingEnabled=false;
+        // Stepped silhouette with a dark underside and chipped upper planes.
+        const rows=[
+          [15,31],[10,37],[7,41],[5,43],[4,44],[3,45],[4,44],
+          [6,42],[8,40],[11,37],[15,33],[19,29]
+        ];
+        rows.forEach(([left,right],row)=>{
+          const yy=7+row*2;
+          for(let xx=left;xx<=right;xx++){
+            const n=(xx*13+yy*17+(xx*yy)%19)%31;
+            ctx.fillStyle=n<5?"#3d4c42":n<12?"#59685a":n<22?"#707c68":n<28?"#899079":"#a1a087";
+            ctx.fillRect(xx,yy,1,2);
+          }
+        });
+        ctx.fillStyle="#39483e";
+        ctx.fillRect(7,26,34,5);ctx.fillRect(12,30,25,3);
+        ctx.fillStyle="#a5a38a";
+        ctx.fillRect(12,11,8,2);ctx.fillRect(17,9,5,2);ctx.fillRect(29,13,7,2);
+        ctx.fillStyle="#c0b99a";
+        ctx.fillRect(15,10,3,1);ctx.fillRect(31,12,3,1);
+        // Moss follows cracks rather than sitting as a flat green cap.
+        ctx.fillStyle="#647b55";
+        ctx.fillRect(8,19,5,2);ctx.fillRect(10,21,3,2);ctx.fillRect(34,23,5,2);
+        ctx.fillStyle="#91a06a";
+        ctx.fillRect(9,19,2,1);ctx.fillRect(36,23,2,1);
+        // Hairline fractures and mineral flecks.
+        ctx.fillStyle="#35463c";
+        ctx.fillRect(23,15,1,5);ctx.fillRect(22,19,3,1);ctx.fillRect(30,17,1,4);
+        ctx.fillStyle="#c1b997";
+        [[20,13],[25,11],[37,18],[14,24],[28,26]].forEach(([px,py])=>ctx.fillRect(px,py,1,1));
+        texture.refresh();
+      }
       const rock=this.add.container(x,y).setDepth(y).setScale(scale);
-      rock.add(this.add.ellipse(1,5,34,11,0x26352e,.34));
-      const body=this.add.polygon(0,0,[-15,4,-11,-8,-4,-14,8,-12,15,-3,12,7,-4,9],0x6b7464);
-      body.setStrokeStyle(2,0x394b40,.9);
-      rock.add(body);
-      rock.add(this.add.polygon(-2,-5,[-8,1,-4,-8,3,-10,7,-5],0x92937b,.7));
-      rock.add(this.add.rectangle(7,-1,3,2,0xb0a88a,.7));
+      rock.add(this.add.ellipse(1,7,48,13,0x172a24,.4));
+      rock.add(this.add.image(0,-2,"muse-rock").setScale(1.12));
       return rock;
     }
 
