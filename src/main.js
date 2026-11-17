@@ -76,7 +76,16 @@ function escapeHTML(value) {
 }
 renderEntries();
 
-$("#map-button").addEventListener("click", () => toast("THE ARCHIPELAGO MAP WILL UNFOLD AS YOU EXPLORE"));
+const mapDialog = $("#map-dialog");
+$("#map-button").addEventListener("click", () => mapDialog.showModal());
+$("#map-close").addEventListener("click", () => mapDialog.close());
+mapDialog.addEventListener("click", event => { if (event.target === mapDialog) mapDialog.close(); });
+window.addEventListener("muse:position", event => {
+  const {x,y} = event.detail;
+  const marker = $("#map-player-marker");
+  marker.setAttribute("cx", 122 + ((x - 180) / 1355) * 498);
+  marker.setAttribute("cy", 95 + ((y - 185) / 715) * 235);
+});
 $("#inspect-button").addEventListener("click", () => toast("YOU ARE AT THE FIRST SHORE"));
 const settingsDialog = $("#settings-dialog");
 $("#settings-button").addEventListener("click", () => settingsDialog.showModal());
