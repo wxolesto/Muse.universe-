@@ -63,10 +63,10 @@ async function renderEntries() {
   const entries = await getEntries();
   $("#entry-count").textContent = `${entries.length} ENTR${entries.length === 1 ? "Y" : "IES"}`;
   $("#entries-list").innerHTML = entries.length ? entries.map(entry => `
-    <article class="entry-card" data-id="${entry.id}">
+    <article class="entry-card" data-id="${escapeHTML(entry.id)}">
       <time>${new Date(entry.createdAt).toLocaleDateString()}</time>
       <h3>${escapeHTML(entry.title)}</h3><p>${escapeHTML(entry.body)}</p>
-      <button class="delete-entry" data-delete="${entry.id}" style="background:none;border:0;color:#a1aa9c;font:9px monospace;cursor:pointer">DELETE PAGE ×</button>
+      <button class="delete-entry" data-delete="${escapeHTML(entry.id)}" style="background:none;border:0;color:#a1aa9c;font:9px monospace;cursor:pointer">DELETE PAGE ×</button>
     </article>`).join("") : '<p style="font-size:11px;color:#79847d">Your first page is waiting to be written.</p>';
   document.querySelectorAll("[data-delete]").forEach(button => button.addEventListener("click", async () => {
     await deleteEntry(button.dataset.delete);
