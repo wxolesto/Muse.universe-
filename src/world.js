@@ -74,7 +74,6 @@ export function createWorld(parent) {
         g.fillRect(x, y, 18, 2);
         g.fillRect(x + 7, y - 2, 9, 1);
       }
-      g.destroy();
     }
 
     drawDistantIsles() {
@@ -104,14 +103,11 @@ export function createWorld(parent) {
           far.fillTriangle(tx-8*s,ty+8*s,tx,ty-13*s,tx+8*s,ty+8*s);
         }
       });
-      far.destroy();
-
       const haze=this.add.graphics().setDepth(-2);
       haze.fillStyle(0x9aafa0,.035);
       haze.fillEllipse(900,160,1800,105);
       haze.fillStyle(0x78958b,.025);
       haze.fillEllipse(760,930,1600,85);
-      haze.destroy();
     }
 
     drawIsland() {
@@ -144,7 +140,6 @@ export function createWorld(parent) {
       g.fillEllipse(1130, 410, 330, 170);
       g.lineStyle(3, 0x354b40, 0.85);
       g.strokePoints(points, true);
-      g.destroy();
       this.applyGroundTexture(points);
       this.drawCoast(points);
       this.createCoastGlints(points);
@@ -159,7 +154,6 @@ export function createWorld(parent) {
         grass.fillStyle(c, 0.3 + (i % 4) * 0.09);
         grass.fillRect(x, y, i % 7 === 0 ? 3 : 2, i % 5 === 0 ? 4 : 2);
       }
-      grass.destroy();
       this.drawPath();
       this.drawTerrainLayers();
     }
@@ -226,7 +220,6 @@ export function createWorld(parent) {
       coast.strokePoints(points, true);
       coast.lineStyle(3, 0x293f3b, .8);
       coast.strokePoints(points, true);
-      coast.destroy();
     }
 
     createCoastGlints(points) {
@@ -275,7 +268,6 @@ export function createWorld(parent) {
         this.add.rectangle(x+(i%3-1)*3,y+(i%2)*2,width,height,i%3===0?0xaaa080:0x77745d,.34).setRotation((i%4-1.5)*.09).setDepth(4.2);
         this.add.rectangle(x,y-1,width*.55,1,0xd4c49a,.18).setDepth(4.3);
       });
-      g.destroy();
     }
 
     drawTerrainLayers() {
@@ -322,8 +314,6 @@ export function createWorld(parent) {
           terrain.fillRect(x+2,y+ledge.drop-1,7,2);
         }
       });
-      terrain.destroy();
-
       // Irregular flagstones sit inside the existing paths, not across them.
       const paving=[
         [462,710,18,10,-.18],[500,686,21,11,.12],[541,661,17,9,-.1],
@@ -355,7 +345,6 @@ export function createWorld(parent) {
         verge.fillRect(x+(i%2?2:-2),y-2,2,4);
         if(i%3===0){verge.fillStyle(0xb2a17b,.6);verge.fillRect(x+5,y+2,3,2);}
       });
-      verge.destroy();
     }
 
     drawBiomeDetails() {
@@ -365,7 +354,6 @@ export function createWorld(parent) {
         grove.fillStyle(i%2?0x425d43:0x263d31,.12);grove.fillEllipse(x,y,w,h);
         grove.fillStyle(0x829064,.07);grove.fillEllipse(x-8,y-7,w*.62,h*.56);
       });
-      grove.destroy();
       [[420,365,1.15],[500,410,.94],[555,350,.82],[640,390,.72],[700,770,.86],[735,815,.74],[820,330,.68]].forEach(([x,y,s])=>this.createTree(x,y,s));
       [[440,455],[475,470],[530,455],[590,420],[650,430],[690,820],[745,845],[790,810],[825,365],[860,390]].forEach(([x,y],i)=>this.createFern(x,y,.72+(i%4)*.13));
 
@@ -383,8 +371,6 @@ export function createWorld(parent) {
           if(i%5===0){meadow.fillStyle(0xeee0bd,.55);meadow.fillRect(x+3,y+2,2,1);}
         }
       });
-      meadow.destroy();
-
       // Saltstone Cove: layered weathered boulders, pools and reed details.
       [[330,555,.92],[365,590,.72],[1400,555,1.08],[1350,600,.8],[1430,640,.68],[1260,785,.78]].forEach(([x,y,s])=>this.createRock(x,y,s));
       [[310,590,.58],[1450,560,.52],[1370,655,.46]].forEach(([x,y,s])=>this.createTidePool(x,y,s));
@@ -393,8 +379,6 @@ export function createWorld(parent) {
         reeds.fillStyle(0x3d5a43,.85);reeds.fillRect(x,y-8,2,10);
         reeds.fillStyle(i%2?0x8b9a68:0x6f8157,.9);reeds.fillRect(x-2,y-13,2,5);reeds.fillRect(x+2,y-16,2,6);
       });
-      reeds.destroy();
-
       // Pebble seams, tiny mushrooms and lichen flecks.
       const accents=this.add.graphics().setDepth(10);
       [[555,485],[575,490],[595,483],[1080,790],[1100,796],[1120,788],[845,825],[865,830]].forEach(([x,y],i)=>{
@@ -406,7 +390,6 @@ export function createWorld(parent) {
         accents.fillStyle(i%2?0xd4c6aa:0xb7a4a0,.9);accents.fillRect(x-2,y-2,5,3);
         accents.fillStyle(0xe5d7bc,.8);accents.fillRect(x-1,y-3,2,1);
       });
-      accents.destroy();
     }
 
     drawWorldDetails() {
@@ -1064,8 +1047,6 @@ export function createWorld(parent) {
           new Phaser.Geom.Point(x+w,y+h),new Phaser.Geom.Point(x+w-24,y+h)
         ],true);
       });
-      shafts.destroy();
-
       // Foreground mist drifts independently from the camera-fixed weather.
       this.foregroundMist=[];
       [[440,520,270,46],[760,855,360,52],[1210,500,300,42]].forEach(([x,y,w,h],i)=>{
