@@ -92,3 +92,8 @@
 .map-discovery.found{opacity:1}
 .map-discovery circle{fill:#d8c69a;stroke:#243a36;stroke-width:3;filter:drop-shadow(0 0 5px #d8c69a88)}
 .map-discovery text{fill:#e4dec9;font:7px "DM Mono",monospace;letter-spacing:1px}
+
+.ambience-volume{display:flex;align-items:center;justify-content:space-between;gap:18px;margin:18px 0;padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);font:8px var(--mono);letter-spacing:.13em;color:#aab5a8}
+.ambience-volume small{display:block;margin-top:5px;color:#738279;font:7px var(--mono)}
+.ambience-volume input{width:min(210px,52%);accent-color:#a7b697;cursor:pointer}
+.icon-button.sound-on{color:#e3d6a8;border-color:#c8b27c88;background:#28362f;box-shadow:0 0 18px #b9ad7622}
