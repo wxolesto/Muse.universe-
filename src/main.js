@@ -108,6 +108,15 @@ window.addEventListener("muse:position", event => {
 });
 $("#inspect-button").addEventListener("click", () => emitWorldEvent("interact"));
 
+const worldExpandButton=$("#world-expand-button");
+function setWorldImmersive(active){
+  document.body.classList.toggle("world-immersive",active);
+  worldExpandButton.textContent=active?"× EXIT":"⛶ EXPAND";
+  worldExpandButton.setAttribute("aria-label",active?"Exit expanded world view":"Expand world view");
+  requestAnimationFrame(()=>window.dispatchEvent(new Event("resize")));
+}
+worldExpandButton.addEventListener("click",()=>setWorldImmersive(!document.body.classList.contains("world-immersive")));
+
 const builderDialog=$("#builder-dialog");
 const builderStatus=$("#builder-status");
 function updateBuilderStatus(){
