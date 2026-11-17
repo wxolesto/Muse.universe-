@@ -7,12 +7,17 @@
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "test": "node --test"
+    "test": "node --test",
+    "cap:add:android": "cap add android",
+    "android:sync": "npm run build && cap sync android"
   },
   "dependencies": {
-    "phaser": "3.90.0"
+    "phaser": "3.90.0",
+    "@capacitor/core": "8.6.2",
+    "@capacitor/android": "8.6.2"
   },
   "devDependencies": {
-    "vite": "^6.4.1"
+    "vite": "^6.4.1",
+    "@capacitor/cli": "8.6.2"
   }
 }
