@@ -125,6 +125,9 @@ function updateBuilderStatus(){
   builderStatus.textContent=`${count} CUSTOM OBJECTS · FIRST SHORE`;
 }
 $("#world-builder-button").addEventListener("click",()=>{updateBuilderStatus();builderDialog.showModal();});
+$("#builder-edit").addEventListener("click",()=>{builderDialog.close();emitWorldEvent("builder:edit");});
+$("#builder-delete").addEventListener("click",()=>emitWorldEvent("builder:delete"));
+window.addEventListener("muse:builder-selection",event=>{$("#builder-delete").disabled=!event.detail?.selected;$("#builder-delete").textContent=event.detail?.selected?"DELETE SELECTED":"DELETE SELECTED";});
 $("#builder-close").addEventListener("click",()=>{builderDialog.close();emitWorldEvent("builder:cancel");});
 $("#builder-finish").addEventListener("click",()=>{builderDialog.close();game?.events.emit("builder:cancel");});
 builderDialog.addEventListener("click",event=>{if(event.target===builderDialog){builderDialog.close();game?.events.emit("builder:cancel");}});
