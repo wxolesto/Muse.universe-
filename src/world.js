@@ -1,3 +1,5 @@
+import Phaser from "phaser";
+
 const WORLD_W = 1800;
 const WORLD_H = 1100;
 
