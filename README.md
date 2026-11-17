@@ -7,8 +7,10 @@ A private, expandable digital universe: a richly atmospheric pixel-art world con
 ### World Mode
 - Phaser 3 world engine with a large first-island prototype, camera follow and movement.
 - Keyboard controls (WASD / arrow keys), sprint and mobile touch controls.
-- Original procedural island scenery: shoreline, grass, old path, trees, flowers, wayfarer hut and pier.
-- Mina and Toto appear as ambient flying myna companions.
+- Layered shoreline with a masked, hand-seeded pixel terrain texture, beach bands, animated water glints, grass, ferns, boulders, driftwood, tide pools, an ancient marker, a wayfarer hut and pier.
+- Mina and Toto appear as original pixel-art myna sprites with animated wings and independent flight paths.
+- Four discoverable landmarks with local progress tracking and map markers.
+- Procedural ocean-and-wind ambience with a master toggle and volume control (starts only after user interaction).
 - Real-device-clock day/night lighting.
 - A live archipelago map with a player-location marker and unexplored island silhouettes.
 - Seasonal weather pass with rain, snow, fog and autumn leaves. Weather is currently a deterministic game-world simulation, not a live weather forecast.
@@ -57,7 +59,7 @@ See [docs/ART_DIRECTION.md](./docs/ART_DIRECTION.md).
 ## Roadmap
 
 1. First Shore and core world engine — prototype.
-2. Original tile sets, character sprite sheets, collision layers and handcrafted animation.
+2. Higher-resolution handcrafted tile sets, richer character sprite sheets, collision layers and environmental animation.
 3. Avatar creator and deeper companion behaviour for Mina and Toto.
 4. Robust season, weather, time and ambient sound systems.
 5. Expandable island/region editor and world interactions.
