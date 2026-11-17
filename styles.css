@@ -238,3 +238,5 @@ body.world-immersive .game-frame{height:100dvh;max-height:none;border:0;box-shad
 body.world-immersive .world-expand-button{top:12px;right:12px}
 @media(max-width:800px){.game-frame{height:72vh;max-height:none}}
 @media(max-width:520px){.game-frame{height:72dvh;min-height:480px;max-height:none}.world-expand-button{top:10px;right:10px;padding:8px 10px;font-size:7px}body.world-immersive .game-actions{right:10px;bottom:12px}}
+
+.builder-footer-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.builder-footer-actions button:disabled{opacity:.35;cursor:not-allowed}.builder-footer{gap:12px;flex-wrap:wrap}@media(max-width:520px){.builder-footer-actions{width:100%}.builder-footer-actions button{flex:1;min-width:0;font-size:7px;padding:0 7px}}
