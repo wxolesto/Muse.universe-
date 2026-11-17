@@ -53,7 +53,7 @@ MUSE uses Capacitor to package the Vite app as an installable Android applicatio
 5. Open that workflow run, scroll to **Artifacts**, and download `MUSE-Android-APK`.
 6. Extract the ZIP and install `app-debug.apk` on your Android phone.
 
-The workflow runs the automated tests, builds the web app, generates the Android project and creates a debug APK. The artifact is retained by GitHub for 14 days.
+The workflow runs the automated tests, builds the web app, generates the Android project and creates a debug APK. The artifact is retained by GitHub for 14 days. The current workflow creates a debug-signed APK for personal installation.
 
 ### Build locally
 
