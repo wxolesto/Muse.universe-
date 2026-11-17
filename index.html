@@ -69,8 +69,17 @@
       </section>
 
       <section class="content-view hidden" id="studio-view">
-        <div class="section-intro"><p class="eyebrow">MAKE SOMETHING THAT IS YOURS</p><h1>Pixel <em>Studio.</em></h1><p>A tiny canvas for little worlds. The full creative toolkit is part of the next build.</p></div>
-        <div class="studio-preview"><div class="pixel-sun"></div><div class="pixel-hill hill-one"></div><div class="pixel-hill hill-two"></div><div class="studio-caption">A NEW CANVAS, WAITING TO HAPPEN</div></div>
+        <div class="section-intro"><p class="eyebrow">MAKE SOMETHING THAT IS YOURS</p><h1>Pixel <em>Studio.</em></h1><p>A proper little pixel workshop. Every creation belongs to your universe.</p></div>
+        <div class="pixel-workbench">
+          <div class="pixel-toolbar">
+            <div class="tool-group"><button class="tool active" data-tool="pencil" title="Pencil">✎</button><button class="tool" data-tool="eraser" title="Eraser">▱</button><button class="tool" data-tool="fill" title="Fill bucket">▨</button><button class="tool" data-tool="eyedropper" title="Pick colour">⌖</button></div>
+            <div class="tool-group"><button id="pixel-undo" title="Undo">↶</button><button id="pixel-redo" title="Redo">↷</button><button id="pixel-clear" title="Clear canvas">⌫</button></div>
+          </div>
+          <div class="pixel-stage"><canvas id="pixel-canvas" width="512" height="512" aria-label="Pixel art canvas"></canvas></div>
+          <div class="pixel-options"><label>CANVAS <select id="pixel-size"><option value="16">16 × 16</option><option value="32" selected>32 × 32</option><option value="64">64 × 64</option></select></label><label>COLOUR <input id="pixel-color" type="color" value="#b8c6a2"></label><div class="pixel-palette" id="pixel-palette"></div></div>
+          <div class="pixel-bottom"><span id="pixel-status">32 × 32 · READY TO CREATE</span><div><button id="pixel-save" class="primary-button">SAVE TO GALLERY ↗</button><button id="pixel-export" class="secondary-button">EXPORT PNG ↓</button></div></div>
+        </div>
+        <div class="gallery-heading"><span>YOUR CREATIONS</span><span>LOCAL GALLERY</span></div><div id="pixel-gallery" class="pixel-gallery"></div>
       </section>
     </main>
     <footer class="app-footer"><span> MUSE <i>·</i> A PRIVATE DIGITAL UNIVERSE</span><span>YOUR WORLD. YOUR RULES.</span></footer>
