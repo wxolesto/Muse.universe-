@@ -14,12 +14,14 @@ export function createWorld(parent) {
       this.cameras.main.setBounds(0, 0, WORLD_W, WORLD_H);
       this.physics.world.setBounds(0, 0, WORLD_W, WORLD_H);
       this.drawOcean();
+      this.drawDistantIsles();
       this.drawIsland();
       this.drawWorldDetails();
       this.createAmbientLife();
       this.createPlayer();
       this.createBirds();
       this.createAtmosphere();
+      this.createCinematicLighting();
       this.createWeather();
       this.createInteractionPrompt();
       this.cameras.main.startFollow(this.player, true, 0.075, 0.075);
@@ -73,6 +75,43 @@ export function createWorld(parent) {
         g.fillRect(x + 7, y - 2, 9, 1);
       }
       g.destroy();
+    }
+
+    drawDistantIsles() {
+      // Distant landforms sit beneath the playable shore, giving the sea a horizon.
+      const far=this.add.graphics().setDepth(-4);
+      const islands=[
+        {x:145,y:205,s:1.0},{x:590,y:105,s:.72},{x:1120,y:120,s:.9},
+        {x:1570,y:235,s:1.12},{x:1660,y:830,s:.68},{x:90,y:860,s:.8}
+      ];
+      islands.forEach((item,i)=>{
+        const {x,y,s}=item;
+        far.fillStyle(0x081b21,.34);far.fillEllipse(x+7*s,y+10*s,190*s,38*s);
+        far.fillStyle(i%2?0x29443e:0x314b43,.72);
+        far.fillPoints([
+          new Phaser.Geom.Point(x-88*s,y+4*s),new Phaser.Geom.Point(x-62*s,y-9*s),
+          new Phaser.Geom.Point(x-36*s,y-8*s),new Phaser.Geom.Point(x-12*s,y-25*s),
+          new Phaser.Geom.Point(x+12*s,y-17*s),new Phaser.Geom.Point(x+39*s,y-22*s),
+          new Phaser.Geom.Point(x+66*s,y-5*s),new Phaser.Geom.Point(x+91*s,y+5*s)
+        ],true);
+        far.fillStyle(0x52614a,.55);
+        far.fillTriangle(x-25*s,y-14*s,x-12*s,y-36*s,x+2*s,y-15*s);
+        far.fillTriangle(x+19*s,y-15*s,x+34*s,y-32*s,x+48*s,y-10*s);
+        // Tiny tree crowns read as silhouettes, not repeated detailed props.
+        for(let t=0;t<4;t++){
+          const tx=x+(-48+t*29)*s,ty=y-18*s-(t%2)*5*s;
+          far.fillStyle(0x1b3831,.72);
+          far.fillTriangle(tx-8*s,ty+8*s,tx,ty-13*s,tx+8*s,ty+8*s);
+        }
+      });
+      far.destroy();
+
+      const haze=this.add.graphics().setDepth(-2);
+      haze.fillStyle(0x9aafa0,.035);
+      haze.fillEllipse(900,160,1800,105);
+      haze.fillStyle(0x78958b,.025);
+      haze.fillEllipse(760,930,1600,85);
+      haze.destroy();
     }
 
     drawIsland() {
@@ -770,6 +809,73 @@ export function createWorld(parent) {
           duration:4800+(i%5)*500,ease:"Sine.easeInOut"
         });
       });
+    }
+
+    createCinematicLighting() {
+      // Low-resolution radial light textures retain crisp pixel-art sampling
+      // while providing soft, restrained illumination at selected landmarks.
+      const makeGlow=(key,inner,outer)=>{
+        if(this.textures.exists(key))return;
+        const texture=this.textures.createCanvas(key,96,96);
+        const ctx=texture.getContext();
+        ctx.imageSmoothingEnabled=false;
+        const gradient=ctx.createRadialGradient(48,48,2,48,48,47);
+        gradient.addColorStop(0,inner);
+        gradient.addColorStop(.28,outer);
+        gradient.addColorStop(1,"rgba(0,0,0,0)");
+        ctx.fillStyle=gradient;ctx.fillRect(0,0,96,96);texture.refresh();
+      };
+      makeGlow("muse-warm-glow","rgba(255,221,151,0.42)","rgba(225,169,98,0.16)");
+      makeGlow("muse-cool-glow","rgba(174,213,198,0.28)","rgba(102,159,153,0.10)");
+
+      const warm=this.add.image(1082,360,"muse-warm-glow").setScale(3.8,2.7)
+        .setBlendMode(Phaser.BlendModes.ADD).setAlpha(.68).setDepth(368);
+      this.tweens.add({targets:warm,alpha:{from:.48,to:.78},scaleX:{from:3.6,to:4},duration:2800,yoyo:true,repeat:-1,ease:"Sine.easeInOut"});
+
+      const markerGlow=this.add.image(690,443,"muse-warm-glow").setScale(2.5,2.1)
+        .setBlendMode(Phaser.BlendModes.ADD).setAlpha(.22).setDepth(454);
+      this.tweens.add({targets:markerGlow,alpha:{from:.12,to:.3},duration:3600,yoyo:true,repeat:-1,ease:"Sine.easeInOut"});
+
+      [[290,570,1.1],[1460,510,.9],[1370,655,.75]].forEach(([x,y,scale],i)=>{
+        const glow=this.add.image(x,y,"muse-cool-glow").setScale(scale*2.4,scale*1.25)
+          .setBlendMode(Phaser.BlendModes.ADD).setAlpha(.34).setDepth(y-1);
+        this.tweens.add({targets:glow,alpha:{from:.18,to:.4},duration:3100+i*430,yoyo:true,repeat:-1,ease:"Sine.easeInOut"});
+      });
+
+      // Thin diagonal shafts break up the flat canopy light; opacity stays low.
+      const shafts=this.add.graphics().setDepth(8);
+      [[475,300,120,300],[575,285,88,260],[710,270,105,280]].forEach(([x,y,w,h],i)=>{
+        shafts.fillStyle(i===1?0xd0c79b:0xb8c5a0,.035);
+        shafts.fillPoints([
+          new Phaser.Geom.Point(x,y),new Phaser.Geom.Point(x+9,y),
+          new Phaser.Geom.Point(x+w,y+h),new Phaser.Geom.Point(x+w-24,y+h)
+        ],true);
+      });
+      shafts.destroy();
+
+      // Foreground mist drifts independently from the camera-fixed weather.
+      this.foregroundMist=[];
+      [[440,520,270,46],[760,855,360,52],[1210,500,300,42]].forEach(([x,y,w,h],i)=>{
+        const mist=this.add.ellipse(x,y,w,h,0xb8c9b6,.035).setDepth(1120+i);
+        this.foregroundMist.push(mist);
+        this.tweens.add({
+          targets:mist,x:x+(i%2? -55:65),alpha:{from:.018,to:.055},
+          scaleX:{from:.92,to:1.12},duration:9200+i*1500,yoyo:true,repeat:-1,ease:"Sine.easeInOut"
+        });
+      });
+
+      // A subtle camera-space vignette frames the play area without hiding detail.
+      if(!this.textures.exists("muse-vignette")){
+        const texture=this.textures.createCanvas("muse-vignette",160,90);
+        const ctx=texture.getContext();ctx.imageSmoothingEnabled=false;
+        const gradient=ctx.createRadialGradient(80,45,25,80,45,78);
+        gradient.addColorStop(0,"rgba(5,14,18,0)");
+        gradient.addColorStop(.72,"rgba(5,14,18,0.04)");
+        gradient.addColorStop(1,"rgba(5,14,18,0.28)");
+        ctx.fillStyle=gradient;ctx.fillRect(0,0,160,90);texture.refresh();
+      }
+      this.add.image(0,0,"muse-vignette").setOrigin(0).setScrollFactor(0)
+        .setDisplaySize(this.scale.width,this.scale.height).setAlpha(.62).setDepth(1950);
     }
 
     createInteractionPrompt() {
