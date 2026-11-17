@@ -52,3 +52,15 @@
 .collection-item button{align-self:start;background:none;border:1px solid var(--line);color:#aab3a7;width:27px;height:27px;cursor:pointer}
 .collection-empty{font-size:11px;color:#7d8980;padding:5px 0}
 @media(max-width:520px){.collection-panel{padding:14px}.collection-form{grid-template-columns:1fr}.collection-form button{grid-column:1}.collection-panel-head h2{font-size:21px}}
+
+/* Privacy and recovery settings */
+.settings-dialog{width:min(520px,calc(100% - 28px));padding:25px;background:#182225;color:var(--ink);border:1px solid #9aa99155;box-shadow:0 25px 90px #000b}
+.settings-dialog::backdrop{background:#070c0ecc;backdrop-filter:blur(7px)}
+.dialog-head{display:flex;justify-content:space-between;align-items:flex-start;gap:15px}
+.dialog-head .eyebrow{margin-bottom:8px}
+.dialog-head h2{font:27px var(--serif);font-weight:500;margin:0;color:#e3e3d7}
+.dialog-head>button{width:30px;height:30px;background:none;border:1px solid var(--line);color:#cbd2c3;font-size:19px;cursor:pointer}
+.dialog-copy{font-size:11px;line-height:1.8;color:#a3ada3;margin:18px 0}
+.backup-actions{display:flex;flex-wrap:wrap;gap:9px}
+.backup-actions button{min-height:38px}
+.privacy-warning{margin:19px 0 0;padding-top:14px;border-top:1px solid var(--line);font:8px/1.8 var(--mono);letter-spacing:.07em;color:#c4a879}
