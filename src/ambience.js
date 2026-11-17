@@ -6,6 +6,7 @@ export class ShoreAmbience {
     this.enabled = false;
     this.volume = 0.32;
     this.layerGains = null;
+    this.starting = null;
   }
 
   async toggle() {
@@ -13,8 +14,17 @@ export class ShoreAmbience {
       await this.stop();
       return false;
     }
-    await this.start();
-    return true;
+    if (this.starting) {
+      await this.starting;
+      return this.enabled;
+    }
+    this.starting = this.start();
+    try {
+      await this.starting;
+      return this.enabled;
+    } finally {
+      this.starting = null;
+    }
   }
 
   createNoiseBuffer(context) {
