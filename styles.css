@@ -87,3 +87,8 @@
 .legend-dot.discovered{background:#9ba987}.legend-dot.player-dot{background:#f0e7c6;box-shadow:0 0 7px #f0e7c6}.legend-dot.locked{background:#46595b}
 .map-footnote{font-size:10px;color:#85928a;line-height:1.7;margin:13px 2px 0}
 @media(max-width:520px){.map-dialog{padding:15px}.map-canvas{padding:4px}.map-legend{gap:10px;font-size:7px}}
+
+.map-discovery{opacity:0;transition:opacity .45s ease}
+.map-discovery.found{opacity:1}
+.map-discovery circle{fill:#d8c69a;stroke:#243a36;stroke-width:3;filter:drop-shadow(0 0 5px #d8c69a88)}
+.map-discovery text{fill:#e4dec9;font:7px "DM Mono",monospace;letter-spacing:1px}
