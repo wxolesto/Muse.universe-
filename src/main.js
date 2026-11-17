@@ -130,6 +130,10 @@ $("#builder-delete").addEventListener("click",()=>emitWorldEvent("builder:delete
 window.addEventListener("muse:builder-selection",event=>{$("#builder-delete").disabled=!event.detail?.selected;$("#builder-delete").textContent=event.detail?.selected?"DELETE SELECTED":"DELETE SELECTED";});
 const worldEditToolbar=$("#world-edit-toolbar");
 $("#world-edit-delete").addEventListener("click",()=>emitWorldEvent("builder:delete"));
+$("#world-edit-rotate-left").addEventListener("click",()=>emitWorldEvent("builder:transform",{rotationDelta:-15}));
+$("#world-edit-rotate-right").addEventListener("click",()=>emitWorldEvent("builder:transform",{rotationDelta:15}));
+$("#world-edit-smaller").addEventListener("click",()=>emitWorldEvent("builder:transform",{scaleDelta:-.1}));
+$("#world-edit-larger").addEventListener("click",()=>emitWorldEvent("builder:transform",{scaleDelta:.1}));
 $("#world-edit-exit").addEventListener("click",()=>{worldEditToolbar.hidden=true;emitWorldEvent("builder:cancel");});
 window.addEventListener("muse:builder-selection",event=>{worldEditToolbar.hidden=!event.detail?.selected;});
 window.addEventListener("muse:builder-mode",event=>{if(!event.detail?.active)worldEditToolbar.hidden=true;});
