@@ -88,11 +88,21 @@ export function initPixelStudio() {
     const link=document.createElement("a");link.download="muse-pixel-art-"+Date.now()+".png";link.href=out.toDataURL("image/png");link.click();
   };
   const loadGallery = () => {
-    let items=[];try{items=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");}catch{}
-    const safe = value => String(value).replace(/[&<>"]/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[char]));
-    gallery.innerHTML=items.map(item=>`<article class="gallery-tile"><img src="${item.image}" alt="${safe(item.title)}"><div><strong>${safe(item.title)}</strong><small>${new Date(item.createdAt).toLocaleDateString()}</small></div><button data-remove-art="${safe(item.id)}" aria-label="Delete artwork">×</button></article>`).join("") || '<p class="gallery-empty">Your first tiny masterpiece will live here.</p>';
+    let items=[];
+    try {
+      const stored=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");
+      items=Array.isArray(stored)?stored.filter(item=>item&&typeof item==="object"):[];
+    } catch {}
+    const safe = value => String(value??"").replace(/[&<>"]/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[char]));
+    const safeImage = value => typeof value==="string" && value.length<=5*1024*1024 && /^data:image\\/png;base64,[A-Za-z0-9+/]+=*$/.test(value) ? value : "";
+    gallery.innerHTML=items.map(item=>{
+      const image=safeImage(item.image);
+      return `<article class="gallery-tile">${image?`<img src="${image}" alt="${safe(item.title)}">`:'<div class="gallery-image-placeholder" aria-label="Image unavailable">▧</div>'}<div><strong>${safe(item.title)}</strong><small>${Number.isFinite(item.createdAt)?new Date(item.createdAt).toLocaleDateString():"DATE UNKNOWN"}</small></div><button data-remove-art="${safe(item.id)}" aria-label="Delete artwork">×</button></article>`;
+    }).join("") || '<p class="gallery-empty">Your first tiny masterpiece will live here.</p>';
     gallery.querySelectorAll("[data-remove-art]").forEach(button=>button.addEventListener("click",()=>{
-      const list=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]").filter(item=>item.id!==button.dataset.removeArt);
+      let stored=[];
+      try { const value=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");stored=Array.isArray(value)?value:[]; } catch {}
+      const list=stored.filter(item=>item?.id!==button.dataset.removeArt);
       localStorage.setItem(STORAGE_KEY,JSON.stringify(list));loadGallery();
     }));
   };
