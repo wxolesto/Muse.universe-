@@ -337,15 +337,7 @@ export function createWorld(parent) {
         stone.setDepth(y);
       }
 
-      this.add.ellipse(1050, 405, 210, 62, 0x283c32, 0.3).setDepth(400);
-      const hut = this.add.container(1050, 365);
-      const shadow = this.add.ellipse(0, 43, 180, 36, 0x1b2925, 0.35);
-      const base = this.add.rectangle(0, 0, 112, 72, 0xb3a17b).setStrokeStyle(3, 0x544c3a);
-      const roof = this.add.triangle(0, -42, -75, 18, 75, 18, 0, -40, 0x4a4036).setStrokeStyle(3, 0x302e29);
-      const door = this.add.rectangle(0, 18, 19, 34, 0x41382d);
-      const window = this.add.rectangle(32, -4, 17, 16, 0xd3bd81).setStrokeStyle(3, 0x625a43);
-      const glow = this.add.rectangle(32, -4, 10, 9, 0xf2d49a, 0.8);
-      hut.add([shadow, base, roof, door, window, glow]).setDepth(365);
+      this.createWayfarerHut(1050,365);
       this.add.text(1050, 430, "THE OLD WAYFARER", {fontFamily:"monospace",fontSize:"9px",color:"#d9d2b5",letterSpacing:2}).setOrigin(0.5).setAlpha(0.78).setDepth(500);
 
       this.createTree(470, 390, 1.15);
@@ -369,6 +361,8 @@ export function createWorld(parent) {
       this.createTidePool(290, 570, .8);
       this.createTidePool(1460, 510, .68);
       this.createAncientMarker(690,455);
+      this.createRuinedArch(835,350);
+      this.createBrokenSeaWall(1285,500);
 
       for (let i = 0; i < 34; i++) {
         const x = 340 + (i * 83) % 1060;
@@ -381,15 +375,153 @@ export function createWorld(parent) {
         flower.add(this.add.rectangle(3, -3, 3, 3, 0xd6bd82));
       }
 
-      // A small weathered landing pier.
-      const pier = this.add.container(1410, 690);
-      for (let i = 0; i < 5; i++) {
-        pier.add(this.add.rectangle(i * 18, 0, 16, 7, i % 2 ? 0x6b5742 : 0x8a7252));
-      }
-      pier.add(this.add.rectangle(36, 15, 4, 25, 0x554b3b));
-      pier.setDepth(700);
+      this.createWeatheredPier(1410,690);
       this.add.text(1435, 735, "LOW TIDE", {fontFamily:"monospace",fontSize:"8px",color:"#c2c7b4",letterSpacing:2}).setOrigin(0.5).setAlpha(0.7);
       this.drawBiomeDetails();
+    }
+
+    createWayfarerHut(x,y) {
+      // A small timber-and-stone building with individually placed, weathered
+      // pieces so its silhouette reads clearly at the game's native pixel scale.
+      this.add.ellipse(x,y+43,190,42,0x172721,.38).setDepth(y+1);
+      const hut=this.add.container(x,y).setDepth(y+5);
+      const add=(child)=>hut.add(child);
+      add(this.add.rectangle(0,25,126,16,0x514b3a));
+      add(this.add.rectangle(0,18,116,29,0x958b6a).setStrokeStyle(2,0x4e4939));
+      add(this.add.rectangle(0,5,112,25,0xb0a17e).setStrokeStyle(2,0x655b45));
+      // Individual masonry courses and chipped corners.
+      for(let row=0;row<3;row++){
+        for(let col=0;col<6;col++){
+          const bx=-49+col*19+(row%2?8:0),by=11+row*9;
+          add(this.add.rectangle(bx,by,15,5,[0x9b9070,0x827c61,0xb2a17b][(row+col)%3],.9)
+            .setStrokeStyle(1,0x70664e,.55));
+        }
+      }
+      // Dark timber frame, lintels and uneven planks.
+      add(this.add.rectangle(-54,-3,7,47,0x594632));
+      add(this.add.rectangle(54,-3,7,47,0x594632));
+      add(this.add.rectangle(0,-17,119,8,0x493d30));
+      add(this.add.rectangle(-24,-5,3,35,0x72583d));
+      add(this.add.rectangle(25,-4,3,34,0x72583d));
+      // Layered thatch roof with a broken, asymmetrical ridge.
+      add(this.add.triangle(0,-39,-73,24,74,24,5,-25,0x3e4034).setStrokeStyle(3,0x292f29));
+      add(this.add.triangle(-2,-43,-63,20,62,20,0,-23,0x66563d));
+      for(let i=0;i<9;i++){
+        const px=-55+i*14;
+        add(this.add.rectangle(px,-42+(i%3)*2,12,3,i%2?0x89734e:0x756344));
+        add(this.add.rectangle(px+3,-38+(i%2)*2,8,2,0x4d4a35));
+      }
+      add(this.add.rectangle(-1,-63,36,5,0x594b37));
+      add(this.add.rectangle(4,-67,23,4,0x777052));
+      // Recessed doorway and a small warm window.
+      add(this.add.rectangle(-17,13,23,38,0x342f29));
+      add(this.add.rectangle(-17,15,15,34,0x594332));
+      add(this.add.rectangle(-21,15,2,29,0x8a6945));
+      add(this.add.circle(-10,16,1.8,0xd7b77b));
+      add(this.add.rectangle(34,-1,23,23,0x3e4037).setStrokeStyle(2,0x574a37));
+      add(this.add.rectangle(34,-1,14,15,0xe4c88d,.82));
+      add(this.add.rectangle(34,-1,2,18,0x6c5940));
+      add(this.add.rectangle(34,-1,18,2,0x6c5940));
+      // Moss, ivy and rain stains break the clean geometry.
+      for(let i=0;i<8;i++){
+        const ix=-53+(i*17)%105,iy=-12+(i*13)%35;
+        add(this.add.rectangle(ix,iy,3,2,i%2?0x536b49:0x71805a,.9));
+      }
+      add(this.add.rectangle(-58,18,5,12,0x526b4b));
+      add(this.add.rectangle(-62,25,4,8,0x61764e));
+      add(this.add.rectangle(58,23,3,8,0x526b4b));
+      add(this.add.rectangle(-40,-18,2,9,0x3d4b3a,.8));
+      add(this.add.rectangle(46,-16,2,7,0x3d4b3a,.8));
+      // A short stone step and a path of worn flagstones.
+      add(this.add.rectangle(-17,39,37,6,0x77745e));
+      add(this.add.rectangle(-17,36,31,3,0xa49a79));
+      for(let i=0;i<4;i++){
+        const stone=this.add.rectangle(4+i*15,43+(i%2)*3,12,4,i%2?0x77745e:0x9b9070,.82);
+        stone.setRotation(-.06);
+        this.add(stone);
+      }
+      this.tweens.add({targets:hut,y:y-1,duration:4200,yoyo:true,repeat:-1,ease:"Sine.easeInOut"});
+      return hut;
+    }
+
+    createRuinedArch(x,y) {
+      const ruin=this.add.container(x,y).setDepth(y+4);
+      ruin.add(this.add.ellipse(0,29,150,24,0x1c2c25,.34));
+      // Two battered piers and a fractured lintel, deliberately incomplete.
+      const stones=[
+        [-37,10,18,19,0x777966],[-37,-7,21,17,0x8b8b72],[-34,-23,17,15,0x696f5f],
+        [37,11,20,18,0x737967],[39,-6,18,17,0x8e8d73],[35,-22,21,15,0x646c5b],
+        [-13,-34,22,12,0x777966],[8,-37,24,11,0x8d8b70],[27,-34,18,10,0x666d5c]
+      ];
+      stones.forEach(([sx,sy,w,h,c],i)=>{
+        const block=this.add.rectangle(sx,sy,w,h,c).setStrokeStyle(2,0x414b40,.9);
+        block.setRotation((i%3-1)*.035);ruin.add(block);
+        ruin.add(this.add.rectangle(sx-w*.18,sy-h*.25,w*.28,2,0xb0a889,.42));
+      });
+      // Missing masonry and fractures expose the broken silhouette.
+      ruin.add(this.add.rectangle(-7,-29,9,5,0x3c493d));
+      ruin.add(this.add.rectangle(22,-42,8,5,0x3c493d));
+      [[-43,-12],[-31,-25],[34,-14],[43,-30]].forEach(([sx,sy],i)=>{
+        ruin.add(this.add.rectangle(sx,sy,3,7,i%2?0x4c6047:0x687b50).setRotation(.3));
+      });
+      ruin.add(this.add.rectangle(0,18,112,5,0x4b5747,.42));
+      this.add.text(x,y+43,"THE OLD STONE GATE",{
+        fontFamily:"monospace",fontSize:"7px",color:"#c3c0a5",letterSpacing:1
+      }).setOrigin(.5).setAlpha(.55).setDepth(y+60);
+      return ruin;
+    }
+
+    createBrokenSeaWall(x,y) {
+      const wall=this.add.container(x,y).setDepth(y+3);
+      wall.add(this.add.ellipse(0,12,210,25,0x1b2b25,.3));
+      const courses=[
+        {y:0,count:8,height:12,colors:[0x737765,0x85836b,0x626e60]},
+        {y:-12,count:7,height:11,colors:[0x88866e,0x707764,0x989176]}
+      ];
+      courses.forEach((course,row)=>{
+        for(let i=0;i<course.count;i++){
+          const bx=-82+i*23+(row?10:0);
+          if((row===1&&i===5)||(row===0&&i===7))continue;
+          const block=this.add.rectangle(bx,course.y,21,course.height,course.colors[(i+row)%3])
+            .setStrokeStyle(1,0x465246,.8);
+          block.setRotation((i%3-1)*.025);wall.add(block);
+          wall.add(this.add.rectangle(bx-4,course.y-3,7,2,0xb0a889,.28));
+        }
+      });
+      // Salt-darkened coping stones and small tufts growing in the joints.
+      for(let i=0;i<6;i++){
+        wall.add(this.add.rectangle(-70+i*27,-20,24,5,i%2?0x5e6759:0x777765));
+      }
+      [[-50,-18],[5,-17],[57,-15]].forEach(([sx,sy],i)=>{
+        wall.add(this.add.rectangle(sx,sy-5,2,8,0x526c4d));
+        wall.add(this.add.rectangle(sx+(i%2?3:-3),sy-8,3,3,0x78865a));
+      });
+      return wall;
+    }
+
+    createWeatheredPier(x,y) {
+      const pier=this.add.container(x,y).setDepth(y+5);
+      pier.add(this.add.ellipse(37,20,125,24,0x1b2b25,.35));
+      // Cross-braced support posts descend into the tidal water.
+      for(let i=0;i<5;i++){
+        const px=i*18;
+        pier.add(this.add.rectangle(px,15,5,34,0x493f31));
+        pier.add(this.add.rectangle(px-1,7,8,4,0x927653));
+        pier.add(this.add.rectangle(px+2,18,2,20,0x806348,.7));
+      }
+      // Uneven planks, grain marks and iron nails.
+      for(let i=0;i<6;i++){
+        const px=-7+i*15;
+        pier.add(this.add.rectangle(px,-1,14,8,i%2?0x70583f:0x947653).setStrokeStyle(1,0x493d30,.8));
+        pier.add(this.add.rectangle(px-3,-2,5,1,0xb99a6a,.6));
+        pier.add(this.add.circle(px+4,-2,1,0x332f2a));
+      }
+      pier.add(this.add.rectangle(37,-7,7,5,0x594832));
+      pier.add(this.add.rectangle(72,4,13,5,0x67513a).setRotation(-.18));
+      // A short mooring rope and a hanging fragment of net.
+      pier.add(this.add.rectangle(73,13,2,15,0x9b8660).setRotation(-.12));
+      for(let i=0;i<4;i++)pier.add(this.add.rectangle(67+i*4,22,1,9,0x887b5b,.65));
+      return pier;
     }
 
     createAmbientLife() {
