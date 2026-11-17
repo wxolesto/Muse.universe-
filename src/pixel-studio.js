@@ -89,7 +89,8 @@ export function initPixelStudio() {
   };
   const loadGallery = () => {
     let items=[];try{items=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");}catch{}
-    const safe = value => String(value).replace(/[&<>"\x27]/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",\x27:"&#39;",\x22:"&quot;"}[char]));\n    gallery.innerHTML=items.map(item=>`<article class="gallery-tile"><img src="${item.image}" alt="${safe(item.title)}"><div><strong>${safe(item.title)}</strong><small>${new Date(item.createdAt).toLocaleDateString()}</small></div><button data-remove-art="${safe(item.id)}" aria-label="Delete artwork">×</button></article>`).join("") || '<p class="gallery-empty">Your first tiny masterpiece will live here.</p>';
+    const safe = value => String(value).replace(/[&<>"]/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[char]));
+    gallery.innerHTML=items.map(item=>`<article class="gallery-tile"><img src="${item.image}" alt="${safe(item.title)}"><div><strong>${safe(item.title)}</strong><small>${new Date(item.createdAt).toLocaleDateString()}</small></div><button data-remove-art="${safe(item.id)}" aria-label="Delete artwork">×</button></article>`).join("") || '<p class="gallery-empty">Your first tiny masterpiece will live here.</p>';
     gallery.querySelectorAll("[data-remove-art]").forEach(button=>button.addEventListener("click",()=>{
       const list=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]").filter(item=>item.id!==button.dataset.removeArt);
       localStorage.setItem(STORAGE_KEY,JSON.stringify(list));loadGallery();
