@@ -439,20 +439,52 @@ export function createWorld(parent) {
     }
 
     createBirds() {
-      this.birds = [];
-      for (let i = 0; i < 2; i++) {
-        const bird = this.add.container(650 + i * 300, 390 + i * 90).setDepth(450 + i);
-        const shadow = this.add.ellipse(0, 9, 12, 4, 0x1d3029, 0.25);
-        const body = this.add.rectangle(0, 0, 8, 6, i ? 0x2d2925 : 0x38342c);
-        const head = this.add.rectangle(4, -3, 5, 5, i ? 0x353029 : 0x454035);
-        const beak = this.add.rectangle(8, -2, 3, 2, 0xc28a4f);
-        const wing = this.add.rectangle(-1, -2, 5, 3, 0x70634c);
-        bird.add([shadow, body, head, beak, wing]);
-        bird.setScale(1.15);
-        bird.setName(i === 0 ? "Mina" : "Toto");
-        this.birds.push({bird,wing,phase:i*2,name:i === 0 ? "Mina" : "Toto"});
-        this.tweens.add({targets:bird,x:bird.x + (i ? -95 : 110),y:bird.y - 28,duration:5200 + i*900,yoyo:true,repeat:-1,ease:"Sine.easeInOut"});
-        this.tweens.add({targets:wing,angle:{from:-24,to:25},duration:180,yoyo:true,repeat:-1,delay:i*60});
+      if (!this.textures.exists("muse-myna")) {
+        const texture=this.textures.createCanvas("muse-myna",32,16);
+        const ctx=texture.getContext();
+        ctx.imageSmoothingEnabled=false;
+        const frames=[
+          [
+            "................",".....BBBB.......","....BBBBBB......","...BBGGGBBBB....",
+            "...BBGBBYYBB....","..BBBBBBBBBB....","...BBBBBBBB.....","....WWWW........",
+            ".....WW.........","....FF..FF......","................","................"
+          ],
+          [
+            "................",".....BBBB.......","....BBBBBB......","...BBGGGBBBB....",
+            "...BBGBBYYBB....","..BBBBBBBBBB....","...BBBBBBBB.....","...WW...........",
+            "..WW............","....FF..FF......","................","................"
+          ]
+        ];
+        const palette={B:"#252a28",G:"#d2ad43",Y:"#d6a34a",W:"#4a5046",F:"#b78b45"};
+        frames.forEach((rows,frame)=>{
+          rows.forEach((row,y)=>[...row].forEach((pixel,x)=>{
+            if(palette[pixel]){ctx.fillStyle=palette[pixel];ctx.fillRect(frame*16+x,y,1,1);}
+          }));
+        });
+        texture.add("glide",0,0,0,16,16);
+        texture.add("flap",0,16,0,16,16);
+        texture.refresh();
+      }
+      this.anims.create({
+        key:"myna-flight",
+        frames:[{key:"muse-myna",frame:"glide"},{key:"muse-myna",frame:"flap"}],
+        frameRate:5,
+        repeat:-1
+      });
+      this.birds=[];
+      for(let i=0;i<2;i++){
+        const x=650+i*300,y=390+i*90;
+        const shadow=this.add.ellipse(x,y+12,18,5,0x1c3029,.23).setDepth(y-1);
+        const bird=this.add.sprite(x,y,"muse-myna","glide").setScale(1.75).setDepth(y+220);
+        bird.setName(i===0?"Mina":"Toto");
+        bird.play("myna-flight");
+        const phase=i*2;
+        this.birds.push({bird,shadow,phase,name:i===0?"Mina":"Toto",previousX:x});
+        this.tweens.add({
+          targets:bird,x:x+(i?-125:145),y:y+(i?24:-45),
+          duration:6900+i*1100,yoyo:true,repeat:-1,ease:"Sine.easeInOut",
+          delay:i*900
+        });
       }
     }
 
@@ -541,20 +573,28 @@ export function createWorld(parent) {
         const y = 300 + (i * 89) % 480;
         const mote = this.add.rectangle(x, y, 2, 2, 0xe6d49a, 0.0).setDepth(950);
         this.fireflies.push(mote);
-        this.tweens.add({targets:mote,alpha:{from:0.03,to:0.65},y:y-12,duration:1100+(i%5)*300,yoyo:true,repeat:-1,delay:i*95});
+        this.tweens.add({targets:mote,y:y-12,duration:1900+(i%5)*360,yoyo:true,repeat:-1,delay:i*95,ease:"Sine.easeInOut"});
       }
       this.shade = this.add.rectangle(0, 0, 2400, 1600, 0x10172c, 0).setOrigin(0).setScrollFactor(0).setDepth(2000);
       this.shade.setBlendMode(Phaser.BlendModes.MULTIPLY);
     }
 
     updateLighting() {
-      const hour = new Date().getHours() + new Date().getMinutes()/60;
-      let alpha = 0;
-      if (hour < 5 || hour > 21) alpha = 0.34;
-      else if (hour < 7) alpha = 0.24 * (7-hour)/2;
-      else if (hour > 18) alpha = 0.26 * (hour-18)/3;
-      else if (hour > 16) alpha = 0.08 * (hour-16)/2;
-      this.tweens.add({targets:this.shade,alpha,duration:5000,ease:"Sine.easeInOut"});
+      const now=new Date();
+      const hour=now.getHours()+now.getMinutes()/60;
+      const daylight=Phaser.Math.Clamp((Math.cos((hour-12)*Math.PI/12)+1)/2,0,1);
+      const nightFactor=1-daylight;
+      const alpha=.34*nightFactor;
+      if(this.lightingTween)this.lightingTween.stop();
+      this.lightingTween=this.tweens.add({targets:this.shade,alpha,duration:5200,ease:"Sine.easeInOut"});
+      const tint=hour<7||hour>18?0x27354b:hour<9||hour>16?0x8b7558:0x10172c;
+      this.shade.setFillStyle(tint,1);
+      this.fireflies?.forEach((mote,i)=>{
+        this.tweens.add({
+          targets:mote,alpha:.025+nightFactor*(.22+(i%4)*.07),
+          duration:4800+(i%5)*500,ease:"Sine.easeInOut"
+        });
+      });
     }
 
     inspectNearby() {
@@ -608,10 +648,11 @@ export function createWorld(parent) {
         window.dispatchEvent(new CustomEvent("muse:position", {detail:{x:this.player.x,y:this.player.y}}));
       }
       if (Phaser.Input.Keyboard.JustDown(keys.E)) this.inspectNearby();
-      this.birds.forEach(({bird,wing}, i) => {
-        bird.y += Math.sin(this.time.now / 380 + i * 2) * 0.025;
-        bird.setDepth(bird.y + 220);
-        if (wing) wing.setAlpha(.72 + Math.sin(this.time.now / 90 + i) * .2);
+      this.birds.forEach(({bird,shadow,previousX},i)=>{
+        bird.setDepth(bird.y+220);
+        bird.setFlipX(bird.x<previousX);
+        shadow.setPosition(bird.x,bird.y+12).setDepth(bird.y-1);
+        this.birds[i].previousX=bird.x;
       });
     }
   }
