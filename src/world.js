@@ -166,17 +166,47 @@ export function createWorld(parent) {
     }
 
     createTree(x, y, scale = 1) {
+      if (!this.textures.exists("muse-tree")) {
+        const texture = this.textures.createCanvas("muse-tree", 32, 42);
+        const ctx = texture.getContext();
+        ctx.imageSmoothingEnabled = false;
+        // Root shadow and branching trunk.
+        ctx.fillStyle = "#3b4032"; ctx.fillRect(13, 22, 7, 18);
+        ctx.fillStyle = "#6e573c"; ctx.fillRect(14, 20, 5, 19);
+        ctx.fillStyle = "#98734a"; ctx.fillRect(15, 23, 2, 13);
+        ctx.fillStyle = "#4b4935"; ctx.fillRect(10, 35, 5, 3); ctx.fillRect(18, 35, 5, 3);
+        ctx.fillStyle = "#5e4c36"; ctx.fillRect(10, 17, 5, 9); ctx.fillRect(18, 15, 5, 11);
+        const rows = [
+          [12,19],[8,23],[5,26],[3,28],[2,29],[1,30],[1,30],[2,29],[3,28],[4,27],
+          [5,26],[6,25],[7,24],[9,22],[11,20]
+        ];
+        const leafPalette = ["#293f34","#344e3c","#405b42","#526b48","#64764e","#7c8659"];
+        rows.forEach(([left,right], row) => {
+          const y = 3 + row;
+          for (let x = left; x <= right; x++) {
+            const hash = (x * 17 + y * 31 + (x*y)%13) % 23;
+            const shade = hash < 3 ? 5 : hash < 7 ? 4 : hash < 13 ? 3 : hash < 19 ? 2 : 1;
+            ctx.fillStyle = leafPalette[shade];
+            ctx.fillRect(x, y, 1, 1);
+          }
+        });
+        // Small pixel clusters catch the light.
+        [[7,8],[9,6],[20,7],[23,11],[11,14],[18,16],[5,13],[25,16]].forEach(([x,y],i) => {
+          ctx.fillStyle = i%2 ? "#87905e" : "#a0a06a";
+          ctx.fillRect(x,y,2,1);
+          ctx.fillRect(x+1,y-1,1,1);
+        });
+        // A few darker gaps make the canopy less symmetrical.
+        [[8,12],[22,14],[14,8],[17,18],[5,17]].forEach(([x,y]) => {
+          ctx.fillStyle = "#263b32"; ctx.fillRect(x,y,2,2);
+        });
+        texture.refresh();
+      }
       const tree = this.add.container(x, y).setScale(scale).setDepth(y);
-      tree.add(this.add.ellipse(3, 19, 65, 19, 0x263b31, 0.35));
-      tree.add(this.add.rectangle(0, 0, 9, 31, 0x65513c));
-      tree.add(this.add.rectangle(-3, 4, 3, 24, 0x8a6b48));
-      tree.add(this.add.rectangle(0, -24, 47, 35, 0x344e3d));
-      tree.add(this.add.rectangle(-12, -34, 29, 22, 0x4f6948));
-      tree.add(this.add.rectangle(13, -29, 25, 25, 0x5c714b));
-      tree.add(this.add.rectangle(-3, -43, 18, 15, 0x78805a));
-      tree.add(this.add.rectangle(11, -20, 10, 8, 0x819064));
-      tree.add(this.add.rectangle(-16, -20, 8, 7, 0x71865b));
-      tree.list.forEach(item => item.setOrigin(0.5));
+      tree.add(this.add.ellipse(2, 19, 66, 17, 0x263b31, 0.35));
+      const canopy = this.add.image(0, -13, "muse-tree").setOrigin(.5,.5).setScale(2.05);
+      tree.add(canopy);
+      this.tweens.add({targets:canopy,angle:{from:-1.2,to:1.2},duration:2400 + (x%5)*180,yoyo:true,repeat:-1,ease:"Sine.easeInOut"});
       return tree;
     }
 
