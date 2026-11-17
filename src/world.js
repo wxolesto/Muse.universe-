@@ -721,6 +721,7 @@ export function createWorld(parent) {
     }
 
     loadPlacedObjects() {
+      (this.placedObjects || []).forEach(display => display.destroy());
       this.placedObjects=[];
       this.readPlacedObjects().forEach(item=>this.drawPlacedObject(item));
     }
@@ -728,6 +729,8 @@ export function createWorld(parent) {
     drawPlacedObject(item) {
       const {x,y,type}=item;
       const g=this.add.graphics().setDepth(y+2);
+      this.placedObjects ||= [];
+      this.placedObjects.push(g);
       if(type==="tree"){
         g.fillStyle(0x263b30,.34);g.fillEllipse(x,y+12,40,13);
         g.fillStyle(0x594b39,1);g.fillRect(x-3,y-13,6,22);
