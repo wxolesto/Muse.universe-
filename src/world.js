@@ -17,6 +17,7 @@ export function createWorld(parent) {
       this.createPlayer();
       this.createBirds();
       this.createAtmosphere();
+      this.createWeather();
       this.cameras.main.startFollow(this.player, true, 0.075, 0.075);
       this.cameras.main.setZoom(1.08);
       this.cameras.main.setDeadzone(110, 70);
@@ -210,9 +211,78 @@ export function createWorld(parent) {
         const wing = this.add.rectangle(-1, -2, 5, 3, 0x70634c);
         bird.add([shadow, body, head, beak, wing]);
         bird.setScale(1.15);
-        this.birds.push({bird,wing,phase:i*2});
+        bird.setName(i === 0 ? "Mina" : "Toto");\n        this.birds.push({bird,wing,phase:i*2,name:i === 0 ? "Mina" : "Toto"});
         this.tweens.add({targets:bird,x:bird.x + (i ? -95 : 110),y:bird.y - 28,duration:5200 + i*900,yoyo:true,repeat:-1,ease:"Sine.easeInOut"});
         this.tweens.add({targets:wing,angle:{from:-24,to:25},duration:180,yoyo:true,repeat:-1,delay:i*60});
+      }
+    }
+
+    createWeather() {
+      const date = new Date();
+      const month = date.getMonth();
+      const daySeed = date.getFullYear() * 372 + month * 31 + date.getDate();
+      const season = month <= 1 || month === 11 ? "WINTER" : month <= 4 ? "SPRING" : month <= 7 ? "SUMMER" : "AUTUMN";
+      const weatherRoll = Math.abs(Math.sin(daySeed * 12.9898) * 43758.5453) % 1;
+      const weather = season === "WINTER" ? (weatherRoll > .66 ? "SNOW" : weatherRoll > .37 ? "FOG" : "CLEAR")
+        : season === "SPRING" ? (weatherRoll > .72 ? "RAIN" : weatherRoll > .46 ? "FOG" : "CLEAR")
+        : season === "SUMMER" ? (weatherRoll > .83 ? "RAIN" : "CLEAR")
+        : (weatherRoll > .68 ? "RAIN" : weatherRoll > .35 ? "FOG" : "CLEAR");
+      const label = document.getElementById("weather-label");
+      if (label) label.textContent = weather.replace("CLEAR", "CLEAR SKIES");
+      const seasonLabel = document.getElementById("season-label");
+      if (seasonLabel) seasonLabel.textContent = season;
+
+      if (weather === "RAIN" || weather === "SNOW") {
+        const count = weather === "RAIN" ? 58 : 34;
+        for (let i = 0; i < count; i++) {
+          const isSnow = weather === "SNOW";
+          const flake = this.add.rectangle(
+            Phaser.Math.Between(0, this.scale.width),
+            Phaser.Math.Between(-this.scale.height, this.scale.height),
+            isSnow ? 3 : 1,
+            isSnow ? 3 : 13,
+            isSnow ? 0xe4e9df : 0xa8c2c4,
+            isSnow ? .68 : .35
+          ).setScrollFactor(0).setDepth(2100);
+          this.tweens.add({
+            targets: flake,
+            y: this.scale.height + 20,
+            x: flake.x + (isSnow ? Phaser.Math.Between(-32, 32) : 12),
+            duration: isSnow ? Phaser.Math.Between(4200, 7600) : Phaser.Math.Between(650, 1150),
+            repeat: -1,
+            onRepeat: () => {
+              flake.y = -20;
+              flake.x = Phaser.Math.Between(0, this.scale.width);
+            }
+          });
+        }
+      }
+      if (weather === "FOG") {
+        for (let i = 0; i < 4; i++) {
+          const mist = this.add.ellipse(
+            this.scale.width * (0.2 + i * .22),
+            this.scale.height * (.35 + (i % 2) * .3),
+            this.scale.width * .62,
+            42 + i * 12,
+            0xd5ded2,
+            .035
+          ).setScrollFactor(0).setDepth(1800);
+          this.tweens.add({ targets: mist, x: mist.x + 55, alpha: .075, duration: 8500 + i * 1700, yoyo: true, repeat: -1, ease: "Sine.easeInOut" });
+        }
+      }
+      if (season === "AUTUMN") {
+        for (let i = 0; i < 9; i++) {
+          const leaf = this.add.rectangle(
+            Phaser.Math.Between(0, this.scale.width),
+            Phaser.Math.Between(0, this.scale.height),
+            4, 3, [0xb77d50,0x9e6845,0xc49a62][i % 3], .72
+          ).setScrollFactor(0).setDepth(2050);
+          this.tweens.add({
+            targets: leaf, y: this.scale.height + 15, x: leaf.x + Phaser.Math.Between(-65,65),
+            angle: 180, duration: Phaser.Math.Between(5200,9000), repeat: -1,
+            onRepeat: () => { leaf.y = -10; leaf.x = Phaser.Math.Between(0,this.scale.width); }
+          });
+        }
       }
     }
 
