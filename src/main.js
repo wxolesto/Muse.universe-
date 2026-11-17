@@ -126,7 +126,7 @@ $("#backup-file").addEventListener("change", async event => {
   if (!file) return;
   try {
     const summary = await importBackup(file);
-    toast(`RESTORED ${summary.journal + summary.archive + summary.artwork + (summary.discoveries || 0) + (summary.worldObjects || 0)} ITEMS — RELOADING`);
+    toast(`RESTORED ${summary.journal + summary.archive + summary.artwork + (summary.discoveries || 0) + (summary.worldObjects || 0) + (summary.innerCheckins || 0) + (summary.musicTracks || 0)} ITEMS — RELOADING`);
     setTimeout(() => window.location.reload(), 900);
   } catch (error) {
     toast(error.message || "BACKUP COULD NOT BE RESTORED");
