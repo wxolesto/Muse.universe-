@@ -26,6 +26,8 @@
         <button class="rail-item active" data-view="world"><span>⌘</span><small>WORLD</small></button>
         <button class="rail-item" data-view="journal"><span>▤</span><small>JOURNAL</small></button>
         <button class="rail-item" data-view="archive"><span>◇</span><small>ARCHIVE</small></button>
+        <button class="rail-item" data-view="inner"><span>☾</span><small>INNER WORLD</small></button>
+        <button class="rail-item" data-view="music"><span>♫</span><small>MUSIC ROOM</small></button>
         <button class="rail-item" data-view="studio"><span>▧</span><small>STUDIO</small></button>
         <div class="rail-spacer"></div>
         <button class="rail-item" id="settings-button"><span>⚙</span><small>SETTINGS</small></button>
@@ -70,6 +72,50 @@
           <form id="collection-form" class="collection-form"><input id="collection-entry-title" maxlength="100" placeholder="Title…" required><textarea id="collection-entry-note" rows="3" placeholder="Add a note, a memory, a detail worth keeping…"></textarea><button class="primary-button" type="submit">ADD TO COLLECTION ↗</button></form>
           <div id="collection-items" class="collection-items"><p>Select one of the collections above to begin.</p></div>
         </section>
+      </section>
+
+      
+      <section class="content-view hidden" id="inner-view">
+        <div class="section-intro"><p class="eyebrow">A QUIET SPACE TO CHECK IN</p><h1>Your inner <em>weather.</em></h1><p>No scores, no right answers. Just a place to notice what is here.</p></div>
+        <section class="inner-checkin">
+          <div class="inner-checkin-head"><div><p class="eyebrow">TODAY / RIGHT NOW</p><h2>How does it feel inside?</h2></div><span class="private-stamp">PRIVATE NOTE</span></div>
+          <div class="mood-grid" id="mood-choices">
+            <button type="button" class="mood-choice" data-mood="bright"><span>☀</span><strong>Bright</strong><small>light · energized</small></button>
+            <button type="button" class="mood-choice" data-mood="calm"><span>◒</span><strong>Calm</strong><small>steady · at ease</small></button>
+            <button type="button" class="mood-choice" data-mood="curious"><span>✧</span><strong>Curious</strong><small>open · wondering</small></button>
+            <button type="button" class="mood-choice" data-mood="tender"><span>❀</span><strong>Tender</strong><small>soft · sensitive</small></button>
+            <button type="button" class="mood-choice" data-mood="restless"><span>〰</span><strong>Restless</strong><small>busy · unsettled</small></button>
+            <button type="button" class="mood-choice" data-mood="heavy"><span>☁</span><strong>Heavy</strong><small>low · weighed down</small></button>
+            <button type="button" class="mood-choice" data-mood="hopeful"><span>✦</span><strong>Hopeful</strong><small>looking ahead</small></button>
+            <button type="button" class="mood-choice" data-mood="uncertain"><span>◇</span><strong>Uncertain</strong><small>in between</small></button>
+          </div>
+          <form id="mood-form" class="mood-form">
+            <label for="mood-note">A few words about it <span>OPTIONAL</span></label>
+            <textarea id="mood-note" rows="4" maxlength="1600" placeholder="What has been on your mind? What might you need today? You can leave this blank."></textarea>
+            <div class="mood-form-foot"><span id="mood-selected-label">CHOOSE WHATEVER FEELS CLOSEST — OR SKIP THE LABEL</span><button class="primary-button" type="submit">SAVE CHECK-IN ↗</button></div>
+          </form>
+        </section>
+        <div class="inner-history-head"><div><p class="eyebrow">A GENTLE RECORD</p><h2>Your check-ins.</h2></div><span id="mood-count">0 MOMENTS</span></div>
+        <div class="mood-history" id="mood-history"><p class="empty-state">Your first check-in will appear here whenever you're ready.</p></div>
+      </section>
+
+      <section class="content-view hidden" id="music-view">
+        <div class="section-intro"><p class="eyebrow">THE SOUNDTRACK OF YOUR UNIVERSE</p><h1>The Music <em>Room.</em></h1><p>Keep the songs, albums and little stories you attach to them.</p></div>
+        <div class="music-intro-card"><span class="music-orbit">♫</span><div><p class="eyebrow">A PERSONAL SOUND ARCHIVE</p><h2>Some songs become places.</h2><p>Save what you listen to, where you found it, and what it brings back. Add a listening link if you like.</p></div></div>
+        <form id="music-form" class="music-form">
+          <div class="music-form-heading"><div><p class="eyebrow">ADD A NEW TRACK</p><h2>Put it on the shelf.</h2></div><span>LOCAL COLLECTION</span></div>
+          <div class="music-fields">
+            <label>SONG TITLE<input id="music-title" maxlength="120" placeholder="The name of the song…" required></label>
+            <label>ARTIST<input id="music-artist" maxlength="100" placeholder="Artist / band"></label>
+            <label>ALBUM<input id="music-album" maxlength="120" placeholder="Album name"></label>
+            <label>CONNECTED FEELING<select id="music-mood"><option value="">Choose a feeling (optional)</option><option>Bright</option><option>Calm</option><option>Curious</option><option>Tender</option><option>Restless</option><option>Heavy</option><option>Hopeful</option><option>Uncertain</option><option>Nostalgic</option><option>Other</option></select></label>
+            <label class="music-wide">LISTENING LINK <span class="field-optional">OPTIONAL · HTTPS OR HTTP</span><input id="music-link" type="url" inputmode="url" placeholder="https://…"></label>
+            <label class="music-wide">WHY THIS ONE? <span class="field-optional">A MEMORY, A LYRIC FRAGMENT, A MOMENT…</span><textarea id="music-note" rows="3" maxlength="1200" placeholder="What makes this song yours?"></textarea></label>
+          </div>
+          <div class="music-form-foot"><span>STORED PRIVATELY ON THIS DEVICE</span><button class="primary-button" type="submit">ADD TO MUSIC ROOM ↗</button></div>
+        </form>
+        <div class="music-library-head"><div><p class="eyebrow">YOUR PERSONAL SOUNDTRACK</p><h2>Saved tracks.</h2></div><span id="music-count">0 TRACKS</span></div>
+        <div id="music-list" class="music-list"><p class="empty-state">The first song is waiting to be added.</p></div>
       </section>
 
       <section class="content-view hidden" id="studio-view">
