@@ -209,3 +209,15 @@
 .track-playlist-label{display:flex;align-items:center;gap:8px;margin-top:9px;color:#839286;font:7px var(--mono);letter-spacing:.1em}
 .track-playlist-label select{padding:5px;max-width:160px;min-width:0}
 @media(max-width:560px){.music-playlist-toolbar{flex-wrap:wrap}.music-playlist-toolbar>div{flex-basis:100%}.music-playlist-toolbar select{flex:1;max-width:none}.music-playlist-toolbar .secondary-button{font-size:7px;padding:9px}}
+
+
+/* Respect operating-system motion preferences in the interface. */
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
