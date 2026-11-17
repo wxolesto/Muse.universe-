@@ -83,3 +83,5 @@ document.querySelectorAll(".touch-pad button").forEach(button => {
   button.addEventListener("pointerleave", stop);
   button.addEventListener("pointercancel", stop);
 });
+
+window.addEventListener("muse:toast", event => toast(event.detail));
