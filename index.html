@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#11151b" />
+  <meta name="description" content="MUSE — a private, living universe." />
+  <title>MUSE — The World of You</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.min.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="MUSE home"><span class="brand-mark">M</span><span>MUSE</span><small>THE WORLD OF YOU</small></a>
+      <div class="top-meta"><span class="live-dot"></span><span id="world-clock">--:--</span><span class="meta-divider"></span><span id="weather-label">CLEAR SKIES</span></div>
+      <button class="icon-button" id="sound-toggle" aria-label="Toggle ambient sound" title="Ambient sound">♫</button>
+    </header>
+
+    <main class="main-layout">
+      <aside class="rail">
+        <button class="rail-item active" data-view="world"><span>⌘</span><small>WORLD</small></button>
+        <button class="rail-item" data-view="journal"><span>▤</span><small>JOURNAL</small></button>
+        <button class="rail-item" data-view="archive"><span>◇</span><small>ARCHIVE</small></button>
+        <button class="rail-item" data-view="studio"><span>▧</span><small>STUDIO</small></button>
+        <div class="rail-spacer"></div>
+        <button class="rail-item" id="settings-button"><span>⚙</span><small>SETTINGS</small></button>
+      </aside>
+
+      <section class="world-panel" id="world-view">
+        <div class="world-heading">
+          <div><p class="eyebrow">YOUR PRIVATE UNIVERSE <span class="eyebrow-line"></span></p><h1>A world of <em>your own.</em></h1><p class="subheading">Somewhere between memory and imagination.</p></div>
+          <div class="island-status"><span class="status-label">CURRENT LOCATION</span><strong>01 / The First Shore</strong><span class="status-coords">THE ARCHIPELAGO · UNKNOWN SEA</span></div>
+        </div>
+        <div class="game-frame">
+          <div class="game-vignette"></div>
+          <div id="game-container" aria-label="MUSE explorable pixel-art island"></div>
+          <div class="game-top-label"><span class="tiny-orb"></span> WORLD SIMULATION <span class="label-separator">/</span> <span id="season-label">LATE AUTUMN</span></div>
+          <div class="game-location"><span class="location-cross">✳</span><span><strong>THE FIRST SHORE</strong><small>A quiet beginning</small></span></div>
+          <div class="game-hint"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><span>TO EXPLORE</span><i></i><span>OR USE ARROW KEYS</span></div>
+          <div class="touch-pad" aria-label="Movement controls"><button data-dir="up">↑</button><div><button data-dir="left">←</button><button data-dir="down">↓</button><button data-dir="right">→</button></div></div>
+          <div class="game-actions"><button id="map-button">◎ <span>WORLD MAP</span></button><button id="inspect-button">⌕ <span>LOOK AROUND</span></button></div>
+        </div>
+        <div class="below-world">
+          <div class="world-note"><span class="note-icon">✦</span><div><strong>A place to begin.</strong><p>This is your first shore. The rest of the world is waiting to be imagined.</p></div></div>
+          <div class="world-stats"><div><small>DISCOVERED</small><strong>01 <i>/ ∞</i></strong></div><div><small>WORLD TIME</small><strong id="day-phase">EVENING</strong></div><div><small>COMPANIONS</small><strong>02 <i>in the skies</i></strong></div></div>
+        </div>
+      </section>
+
+      <section class="content-view hidden" id="journal-view">
+        <div class="section-intro"><p class="eyebrow">A PLACE FOR YOUR THOUGHTS</p><h1>The <em>Journal.</em></h1><p>Keep the things you don't want to lose.</p></div>
+        <form id="entry-form" class="entry-form"><input id="entry-title" maxlength="90" placeholder="Give this page a title…" required /><textarea id="entry-body" rows="7" placeholder="Start anywhere. A thought, a memory, a passing feeling…"></textarea><div class="form-footer"><span>PRIVATE · STORED ON THIS DEVICE</span><button class="primary-button" type="submit">SAVE PAGE <span>↗</span></button></div></form>
+        <div class="saved-heading"><span>YOUR PAGES</span><span id="entry-count">0 ENTRIES</span></div><div id="entries-list" class="entries-list"></div>
+      </section>
+
+      <section class="content-view hidden" id="archive-view">
+        <div class="section-intro"><p class="eyebrow">FRAGMENTS OF YOUR UNIVERSE</p><h1>The <em>Archive.</em></h1><p>A little space for everything that matters.</p></div>
+        <div class="archive-grid">
+          <article class="archive-card"><span class="archive-symbol">♫</span><small>COLLECTION 01</small><h2>Soundtrack</h2><p>Songs, albums and the moments they hold.</p><span class="card-foot">COMING INTO FOCUS ↗</span></article>
+          <article class="archive-card"><span class="archive-symbol">✧</span><small>COLLECTION 02</small><h2>People</h2><p>The stories, details and memories connected to people.</p><span class="card-foot">COMING INTO FOCUS ↗</span></article>
+          <article class="archive-card"><span class="archive-symbol">⌁</span><small>COLLECTION 03</small><h2>Curiosities</h2><p>Questions, discoveries and things worth keeping.</p><span class="card-foot">COMING INTO FOCUS ↗</span></article>
+          <article class="archive-card"><span class="archive-symbol">◌</span><small>COLLECTION 04</small><h2>Memories</h2><p>Small moments that deserve a place to live.</p><span class="card-foot">COMING INTO FOCUS ↗</span></article>
+        </div>
+      </section>
+
+      <section class="content-view hidden" id="studio-view">
+        <div class="section-intro"><p class="eyebrow">MAKE SOMETHING THAT IS YOURS</p><h1>Pixel <em>Studio.</em></h1><p>A tiny canvas for little worlds. The full creative toolkit is part of the next build.</p></div>
+        <div class="studio-preview"><div class="pixel-sun"></div><div class="pixel-hill hill-one"></div><div class="pixel-hill hill-two"></div><div class="studio-caption">A NEW CANVAS, WAITING TO HAPPEN</div></div>
+      </section>
+    </main>
+    <footer class="app-footer"><span> MUSE <i>·</i> A PRIVATE DIGITAL UNIVERSE</span><span>YOUR WORLD. YOUR RULES.</span></footer>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
