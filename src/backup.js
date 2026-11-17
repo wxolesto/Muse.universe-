@@ -10,7 +10,8 @@ export async function exportBackup() {
     exportedAt: new Date().toISOString(),
     journal: await getEntries(),
     archive: readJSON(ARCHIVE_KEY, {}),
-    pixelGallery: readJSON(ART_KEY, [])
+    pixelGallery: readJSON(ART_KEY, []),
+    discoveries: readJSON("muse.discoveries.v1", [])
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
   const url = URL.createObjectURL(blob);
@@ -36,10 +37,12 @@ export async function importBackup(file) {
   }
   localStorage.setItem(ARCHIVE_KEY, JSON.stringify(payload.archive));
   localStorage.setItem(ART_KEY, JSON.stringify(payload.pixelGallery));
+  if (Array.isArray(payload.discoveries)) localStorage.setItem("muse.discoveries.v1", JSON.stringify(payload.discoveries));
   return {
     journal: payload.journal.length,
     archive: Object.values(payload.archive).reduce((sum, items) => sum + (Array.isArray(items) ? items.length : 0), 0),
-    artwork: payload.pixelGallery.length
+    artwork: payload.pixelGallery.length,
+    discoveries: Array.isArray(payload.discoveries) ? payload.discoveries.length : 0
   };
 }
 
