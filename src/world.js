@@ -16,6 +16,7 @@ export function createWorld(parent) {
       this.drawOcean();
       this.drawIsland();
       this.drawWorldDetails();
+      this.createAmbientLife();
       this.createPlayer();
       this.createBirds();
       this.createAtmosphere();
@@ -350,6 +351,55 @@ export function createWorld(parent) {
       pier.setDepth(700);
       this.add.text(1435, 735, "LOW TIDE", {fontFamily:"monospace",fontSize:"8px",color:"#c2c7b4",letterSpacing:2}).setOrigin(0.5).setAlpha(0.7);
       this.drawBiomeDetails();
+    }
+
+    createAmbientLife() {
+      // Fireflies drift beneath Fern Hollow's canopy. Each glow is built from
+      // crisp pixel-sized shapes rather than a blurred raster effect.
+      const fireflyPoints = [[455,430],[520,455],[585,395],[650,425],[710,790],[770,835],[825,385]];
+      fireflyPoints.forEach(([x,y],i) => {
+        const glow = this.add.container(x,y).setDepth(y+2);
+        glow.add(this.add.rectangle(0,0,9,9,0xd5d89a,.09));
+        glow.add(this.add.rectangle(0,0,5,5,0xd5d89a,.16));
+        glow.add(this.add.rectangle(0,0,2,2,0xf2e8ae,.95));
+        this.tweens.add({
+          targets:glow,x:x+Phaser.Math.Between(-18,18),y:y+Phaser.Math.Between(-14,14),
+          alpha:{from:.35,to:1},duration:1900+i*170,yoyo:true,repeat:-1,
+          delay:i*240,ease:"Sine.easeInOut"
+        });
+      });
+
+      // Tiny butterflies hover over the meadow in short, unhurried arcs.
+      const butterflySpots = [[930,685],[1015,715],[1160,365],[1220,405]];
+      const wingColors = [0xd5b6a0,0xe0d3a7,0xb9c7a0,0xc5a9b5];
+      butterflySpots.forEach(([x,y],i) => {
+        const insect = this.add.container(x,y).setDepth(y+3);
+        const left = this.add.rectangle(-3,0,4,3,wingColors[i],.95);
+        const right = this.add.rectangle(3,0,4,3,wingColors[(i+1)%wingColors.length],.95);
+        const body = this.add.rectangle(0,1,1,4,0x3b4034,.95);
+        insect.add([left,right,body]);
+        this.tweens.add({targets:[left,right],scaleY:.35,duration:230,yoyo:true,repeat:-1,ease:"Sine.easeInOut"});
+        this.tweens.add({
+          targets:insect,x:x+Phaser.Math.Between(-20,20),y:y-Phaser.Math.Between(8,22),
+          duration:2400+i*310,yoyo:true,repeat:-1,delay:i*380,ease:"Sine.easeInOut"
+        });
+      });
+
+      // Small shore crabs: a few bright shell pixels and alternating sideways steps.
+      [[325,625],[350,650],[1370,675],[1430,705]].forEach(([x,y],i) => {
+        const crab = this.add.container(x,y).setDepth(y+1);
+        crab.add(this.add.ellipse(0,3,13,4,0x26352e,.28));
+        crab.add(this.add.rectangle(0,0,7,4,i%2?0x9b765e:0xb18468));
+        crab.add(this.add.rectangle(-2,-2,3,2,0xd0a17b));
+        crab.add(this.add.rectangle(-5,1,2,1,0xdbc49a));
+        crab.add(this.add.rectangle(5,1,2,1,0xdbc49a));
+        crab.add(this.add.rectangle(-5,-3,1,1,0x242d29));
+        crab.add(this.add.rectangle(5,-3,1,1,0x242d29));
+        this.tweens.add({
+          targets:crab,x:x+(i%2? -9:9),duration:1800+i*210,yoyo:true,repeat:-1,
+          delay:i*430,ease:"Sine.easeInOut"
+        });
+      });
     }
 
     createTree(x, y, scale = 1) {
