@@ -225,6 +225,15 @@ export function createWorld(parent) {
       const month = date.getMonth();
       const daySeed = date.getFullYear() * 372 + month * 31 + date.getDate();
       const season = month <= 1 || month === 11 ? "WINTER" : month <= 4 ? "SPRING" : month <= 7 ? "SUMMER" : "AUTUMN";
+      const seasonalTint = {
+        WINTER: [0x9bb5cf, .075],
+        SPRING: [0x9ab78c, .045],
+        SUMMER: [0xe0bd79, .035],
+        AUTUMN: [0xc68e5d, .075]
+      }[season];
+      this.add.rectangle(0, 0, 2400, 1600, seasonalTint[0], seasonalTint[1])
+        .setOrigin(0).setScrollFactor(0).setDepth(1900)
+        .setBlendMode(Phaser.BlendModes.MULTIPLY);
       const weatherRoll = Math.abs(Math.sin(daySeed * 12.9898) * 43758.5453) % 1;
       const weather = season === "WINTER" ? (weatherRoll > .66 ? "SNOW" : weatherRoll > .37 ? "FOG" : "CLEAR")
         : season === "SPRING" ? (weatherRoll > .72 ? "RAIN" : weatherRoll > .46 ? "FOG" : "CLEAR")
@@ -338,7 +347,7 @@ export function createWorld(parent) {
         vx = 0;
         vy = 0;
       }
-      this.player.body.setVelocity(vx * speed, vy * speed);
+      this.player.body.setVelocity(vx * speed, vy * speed);\n      this.player.setDepth(this.player.y);
       if (Phaser.Input.Keyboard.JustDown(keys.E)) this.inspectNearby();
       if (vx < 0) this.playerVisual.setScale(-1, 1);
       else if (vx > 0) this.playerVisual.setScale(1, 1);
