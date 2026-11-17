@@ -1,41 +1,67 @@
 # MUSE — The World of You
 
-A private, expandable digital universe. A living pixel-art world connected to a modern personal archive.
+A private, expandable digital universe: a richly atmospheric pixel-art world connected to a modern personal archive and creative workspace.
 
-## Current build
+## Current foundation
 
-This first foundation includes:
-- A responsive editorial interface with World, Journal, Archive and Studio areas.
-- A Phaser-powered explorable island prototype.
-- Keyboard and touch movement.
-- A local-first journal using IndexedDB with a localStorage fallback.
-- A real-world clock display and a responsive mobile layout.
+### World Mode
+- Phaser 3 world engine with a large first-island prototype, camera follow and movement.
+- Keyboard controls (WASD / arrow keys), sprint and mobile touch controls.
+- Original procedural island scenery: shoreline, grass, old path, trees, flowers, wayfarer hut and pier.
+- Mina and Toto appear as ambient flying myna companions.
+- Real-device-clock day/night lighting.
+- Seasonal weather pass with rain, snow, fog and autumn leaves. Weather is currently a deterministic game-world simulation, not a live weather forecast.
+
+### Library Mode
+- Private local journal with IndexedDB storage and localStorage fallback.
+- Archive collections for Soundtrack, People, Curiosities and Memories.
+- Interactive Pixel Studio: 16×16, 32×32 and 64×64 canvases, pencil, eraser, fill, eyedropper, palette, undo/redo, PNG export and local gallery.
+- Responsive editorial interface designed to complement the pixel-art world.
 
 ## Run locally
 
-Serve this folder with any static web server. For example:
+Requirements: Node.js 20 or newer.
 
 ```bash
-python -m http.server 8000
+npm install
+npm run dev
 ```
 
-Then open http://localhost:8000.
+Open the local URL printed by Vite (usually http://localhost:5173).
 
-Phaser is currently loaded from jsDelivr. A production build should vendor or bundle dependencies so the experience does not depend on a third-party CDN.
+Create a production build:
+
+```bash
+npm run build
+npm run preview
+```
 
 ## Privacy and data
 
-Journal entries are stored in this browser on this device. This prototype does **not** yet encrypt entries or provide backup/restore. Do not treat it as a secure vault until encryption, recovery and export have been implemented. Clearing browser site data can erase local entries.
+MUSE currently stores journal entries, archive records and pixel-art gallery data in the browser on the device where they were created. No app account or server sync is implemented.
+
+Important limitations:
+- Local browser storage is not encrypted in this prototype.
+- Clearing site data or changing browser/device can remove or strand local content.
+- There is not yet a complete export/restore or encrypted backup system.
+- Do not use the current prototype as a secure vault for highly sensitive information.
+
+## Quality direction
+
+MUSE aims for handcrafted pixel-art environments with strong silhouettes, layered depth, original sprite work, environmental animation and detailed sound design. The current island is a functional art-direction prototype; it is not yet the final high-detail production art pass.
+
+See [docs/ART_DIRECTION.md](./docs/ART_DIRECTION.md).
 
 ## Roadmap
 
-1. World engine and first island — current foundation.
-2. Detailed original pixel-art environments, collision, interaction and animation.
-3. Avatar creator and ambient companions Mina & Toto.
-4. Seasons, weather, day/night lighting and soundscape.
-5. Expandable islands and a world builder.
-6. Journal, memory archive, people, music and knowledge collections.
-7. Pixel-art studio, export, encrypted backups and restore.
-8. Performance, accessibility, mobile packaging and full regression testing.
+1. First Shore and core world engine — prototype.
+2. Original tile sets, character sprite sheets, collision layers and handcrafted animation.
+3. Avatar creator and deeper companion behaviour for Mina and Toto.
+4. Robust season, weather, time and ambient sound systems.
+5. Expandable island/region editor and world interactions.
+6. Rich journal, memory timeline, people and culture libraries.
+7. Pixel Studio layers, selection tools, palettes and project files.
+8. Encrypted backups, import/export, restore and data migration.
+9. Performance profiling, accessibility, mobile packaging and regression testing.
 
-MUSE is designed as two connected experiences: **World Mode** for exploration and **Library Mode** for creating, writing and organizing. Both share the same local data layer.
+MUSE is intentionally split into two connected experiences: **World Mode** for exploration and **Library Mode** for writing, creating and organizing. Both will share a common local-first data layer.
