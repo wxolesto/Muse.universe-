@@ -211,7 +211,8 @@ export function createWorld(parent) {
         const wing = this.add.rectangle(-1, -2, 5, 3, 0x70634c);
         bird.add([shadow, body, head, beak, wing]);
         bird.setScale(1.15);
-        bird.setName(i === 0 ? "Mina" : "Toto");\n        this.birds.push({bird,wing,phase:i*2,name:i === 0 ? "Mina" : "Toto"});
+        bird.setName(i === 0 ? "Mina" : "Toto");
+        this.birds.push({bird,wing,phase:i*2,name:i === 0 ? "Mina" : "Toto"});
         this.tweens.add({targets:bird,x:bird.x + (i ? -95 : 110),y:bird.y - 28,duration:5200 + i*900,yoyo:true,repeat:-1,ease:"Sine.easeInOut"});
         this.tweens.add({targets:wing,angle:{from:-24,to:25},duration:180,yoyo:true,repeat:-1,delay:i*60});
       }
