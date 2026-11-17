@@ -9,13 +9,15 @@ A private, expandable digital universe: a richly atmospheric pixel-art world con
 - Keyboard controls (WASD / arrow keys), sprint and mobile touch controls.
 - Original procedural island scenery: shoreline, grass, old path, trees, flowers, wayfarer hut and pier.
 - Mina and Toto appear as ambient flying myna companions.
-- Real-device-clock day/night lighting.\n- A live archipelago map with a player-location marker and unexplored island silhouettes.
+- Real-device-clock day/night lighting.
+- A live archipelago map with a player-location marker and unexplored island silhouettes.
 - Seasonal weather pass with rain, snow, fog and autumn leaves. Weather is currently a deterministic game-world simulation, not a live weather forecast.
 
 ### Library Mode
 - Private local journal with IndexedDB storage and localStorage fallback.
 - Archive collections for Soundtrack, People, Curiosities and Memories.
-- Interactive Pixel Studio: 16×16, 32×32 and 64×64 canvases, pencil, eraser, fill, eyedropper, palette, undo/redo, PNG export and local gallery.\n- Local JSON backup and restore for journal entries, archive collections and pixel artwork.
+- Interactive Pixel Studio: 16×16, 32×32 and 64×64 canvases, pencil, eraser, fill, eyedropper, palette, undo/redo, PNG export and local gallery.
+- Local JSON backup and restore for journal entries, archive collections and pixel artwork.
 - Responsive editorial interface designed to complement the pixel-art world.
 
 ## Run locally
