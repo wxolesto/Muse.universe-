@@ -189,7 +189,7 @@ export function createWorld(parent) {
       const scarf = this.add.rectangle(5, -8, 4, 10, 0xb17e69);
       body.add([cape, torso, head, hair, legs, scarf]);
       this.player.add([shadow, body]);
-      this.player.body = this.physics.add.existing(this.player);
+      this.physics.add.existing(this.player);
       this.player.body.setCollideWorldBounds(true);
       this.player.body.setSize(15, 15).setOffset(-7, -1);
       this.player.body.setDrag(900, 900);
@@ -236,7 +236,6 @@ export function createWorld(parent) {
       else if (hour > 18) alpha = 0.26 * (hour-18)/3;
       else if (hour > 16) alpha = 0.08 * (hour-16)/2;
       this.tweens.add({targets:this.shade,alpha,duration:5000,ease:"Sine.easeInOut"});
-      $("#weather-label");
     }
 
     update() {
