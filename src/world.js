@@ -349,6 +349,10 @@ export function createWorld(parent) {
       }
       this.player.body.setVelocity(vx * speed, vy * speed);
       this.player.setDepth(this.player.y);
+      if (this.time.now > (this.nextMapUpdate || 0)) {
+        this.nextMapUpdate = this.time.now + 250;
+        window.dispatchEvent(new CustomEvent("muse:position", {detail:{x:this.player.x,y:this.player.y}}));
+      }
       if (Phaser.Input.Keyboard.JustDown(keys.E)) this.inspectNearby();
       if (vx < 0) this.playerVisual.setScale(-1, 1);
       else if (vx > 0) this.playerVisual.setScale(1, 1);
