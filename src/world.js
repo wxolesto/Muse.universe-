@@ -187,7 +187,7 @@ export function createWorld(parent) {
           "...HHSSSSSSHH...","..HHSSSSSSSSHH..","..HHSSSESSSSHH..","..HHSSSSSSSSHH..",
           "...HHSSSSSSHH...","....RRRRRRRR....","...RRRRRRRRRR...","...CCCTTTCCC....",
           "..CCCCCTTTCCCC..","..CCCCCttCCCCC..","...CCCTTTCCC....","...CCCTTTCCC....",
-          "....PPPPPP......","...PPPPPPPP.....","...PPPP..PPP.....","...PPPP..PPP.....",
+          "....PPPPPP......","...PPPPPPPP.....","...PPPP..PPP....","...PPPP..PPP....",
           "....BB....BB....","....BBBBBBBB....","....BB....BB....","................"
         ],
         [
@@ -195,7 +195,7 @@ export function createWorld(parent) {
           "...HHSSSSSSHH...","..HHSSSSSSSSHH..","..HHSSSESSSSHH..","..HHSSSSSSSSHH..",
           "...HHSSSSSSHH...","....RRRRRRRR....","...RRRRRRRRRR...","...CCCTTTCCC....",
           "..CCCCCTTTCCCC..","..CCCCCttCCCCC..","...CCCTTTCCC....","...CCCTTTCCC....",
-          "....PPPPPP......","...PPPPPPPP.....","...PPP...PPP.....","...PPP...PPP.....",
+          "....PPPPPP......","...PPPPPPPP.....","...PPP...PPP....","...PPP...PPP....",
           "...BBB...BBB....","...BBBB..BBBB...","....BB....BB....","................"
         ]
       ];
