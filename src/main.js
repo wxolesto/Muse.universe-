@@ -140,6 +140,10 @@ window.addEventListener("muse:toast", event => toast(event.detail));
 
 
 const discoveryKey = "muse.discoveries.v1";
+const fieldNotesDialog = $("#field-notes-dialog");
+$("#field-notes-button").addEventListener("click", () => { renderFieldNotes(); fieldNotesDialog.showModal(); });
+$("#field-notes-close").addEventListener("click", () => fieldNotesDialog.close());
+fieldNotesDialog.addEventListener("click", event => { if (event.target === fieldNotesDialog) fieldNotesDialog.close(); });
 function readDiscoveries() {
   try {
     const value = JSON.parse(localStorage.getItem(discoveryKey) || "[]");
@@ -151,6 +155,8 @@ function updateDiscoveryCount() {
   if (!node) return;
   const count = readDiscoveries().length;
   node.innerHTML = `${String(count).padStart(2,"0")} <i>/ 04</i>`;
+  const progress = $("#field-notes-progress");
+  if (progress) progress.textContent = `${count} OF 4 LANDMARKS FOUND`;
   document.querySelectorAll("[data-map-discovery]").forEach(marker => marker.classList.toggle("found", readDiscoveries().some(item => item.id === marker.dataset.mapDiscovery)));
 }
 updateDiscoveryCount();
@@ -162,9 +168,30 @@ window.addEventListener("muse:discovery", event => {
     toast(item.description || item.title);
     return;
   }
-  discoveries.push({id:item.id,title:item.title,discoveredAt:Date.now()});
+  discoveries.push({id:item.id,title:item.title,description:item.description,lore:item.lore,discoveredAt:Date.now()});
   try { localStorage.setItem(discoveryKey, JSON.stringify(discoveries)); }
   catch { toast("DISCOVERY FOUND — STORAGE IS FULL"); return; }
   updateDiscoveryCount();
+  renderFieldNotes();
   toast(`NEW DISCOVERY · ${item.title}`);
 });
+
+function renderFieldNotes() {
+  const list = $("#field-notes-list");
+  if (!list) return;
+  const discoveries = readDiscoveries();
+  const escape = value => String(value || "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
+  if (!discoveries.length) {
+    list.innerHTML = '<div class="field-notes-empty"><span>✧</span><strong>Nothing in the log. Yet.</strong><p>Wander the island and look for places that seem to hold a story. Press E or use INTERACT when you find one.</p></div>';
+    return;
+  }
+  list.innerHTML = discoveries.map((item,index) => `
+    <article class="field-note-card">
+      <div class="field-note-index">0${index+1}</div>
+      <div class="field-note-content"><div class="field-note-meta">LANDMARK DISCOVERED · ${item.discoveredAt ? new Date(item.discoveredAt).toLocaleDateString() : "DATE UNKNOWN"}</div>
+        <h3>${escape(item.title)}</h3><p class="field-note-summary">${escape(item.description)}</p>
+        <p class="field-note-lore">${escape(item.lore || item.description).replace(/\n\n/g,"</p><p class=\"field-note-lore\">")}</p>
+      </div>
+    </article>`).join("");
+}
+renderFieldNotes();
