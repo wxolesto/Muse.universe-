@@ -286,7 +286,7 @@ export function createWorld(parent) {
     roundPixels: true,
     antialias: false,
     physics: { default: "arcade", arcade: { debug: false } },
-    scale: { mode: Phaser.Scale.RESIZE, autoCenter: Phaser.Scale.CENTER_BOTH, width: "100%", height: "100%" },
+    scale: { mode: Phaser.Scale.RESIZE, autoCenter: Phaser.Scale.CENTER_BOTH },
     scene: [FirstShore]
   };
   return new Phaser.Game(config);
