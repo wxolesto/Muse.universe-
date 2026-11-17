@@ -2,6 +2,7 @@ import { createWorld } from "./world.js";
 import { getEntries, saveEntry, deleteEntry, createId } from "./storage.js";
 import { initPixelStudio } from "./pixel-studio.js";
 import { initArchive } from "./archive.js";
+import { exportBackup, importBackup } from "./backup.js";
 
 const $ = (selector) => document.querySelector(selector);
 const toast = (message) => {
@@ -77,7 +78,28 @@ renderEntries();
 
 $("#map-button").addEventListener("click", () => toast("THE ARCHIPELAGO MAP WILL UNFOLD AS YOU EXPLORE"));
 $("#inspect-button").addEventListener("click", () => toast("YOU ARE AT THE FIRST SHORE"));
-$("#settings-button").addEventListener("click", () => toast("WORLD SETTINGS ARE COMING IN THE NEXT BUILD"));
+const settingsDialog = $("#settings-dialog");
+$("#settings-button").addEventListener("click", () => settingsDialog.showModal());
+$("#settings-close").addEventListener("click", () => settingsDialog.close());
+$("#backup-export").addEventListener("click", async () => {
+  try { await exportBackup(); toast("MUSE BACKUP EXPORTED"); }
+  catch { toast("BACKUP COULD NOT BE CREATED"); }
+});
+$("#backup-import").addEventListener("click", () => $("#backup-file").click());
+$("#backup-file").addEventListener("change", async event => {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  try {
+    const summary = await importBackup(file);
+    toast(`RESTORED ${summary.journal + summary.archive + summary.artwork} ITEMS — RELOADING`);
+    setTimeout(() => window.location.reload(), 900);
+  } catch (error) {
+    toast(error.message || "BACKUP COULD NOT BE RESTORED");
+  } finally { event.target.value = ""; }
+});
+settingsDialog.addEventListener("click", event => {
+  if (event.target === settingsDialog) settingsDialog.close();
+});
 $("#sound-toggle").addEventListener("click", () => toast("AMBIENT SOUND SYSTEM — IN DEVELOPMENT"));
 
 document.querySelectorAll(".touch-pad button").forEach(button => {
