@@ -161,6 +161,7 @@ export function createWorld(parent) {
       }
       grass.destroy();
       this.drawPath();
+      this.drawTerrainLayers();
     }
 
     applyGroundTexture(points) {
@@ -275,6 +276,86 @@ export function createWorld(parent) {
         this.add.rectangle(x,y-1,width*.55,1,0xd4c49a,.18).setDepth(4.3);
       });
       g.destroy();
+    }
+
+    drawTerrainLayers() {
+      // Broad, shallow rock shelves add readable elevation without changing
+      // the island's safe walking polygon or trapping the player.
+      const terrain=this.add.graphics().setDepth(2.35);
+      const ledges=[
+        {
+          points:[[350,344],[390,296],[488,270],[590,279],[680,319],[716,360],[655,377],[552,357],[454,371],[386,366]],
+          drop:18,top:0x8d8b69,side:0x414b3d,edge:0xb1a47b
+        },
+        {
+          points:[[1190,470],[1262,442],[1352,463],[1410,516],[1418,567],[1368,591],[1296,566],[1230,535]],
+          drop:15,top:0x777e61,side:0x3c4a40,edge:0xa59a73
+        },
+        {
+          points:[[1010,790],[1080,766],[1160,778],[1215,817],[1170,842],[1088,835],[1030,820]],
+          drop:11,top:0x818565,side:0x485441,edge:0xa39a70
+        }
+      ];
+      const polygon=(coords)=>coords.map(([x,y])=>new Phaser.Geom.Point(x,y));
+      ledges.forEach((ledge,index)=>{
+        const lower=ledge.points.map(([x,y])=>[x,y+ledge.drop]);
+        terrain.fillStyle(0x17251f,.22);
+        terrain.fillPoints(polygon(ledge.points.map(([x,y])=>[x+5,y+ledge.drop+7])),true);
+        terrain.fillStyle(ledge.side,.92);
+        terrain.fillPoints(polygon([...ledge.points,...lower.slice().reverse()]),true);
+        terrain.fillStyle(ledge.top,.82);
+        terrain.fillPoints(polygon(ledge.points),true);
+        terrain.lineStyle(2,ledge.edge,.42);
+        terrain.strokePoints(polygon(ledge.points),true);
+        // Broken strata lines make the exposed edge read as layered stone.
+        for(let i=1;i<ledge.points.length-1;i+=2){
+          const [x,y]=ledge.points[i];
+          terrain.lineStyle(1,index===1?0x263b34:0x3c493b,.48);
+          terrain.lineBetween(x,y+3,x-3,y+ledge.drop-2);
+          terrain.fillStyle(ledge.edge,.3);
+          terrain.fillRect(x+7,y+ledge.drop-4,5,1);
+        }
+        // Small moss seams soften the meeting of rock and soil.
+        for(let i=0;i<ledge.points.length;i+=3){
+          const [x,y]=ledge.points[i];
+          terrain.fillStyle(0x536d4c,.72);
+          terrain.fillRect(x+2,y+ledge.drop-1,7,2);
+        }
+      });
+      terrain.destroy();
+
+      // Irregular flagstones sit inside the existing paths, not across them.
+      const paving=[
+        [462,710,18,10,-.18],[500,686,21,11,.12],[541,661,17,9,-.1],
+        [580,641,19,10,.08],[620,620,20,10,-.14],[661,604,18,9,.1],
+        [704,584,22,11,-.08],[747,565,18,9,.16],[790,545,20,10,-.12],
+        [835,526,18,9,.08],[880,509,21,10,-.1],[925,488,18,9,.12],
+        [970,468,20,10,-.08],[1012,448,19,9,.14],[1058,429,20,10,-.1],
+        [1098,412,18,9,.08],
+        [775,462,17,9,-.1],[790,432,18,9,.12],[807,404,17,9,-.08],[831,376,18,9,.1],
+        [633,674,17,9,.12],[611,714,18,10,-.14],[600,752,16,8,.08],
+        [1094,498,17,9,-.12],[1145,526,18,10,.1],[1190,557,18,9,-.08],[1235,591,19,10,.12]
+      ];
+      paving.forEach(([x,y,w,h,rotation],i)=>{
+        const slab=this.add.container(x,y).setDepth(y+1);
+        slab.add(this.add.ellipse(1,4,w+5,h+4,0x25332b,.28));
+        const stone=this.add.rectangle(0,0,w,h,i%4===0?0x77765e:i%3===0?0xaaa080:0x91896b,.72)
+          .setStrokeStyle(1,0x4c5140,.48).setRotation(rotation);
+        slab.add(stone);
+        slab.add(this.add.rectangle(-w*.18,-h*.2,w*.32,1,0xd2c49b,.38).setRotation(rotation));
+        if(i%4===1) slab.add(this.add.rectangle(w*.2,h*.15,3,1,0x535744,.5).setRotation(rotation-.3));
+      });
+
+      // Tufts and gravel interrupt the perfect edges of the worn trail.
+      const verge=this.add.graphics().setDepth(4.5);
+      const tufts=[[485,692],[525,672],[565,646],[645,615],[685,596],[735,574],[820,532],[900,500],[948,480],[1038,438],[1080,420],[765,450],[800,416],[620,690],[590,735],[1115,510],[1170,545],[1218,578]];
+      tufts.forEach(([x,y],i)=>{
+        verge.fillStyle(i%3?0x405d43:0x718052,.82);
+        verge.fillRect(x,y,2,5);
+        verge.fillRect(x+(i%2?2:-2),y-2,2,4);
+        if(i%3===0){verge.fillStyle(0xb2a17b,.6);verge.fillRect(x+5,y+2,3,2);}
+      });
+      verge.destroy();
     }
 
     drawBiomeDetails() {
