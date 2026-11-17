@@ -40,6 +40,43 @@ npm run build
 npm run preview
 ```
 
+## Build an Android APK
+
+MUSE uses Capacitor to package the Vite app as an installable Android application.
+
+### Build from GitHub
+
+1. Open the repository's **Actions** tab.
+2. Select **Build MUSE Android APK**.
+3. Press **Run workflow** and confirm the `main` branch.
+4. Wait for the workflow to finish successfully.
+5. Open that workflow run, scroll to **Artifacts**, and download `MUSE-Android-APK`.
+6. Extract the ZIP and install `app-debug.apk` on your Android phone.
+
+The workflow runs the automated tests, builds the web app, generates the Android project and creates a debug APK. The artifact is retained by GitHub for 14 days.
+
+### Build locally
+
+Requirements: Node.js 22+, Android Studio, and Android SDK.
+
+```bash
+npm install
+npm run build
+npx cap add android
+npx cap sync android
+```
+
+Open the generated `android/` folder in Android Studio, or build a debug APK from the command line:
+
+```bash
+cd android
+./gradlew assembleDebug
+```
+
+The APK will be at `android/app/build/outputs/apk/debug/app-debug.apk`.
+
+**Signing note:** the GitHub workflow currently produces a debug-signed APK for personal testing. A stable private release-signing key is needed for seamless in-place updates across future APK builds; do not publish or commit that private key. Until release signing is configured, Android may require uninstalling an older build before installing a debug APK signed with a different key. Back up MUSE data before reinstalling.
+
 ## Privacy and data
 
 MUSE currently stores journal entries, archive records and pixel-art gallery data in the browser on the device where they were created. No app account or server sync is implemented.
