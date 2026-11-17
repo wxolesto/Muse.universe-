@@ -100,7 +100,7 @@ $("#backup-file").addEventListener("change", async event => {
   if (!file) return;
   try {
     const summary = await importBackup(file);
-    toast(`RESTORED ${summary.journal + summary.archive + summary.artwork} ITEMS — RELOADING`);
+    toast(`RESTORED ${summary.journal + summary.archive + summary.artwork + (summary.discoveries || 0)} ITEMS — RELOADING`);
     setTimeout(() => window.location.reload(), 900);
   } catch (error) {
     toast(error.message || "BACKUP COULD NOT BE RESTORED");
@@ -135,6 +135,7 @@ function updateDiscoveryCount() {
   if (!node) return;
   const count = readDiscoveries().length;
   node.innerHTML = `${String(count).padStart(2,"0")} <i>/ 04</i>`;
+  document.querySelectorAll("[data-map-discovery]").forEach(marker => marker.classList.toggle("found", readDiscoveries().some(item => item.id === marker.dataset.mapDiscovery)));
 }
 updateDiscoveryCount();
 window.addEventListener("muse:discovery", event => {
