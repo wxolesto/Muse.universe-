@@ -94,7 +94,7 @@ export function initPixelStudio() {
       items=Array.isArray(stored)?stored.filter(item=>item&&typeof item==="object"):[];
     } catch {}
     const safe = value => String(value??"").replace(/[&<>"]/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[char]));
-    const safeImage = value => typeof value==="string" && value.length<=5*1024*1024 && /^data:image\\/png;base64,[A-Za-z0-9+/]+=*$/.test(value) ? value : "";
+    const safeImage = value => typeof value==="string" && value.length<=5*1024*1024 && /^data:image\/png;base64,[A-Za-z0-9+/]+=*$/.test(value) ? value : "";
     gallery.innerHTML=items.map(item=>{
       const image=safeImage(item.image);
       return `<article class="gallery-tile">${image?`<img src="${image}" alt="${safe(item.title)}">`:'<div class="gallery-image-placeholder" aria-label="Image unavailable">▧</div>'}<div><strong>${safe(item.title)}</strong><small>${Number.isFinite(item.createdAt)?new Date(item.createdAt).toLocaleDateString():"DATE UNKNOWN"}</small></div><button data-remove-art="${safe(item.id)}" aria-label="Delete artwork">×</button></article>`;
