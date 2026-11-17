@@ -88,6 +88,29 @@ window.addEventListener("muse:position", event => {
   marker.setAttribute("cy", 95 + ((y - 185) / 715) * 235);
 });
 $("#inspect-button").addEventListener("click", () => game?.events.emit("interact"));
+
+const builderDialog=$("#builder-dialog");
+const builderStatus=$("#builder-status");
+function updateBuilderStatus(){
+  let count=0;
+  try{const data=JSON.parse(localStorage.getItem("muse.world.objects.v1")||"[]");count=Array.isArray(data)?data.length:0;}catch{}
+  builderStatus.textContent=`${count} CUSTOM OBJECTS · FIRST SHORE`;
+}
+$("#world-builder-button").addEventListener("click",()=>{updateBuilderStatus();builderDialog.showModal();});
+$("#builder-close").addEventListener("click",()=>{builderDialog.close();game?.events.emit("builder:cancel");});
+$("#builder-finish").addEventListener("click",()=>{builderDialog.close();game?.events.emit("builder:cancel");});
+builderDialog.addEventListener("click",event=>{if(event.target===builderDialog){builderDialog.close();game?.events.emit("builder:cancel");}});
+document.querySelectorAll("[data-build-item]").forEach(button=>button.addEventListener("click",()=>{
+  document.querySelectorAll("[data-build-item]").forEach(item=>item.classList.toggle("selected",item===button));
+  builderDialog.close();
+  game?.events.emit("builder:start",button.dataset.buildItem);
+  window.dispatchEvent(new CustomEvent("muse:builder-mode",{detail:{active:true,type:button.dataset.buildItem}}));
+}));
+window.addEventListener("muse:object-placed",event=>{
+  updateBuilderStatus();
+  toast(`${event.detail.type.toUpperCase()} ADDED TO YOUR SHORE`);
+});
+
 const settingsDialog = $("#settings-dialog");
 $("#settings-button").addEventListener("click", () => settingsDialog.showModal());
 $("#settings-close").addEventListener("click", () => settingsDialog.close());
