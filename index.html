@@ -88,6 +88,27 @@
     </main>
     <footer class="app-footer"><span> MUSE <i>·</i> A PRIVATE DIGITAL UNIVERSE</span><span>YOUR WORLD. YOUR RULES.</span></footer>
   </div>
+  <dialog class="map-dialog" id="map-dialog">
+    <div class="dialog-head"><div><p class="eyebrow">MUSE / CARTOGRAPHY</p><h2>The Archipelago.</h2></div><button id="map-close" aria-label="Close map">×</button></div>
+    <div class="map-canvas">
+      <svg viewBox="0 0 720 420" role="img" aria-label="Map of the MUSE archipelago">
+        <defs><pattern id="sea-grid" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M28 0H0V28" fill="none" stroke="#9ab0a0" stroke-opacity=".08" stroke-width="1"/></pattern></defs>
+        <rect width="720" height="420" fill="url(#sea-grid)"/>
+        <path class="map-island active-island" d="M122 184l24-45 55-28 62-8 52 18 45-21 67 22 45 38 37 28 13 49-30 44-55 25-65 3-52-19-53 20-67-22-48-34-28-43z"/>
+        <path class="map-island locked-island" d="M475 78l22-29 48-9 41 18 13 31-20 28-52 6-40-18z"/>
+        <path class="map-island locked-island" d="M560 285l27-31 49 1 38 25-8 35-48 18-42-14z"/>
+        <path class="map-island locked-island" d="M74 65l20-25 43 3 28 22-13 30-42 12-33-17z"/>
+        <path class="map-path" d="M205 270Q300 240 355 208T490 93"/>
+        <g class="map-location"><circle cx="360" cy="210" r="19"/><circle cx="360" cy="210" r="5"/></g>
+        <circle id="map-player-marker" class="map-player" cx="360" cy="210" r="7"/>
+        <text x="276" y="322" class="map-label">THE FIRST SHORE</text>
+        <text x="500" y="35" class="map-muted">???</text><text x="595" y="365" class="map-muted">UNMAPPED</text>
+        <text x="86" y="28" class="map-muted">THE UNKNOWN SEA</text>
+      </svg>
+      <div class="map-legend"><span><i class="legend-dot discovered"></i> DISCOVERED</span><span><i class="legend-dot player-dot"></i> YOU ARE HERE</span><span><i class="legend-dot locked"></i> UNEXPLORED</span></div>
+    </div>
+    <p class="map-footnote">The world is larger than this map. New shores will appear as your universe grows.</p>
+  </dialog>
   <dialog class="settings-dialog" id="settings-dialog">
     <div class="dialog-head"><div><p class="eyebrow">MUSE / WORLD SETTINGS</p><h2>Your universe, protected.</h2></div><button id="settings-close" aria-label="Close settings">×</button></div>
     <p class="dialog-copy">Create a portable backup of your journal, archive collections and pixel artworks, or restore a previous backup on this device.</p>
