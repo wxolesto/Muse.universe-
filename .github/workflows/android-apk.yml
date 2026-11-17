@@ -81,8 +81,8 @@ jobs:
           if (!gradle.includes('buildTypes {')) throw new Error('Could not find Android buildTypes block');
           const signing = `signingConfigs {\n        release {\n            storeFile file('muse-release.keystore')\n            storePassword System.getenv('MUSE_KEYSTORE_PASSWORD')\n            keyAlias System.getenv('MUSE_KEY_ALIAS')\n            keyPassword System.getenv('MUSE_KEY_PASSWORD')\n        }\n    }\n    `;
           gradle = gradle.replace('buildTypes {', signing + 'buildTypes {');
-          if (!/buildTypes\\s*\\{\\s*release\\s*\\{/.test(gradle)) throw new Error('Could not find release build type');
-          gradle = gradle.replace(/(buildTypes\\s*\\{\\s*release\\s*\\{)/, '$1\\n            signingConfig signingConfigs.release');
+          if (!/buildTypes\s*\\{\s*release\s*\\{/.test(gradle)) throw new Error('Could not find release build type');
+          gradle = gradle.replace(/(buildTypes\s*\\{\s*release\s*\\{)/, '$1\n            signingConfig signingConfigs.release');
           fs.writeFileSync(file, gradle);
           NODE
 
