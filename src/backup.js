@@ -17,6 +17,7 @@ export async function exportBackup() {
     worldObjects: readJSON("muse.world.objects.v1", []),
     innerCheckins: readJSON("muse.inner.checkins.v1", []),
     musicTracks: readJSON("muse.music.tracks.v1", []),
+    musicPlaylists: readJSON("muse.music.playlists.v1", []),
     musicAudio: audioFiles
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
@@ -47,6 +48,7 @@ export async function importBackup(file) {
   if (Array.isArray(payload.worldObjects)) localStorage.setItem("muse.world.objects.v1", JSON.stringify(payload.worldObjects));
   if (Array.isArray(payload.innerCheckins)) localStorage.setItem("muse.inner.checkins.v1", JSON.stringify(payload.innerCheckins));
   if (Array.isArray(payload.musicTracks)) localStorage.setItem("muse.music.tracks.v1", JSON.stringify(payload.musicTracks));
+  if (Array.isArray(payload.musicPlaylists)) localStorage.setItem("muse.music.playlists.v1", JSON.stringify(payload.musicPlaylists));
   if (Array.isArray(payload.musicAudio)) for (const item of payload.musicAudio) { if (item && typeof item.id === "string" && typeof item.data === "string") await saveAudioFile(item.id, dataURLToBlob(item.data, item.type)); }
   return {
     journal: payload.journal.length,
@@ -56,7 +58,8 @@ export async function importBackup(file) {
     worldObjects: Array.isArray(payload.worldObjects) ? payload.worldObjects.length : 0,
     innerCheckins: Array.isArray(payload.innerCheckins) ? payload.innerCheckins.length : 0,
     musicTracks: Array.isArray(payload.musicTracks) ? payload.musicTracks.length : 0,
-    musicAudioFiles: Array.isArray(payload.musicAudio) ? payload.musicAudio.length : 0
+    musicAudioFiles: Array.isArray(payload.musicAudio) ? payload.musicAudio.length : 0,
+    musicPlaylists: Array.isArray(payload.musicPlaylists) ? payload.musicPlaylists.length : 0
   };
 }
 
