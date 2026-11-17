@@ -55,7 +55,7 @@ export function initPixelStudio() {
       if(pixels[index]){color=pixels[index];colorInput.value=color;selectPalette(color);}
       return;
     }
-    if(tool==="fill"){floodFill(x,y);return;}
+    if(tool==="fill"){floodFill(x,y);render();return;}
     pixels[index]=tool==="eraser"?null:color;
     render();
   };
@@ -89,7 +89,7 @@ export function initPixelStudio() {
   };
   const loadGallery = () => {
     let items=[];try{items=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");}catch{}
-    gallery.innerHTML=items.map(item=>`<article class="gallery-tile"><img src="${item.image}" alt="${item.title}"><div><strong>${item.title}</strong><small>${new Date(item.createdAt).toLocaleDateString()}</small></div><button data-remove-art="${item.id}" aria-label="Delete artwork">×</button></article>`).join("") || '<p class="gallery-empty">Your first tiny masterpiece will live here.</p>';
+    const safe = value => String(value).replace(/[&<>"\x27]/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",\x27:"&#39;",\x22:"&quot;"}[char]));\n    gallery.innerHTML=items.map(item=>`<article class="gallery-tile"><img src="${item.image}" alt="${safe(item.title)}"><div><strong>${safe(item.title)}</strong><small>${new Date(item.createdAt).toLocaleDateString()}</small></div><button data-remove-art="${safe(item.id)}" aria-label="Delete artwork">×</button></article>`).join("") || '<p class="gallery-empty">Your first tiny masterpiece will live here.</p>';
     gallery.querySelectorAll("[data-remove-art]").forEach(button=>button.addEventListener("click",()=>{
       const list=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]").filter(item=>item.id!==button.dataset.removeArt);
       localStorage.setItem(STORAGE_KEY,JSON.stringify(list));loadGallery();
@@ -131,8 +131,8 @@ export function initPixelStudio() {
     const outCtx=out.getContext("2d");
     pixels.forEach((value,index)=>{if(value){outCtx.fillStyle=value;outCtx.fillRect(index%size,Math.floor(index/size),1,1);}});
     const items=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");
-    items.unshift({id:crypto.randomUUID?.()||String(Date.now()),title:title.trim(),image:out.toDataURL("image/png"),createdAt:Date.now(),size});
-    try{localStorage.setItem(STORAGE_KEY,JSON.stringify(items.slice(0,80)));loadGallery();status.textContent="SAVED TO YOUR LOCAL GALLERY";}catch{status.textContent="GALLERY STORAGE FULL — EXPORT PNG INSTEAD";}
+    items.unshift({id:globalThis.crypto?.randomUUID?.()||String(Date.now()),title:title.trim(),image:out.toDataURL("image/png"),createdAt:Date.now(),size});
+    try{localStorage.setItem(STORAGE_KEY,JSON.stringify(items.slice(0,24)));loadGallery();status.textContent="SAVED TO YOUR LOCAL GALLERY";}catch{status.textContent="GALLERY STORAGE FULL — EXPORT PNG INSTEAD";}
   });
   render();loadGallery();
 }
