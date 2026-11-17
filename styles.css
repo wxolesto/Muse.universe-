@@ -221,3 +221,20 @@
     scroll-behavior: auto !important;
   }
 }
+
+
+/* Expanded exploration viewport */
+.game-frame{height:clamp(520px,70vh,760px);max-height:none}
+.world-expand-button{position:absolute;z-index:5;top:14px;right:15px;border:1px solid #d9ddc65c;background:#121c1dc9;color:#e4e5d8;padding:9px 12px;font:8px var(--mono);letter-spacing:.1em;cursor:pointer;backdrop-filter:blur(8px)}
+.world-expand-button:hover{background:#35453b}
+body.world-immersive{overflow:hidden}
+body.world-immersive .app-shell{max-width:none;min-height:100dvh;padding:0}
+body.world-immersive .topbar,body.world-immersive .app-footer{display:none}
+body.world-immersive .main-layout{display:block;padding:0;margin:0;min-height:100dvh}
+body.world-immersive .rail{display:none}
+body.world-immersive .world-panel{display:block;width:100%;max-width:none;height:100dvh;margin:0}
+body.world-immersive .world-heading,body.world-immersive .below-world{display:none}
+body.world-immersive .game-frame{height:100dvh;max-height:none;border:0;box-shadow:none}
+body.world-immersive .world-expand-button{top:12px;right:12px}
+@media(max-width:800px){.game-frame{height:72vh;max-height:none}}
+@media(max-width:520px){.game-frame{height:72dvh;min-height:480px;max-height:none}.world-expand-button{top:10px;right:10px;padding:8px 10px;font-size:7px}body.world-immersive .game-actions{right:10px;bottom:12px}}
