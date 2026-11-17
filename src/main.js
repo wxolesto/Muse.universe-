@@ -1,4 +1,3 @@
-import { createWorld } from "./world.js";
 import { getEntries, saveEntry, deleteEntry, createId } from "./storage.js";
 import { initPixelStudio } from "./pixel-studio.js";
 import { initArchive } from "./archive.js";
@@ -40,12 +39,30 @@ initArchive();
 initInnerWorld();
 
 let game;
-try {
-  game = createWorld("game-container");
-} catch (error) {
-  console.error("MUSE world could not start:", error);
-  $("#game-container").innerHTML = '<div style="padding:24px;color:#e8e4d9;font:12px monospace">The world engine could not start. Please refresh this page.</div>';
+let worldPromise;
+function ensureWorld() {
+  if (game) return Promise.resolve(game);
+  if (!worldPromise) {
+    const container = $("#game-container");
+    container.setAttribute("aria-busy", "true");
+    worldPromise = import("./world.js").then(({createWorld}) => {
+      game = createWorld("game-container");
+      container.removeAttribute("aria-busy");
+      return game;
+    }).catch(error => {
+      worldPromise = null;
+      console.error("MUSE world could not start:", error);
+      container.removeAttribute("aria-busy");
+      container.innerHTML = '<div style="padding:24px;color:#e8e4d9;font:12px monospace">The world engine could not start. Please refresh this page.</div>';
+      throw error;
+    });
+  }
+  return worldPromise;
 }
+function emitWorldEvent(name, ...args) {
+  ensureWorld().then(world => world.events.emit(name, ...args)).catch(() => {});
+}
+ensureWorld().catch(() => {});
 
 $("#entry-form").addEventListener("submit", async event => {
   event.preventDefault();
@@ -89,7 +106,7 @@ window.addEventListener("muse:position", event => {
   marker.setAttribute("cx", 122 + ((x - 180) / 1355) * 498);
   marker.setAttribute("cy", 95 + ((y - 185) / 715) * 235);
 });
-$("#inspect-button").addEventListener("click", () => game?.events.emit("interact"));
+$("#inspect-button").addEventListener("click", () => emitWorldEvent("interact"));
 
 const builderDialog=$("#builder-dialog");
 const builderStatus=$("#builder-status");
@@ -99,13 +116,13 @@ function updateBuilderStatus(){
   builderStatus.textContent=`${count} CUSTOM OBJECTS · FIRST SHORE`;
 }
 $("#world-builder-button").addEventListener("click",()=>{updateBuilderStatus();builderDialog.showModal();});
-$("#builder-close").addEventListener("click",()=>{builderDialog.close();game?.events.emit("builder:cancel");});
+$("#builder-close").addEventListener("click",()=>{builderDialog.close();emitWorldEvent("builder:cancel");});
 $("#builder-finish").addEventListener("click",()=>{builderDialog.close();game?.events.emit("builder:cancel");});
 builderDialog.addEventListener("click",event=>{if(event.target===builderDialog){builderDialog.close();game?.events.emit("builder:cancel");}});
 document.querySelectorAll("[data-build-item]").forEach(button=>button.addEventListener("click",()=>{
   document.querySelectorAll("[data-build-item]").forEach(item=>item.classList.toggle("selected",item===button));
   builderDialog.close();
-  game?.events.emit("builder:start",button.dataset.buildItem);
+  emitWorldEvent("builder:start",button.dataset.buildItem);
   window.dispatchEvent(new CustomEvent("muse:builder-mode",{detail:{active:true,type:button.dataset.buildItem}}));
 }));
 window.addEventListener("muse:object-placed",event=>{
