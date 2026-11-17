@@ -15,7 +15,7 @@ permissions:
 
 concurrency:
   group: muse-android-apk
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build-apk:
