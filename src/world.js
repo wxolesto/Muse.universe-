@@ -613,10 +613,10 @@ export function createWorld(parent) {
 
     getNearbyDiscovery() {
       const discoveries=[
-        {id:"wayfarer",title:"THE OLD WAYFARER",x:1050,y:365,r:145,description:"A small house with a light left on. Someone once lived here."},
-        {id:"marker",title:"THE WEATHERED MARKER",x:690,y:455,r:92,description:"Its symbols have almost disappeared beneath the moss."},
-        {id:"low-tide",title:"LOW TIDE",x:1380,y:665,r:110,description:"The sea has left tiny shells and glass-smooth stones along the pier."},
-        {id:"quiet-grove",title:"THE QUIET GROVE",x:760,y:780,r:95,description:"The leaves move even when the air feels still."}
+        {id:"wayfarer",title:"THE OLD WAYFARER",x:1050,y:365,r:145,description:"A small house with a light left on. Someone once lived here.",lore:"The door is weathered, but the lamp in the eastern window still glows. A shelf inside holds four empty cups and a map with its edges carefully folded. Whoever lived here expected company — and never quite stopped waiting.\n\nA note is pinned beneath the map: “If you have found this place, the shore has not forgotten how to welcome strangers.”"},
+        {id:"marker",title:"THE WEATHERED MARKER",x:690,y:455,r:92,description:"Its symbols have almost disappeared beneath the moss.",lore:"The stone is older than the path that passes it. Beneath the moss, its carved marks form a pattern of tides, stars and tiny branching lines. It does not point north. It points somewhere that no longer appears on any chart.\n\nOne symbol has been polished smooth by countless fingertips."},
+        {id:"low-tide",title:"LOW TIDE",x:1380,y:665,r:110,description:"The sea has left tiny shells and glass-smooth stones along the pier.",lore:"At the far end of the pier, the water withdraws just long enough to reveal a narrow ribbon of dark sand. There are pale shells, green glass and a little brass button worn almost flat.\n\nThe tide will cover the shore again. For now, the sea has left a small collection of things it could not keep."},
+        {id:"quiet-grove",title:"THE QUIET GROVE",x:760,y:780,r:95,description:"The leaves move even when the air feels still.",lore:"The trees grow close together here, their roots threading through the same patch of earth. The air is cooler beneath their canopy. If you stay still, you may notice that the leaves move in a slow rhythm — not with the wind, but as if the grove is breathing.\n\nA single feather rests beside the oldest root. Mina and Toto sometimes circle this place before flying out over the water."}
       ];
       return discoveries
         .map(item=>({...item,distance:Phaser.Math.Distance.Between(this.player.x,this.player.y,item.x,item.y)}))
@@ -627,7 +627,7 @@ export function createWorld(parent) {
     inspectNearby() {
       const nearby=this.getNearbyDiscovery();
       if(nearby){
-        window.dispatchEvent(new CustomEvent("muse:discovery",{detail:{id:nearby.id,title:nearby.title,description:nearby.description}}));
+        window.dispatchEvent(new CustomEvent("muse:discovery",{detail:{id:nearby.id,title:nearby.title,description:nearby.description,lore:nearby.lore}}));
       }else{
         window.dispatchEvent(new CustomEvent("muse:toast",{detail:"Only wind, grass and the sound of the sea."}));
       }
