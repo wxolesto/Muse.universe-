@@ -599,19 +599,19 @@ export function createWorld(parent) {
 
     inspectNearby() {
       const discoveries = [
-        {x:1050,y:365,r:145,message:"THE OLD WAYFARER — A small house with a light left on. Someone once lived here."},
-        {x:690,y:455,r:92,message:"THE WEATHERED MARKER — Its symbols have almost disappeared beneath the moss."},
-        {x:1380,y:665,r:110,message:"LOW TIDE — The sea has left tiny shells and glass-smooth stones along the pier."},
-        {x:760,y:780,r:95,message:"THE QUIET GROVE — The leaves move even when the air feels still."}
+        {id:"wayfarer",title:"THE OLD WAYFARER",x:1050,y:365,r:145,description:"A small house with a light left on. Someone once lived here."},
+        {id:"marker",title:"THE WEATHERED MARKER",x:690,y:455,r:92,description:"Its symbols have almost disappeared beneath the moss."},
+        {id:"low-tide",title:"LOW TIDE",x:1380,y:665,r:110,description:"The sea has left tiny shells and glass-smooth stones along the pier."},
+        {id:"quiet-grove",title:"THE QUIET GROVE",x:760,y:780,r:95,description:"The leaves move even when the air feels still."}
       ];
-      const nearby = discoveries
-        .map(item => ({...item,distance:Phaser.Math.Distance.Between(this.player.x,this.player.y,item.x,item.y)}))
-        .filter(item => item.distance < item.r)
+      const nearby=discoveries
+        .map(item=>({...item,distance:Phaser.Math.Distance.Between(this.player.x,this.player.y,item.x,item.y)}))
+        .filter(item=>item.distance<item.r)
         .sort((a,b)=>a.distance-b.distance)[0];
-      if (nearby) {
-        window.dispatchEvent(new CustomEvent("muse:toast", {detail:nearby.message}));
-      } else {
-        window.dispatchEvent(new CustomEvent("muse:toast", {detail:"Only wind, grass and the sound of the sea."}));
+      if(nearby){
+        window.dispatchEvent(new CustomEvent("muse:discovery",{detail:{id:nearby.id,title:nearby.title,description:nearby.description}}));
+      }else{
+        window.dispatchEvent(new CustomEvent("muse:toast",{detail:"Only wind, grass and the sound of the sea."}));
       }
     }
 
