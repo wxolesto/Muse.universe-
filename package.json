@@ -12,7 +12,6 @@
     "android:sync": "npm run build && cap sync android"
   },
   "dependencies": {
-    "phaser": "3.90.0",
     "@capacitor/core": "8.6.2",
     "@capacitor/android": "8.6.2"
   },
