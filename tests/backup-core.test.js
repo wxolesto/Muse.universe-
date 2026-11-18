@@ -14,6 +14,7 @@ test("accepts a valid current backup and older v1 backups with optional sections
   assert.equal(validated.journal.length, 1);
   assert.deepEqual(validated.musicTracks, []);
   assert.deepEqual(validated.musicAudio, []);
+  assert.deepEqual(validated.libraryItems, []);
 });
 
 test("rejects malformed required sections before restore begins", () => {
@@ -57,4 +58,28 @@ test("validates audio media MIME and payload", () => {
   assert.equal(validateBackupPayload(payload).musicAudio.length, 1);
   payload.musicAudio[0].data = "data:image/png;base64,AA==";
   assert.throws(() => validateBackupPayload(payload), /audio data URL/);
+});
+
+test("validates and preserves Library books, movies and series in backups", () => {
+  const payload = base();
+  payload.libraryItems = [
+    {id:"b1",type:"book",title:"A Book",creator:"An Author",status:"finished",rating:5,createdAt:20},
+    {id:"m1",type:"movie",title:"A Film",status:"want",cover:"data:image/jpeg;base64,AA==",createdAt:21},
+    {id:"s1",type:"series",title:"A Series",status:"in-progress",createdAt:22}
+  ];
+  const validated = validateBackupPayload(payload);
+  assert.equal(validated.libraryItems.length, 3);
+  assert.equal(validated.libraryItems[1].type, "movie");
+});
+
+test("rejects invalid Library types, statuses, ratings and cover payloads", () => {
+  const payload = base();
+  payload.libraryItems = [{id:"x1",type:"game",title:"Not a library type",createdAt:1}];
+  assert.throws(() => validateBackupPayload(payload), /library item type/);
+  payload.libraryItems = [{id:"x1",type:"book",title:"Book",status:"unknown",createdAt:1}];
+  assert.throws(() => validateBackupPayload(payload), /library item status/);
+  payload.libraryItems = [{id:"x1",type:"book",title:"Book",rating:8,createdAt:1}];
+  assert.throws(() => validateBackupPayload(payload), /library item rating/);
+  payload.libraryItems = [{id:"x1",type:"book",title:"Book",cover:"data:text/html;base64,AA==",createdAt:1}];
+  assert.throws(() => validateBackupPayload(payload), /image data URL/);
 });
