@@ -242,3 +242,62 @@ body.world-immersive .world-expand-button{top:12px;right:12px}
 .builder-footer-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.builder-footer-actions button:disabled{opacity:.35;cursor:not-allowed}.builder-footer{gap:12px;flex-wrap:wrap}@media(max-width:520px){.builder-footer-actions{width:100%}.builder-footer-actions button{flex:1;min-width:0;font-size:7px;padding:0 7px}}
 
 .world-edit-toolbar{position:fixed;z-index:30;left:50%;bottom:18px;transform:translateX(-50%);display:flex;align-items:center;gap:8px;padding:9px 11px;background:#142024ed;border:1px solid #b9c7a566;box-shadow:0 12px 38px #0009;backdrop-filter:blur(12px);color:#dfe4d5}.world-edit-toolbar[hidden]{display:none}.world-edit-toolbar span{font:8px var(--mono);letter-spacing:.1em;color:#aebaa9;margin:0 7px}.world-edit-toolbar button{border:1px solid #c7d0b44d;background:#263532;color:#e5e8d9;padding:9px 12px;font:8px var(--mono);letter-spacing:.08em}.world-edit-toolbar button:hover{background:#52634e}@media(max-width:520px){.world-edit-toolbar{width:calc(100% - 24px);bottom:12px;justify-content:center}.world-edit-toolbar span{font-size:6px;margin:0 2px}.world-edit-toolbar button{padding:9px 8px}}
+
+
+/* Mobile explorer controls: a compact D-pad anchored to the bottom edge. */
+#game-container{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+.touch-pad{
+  display:none;
+  position:absolute;
+  z-index:6;
+  left:14px;
+  right:auto;
+  top:auto;
+  bottom:14px;
+  transform:none;
+  width:140px;
+  height:140px;
+  display:grid;
+  grid-template-columns:repeat(3,44px);
+  grid-template-rows:repeat(3,44px);
+  gap:3px;
+  align-content:center;
+  justify-content:center;
+  pointer-events:none;
+}
+.touch-pad>button,
+.touch-pad>div button{
+  width:44px;height:44px;
+  display:grid;place-items:center;
+  border:1px solid #d9ddc67a;
+  border-radius:7px;
+  background:#142321dc;
+  color:#f0eddf;
+  font:22px/1 var(--sans);
+  box-shadow:0 3px 12px #0007;
+  backdrop-filter:blur(7px);
+  touch-action:none;
+  user-select:none;
+  -webkit-user-select:none;
+  pointer-events:auto;
+}
+.touch-pad>button{grid-column:2;grid-row:1}
+.touch-pad>div{display:contents}
+.touch-pad>div button[data-dir="left"]{grid-column:1;grid-row:2}
+.touch-pad>div button[data-dir="down"]{grid-column:2;grid-row:3}
+.touch-pad>div button[data-dir="right"]{grid-column:3;grid-row:2}
+.touch-pad button:active{background:#62745b;border-color:#e1e7c8;transform:scale(.96)}
+@media(max-width:800px){
+  .touch-pad{display:grid;left:12px;bottom:12px;right:auto;top:auto;transform:none}
+  .game-location{bottom:158px;left:14px}
+  .game-actions{right:12px;bottom:14px;left:auto;top:auto;flex-direction:column;z-index:6}
+}
+@media(max-width:520px){
+  .touch-pad{left:8px;bottom:8px;width:132px;height:132px;grid-template-columns:repeat(3,42px);grid-template-rows:repeat(3,42px);gap:2px}
+  .touch-pad>button,.touch-pad>div button{width:42px;height:42px;font-size:20px}
+  .game-location{bottom:145px;left:10px}
+  .game-actions{right:8px;bottom:9px;gap:5px}
+  .game-actions button{min-width:76px;text-align:center}
+}
+body.world-immersive .touch-pad{bottom:14px;left:14px}
+@media(max-width:520px){body.world-immersive .touch-pad{bottom:8px;left:8px}}
