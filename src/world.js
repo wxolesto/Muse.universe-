@@ -145,6 +145,7 @@ export function createWorld(parent) {
       g.strokePoints(points, true);
       this.applyGroundTexture(points);
       this.drawCoast(points);
+      this.drawShorelineAccents(points);
       this.createCoastGlints(points);
 
       const grass = this.add.graphics().setDepth(3);
@@ -223,6 +224,47 @@ export function createWorld(parent) {
       coast.strokePoints(points, true);
       coast.lineStyle(3, 0x293f3b, .8);
       coast.strokePoints(points, true);
+    }
+
+    drawShorelineAccents(points) {
+      // Broken foam, wet-sand flecks and scattered shell fragments soften the
+      // hard edge between land and sea without adding hundreds of sprites.
+      const accents = this.add.graphics().setDepth(6.2);
+      let sample = 0;
+      for (let edge = 0; edge < points.length; edge++) {
+        const a = points[edge];
+        const b = points[(edge + 1) % points.length];
+        const length = Phaser.Math.Distance.Between(a.x, a.y, b.x, b.y);
+        const steps = Math.max(1, Math.floor(length / 72));
+        for (let step = 1; step < steps; step++) {
+          if (sample++ % 2) continue;
+          const t = step / steps;
+          const x = Phaser.Math.Linear(a.x, b.x, t);
+          const y = Phaser.Math.Linear(a.y, b.y, t);
+          const dx = x - 850;
+          const dy = y - 550;
+          const magnitude = Math.max(1, Math.hypot(dx, dy));
+          const nx = dx / magnitude;
+          const ny = dy / magnitude;
+          const variation = Math.sin(sample * 2.17) * 5;
+          const shoreX = x + nx * (43 + variation);
+          const shoreY = y + ny * (43 + variation);
+
+          accents.fillStyle(0xd7d7bd, 0.16);
+          accents.fillEllipse(shoreX, shoreY, 10 + (sample % 3) * 3, 2);
+          accents.fillStyle(0x243f3c, 0.2);
+          accents.fillEllipse(shoreX + nx * 5, shoreY + ny * 5, 7, 2);
+
+          if (sample % 5 === 0) {
+            const shellX = shoreX + nx * 8 + Math.sin(sample) * 4;
+            const shellY = shoreY + ny * 8 + Math.cos(sample * 1.4) * 3;
+            accents.fillStyle(sample % 2 ? 0xc8b995 : 0xb9aaa0, 0.72);
+            accents.fillEllipse(shellX, shellY, 4, 3);
+            accents.fillStyle(0xe0d2b2, 0.55);
+            accents.fillRect(shellX - 1, shellY - 2, 2, 1);
+          }
+        }
+      }
     }
 
     createCoastGlints(points) {
@@ -1310,11 +1352,18 @@ export function createWorld(parent) {
         this.nextMapUpdate = this.time.now + 250;
         window.dispatchEvent(new CustomEvent("muse:position", {detail:{x:this.player.x,y:this.player.y}}));
       }
-      const nearby=this.getNearbyDiscovery();
-      if(Boolean(nearby)!==this.showingInteractionPrompt){
-        this.showingInteractionPrompt=Boolean(nearby);
-        this.tweens.add({targets:this.interactionPrompt,alpha:nearby?1:0,duration:220,ease:"Sine.easeOut"});
+      // Discovery proximity only needs a 10 Hz refresh; movement and sprite
+      // depth remain frame-accurate while avoiding repeated array allocations.
+      if (this.time.now > (this.nextDiscoveryCheck || 0)) {
+        this.nextDiscoveryCheck = this.time.now + 100;
+        const nearby = this.getNearbyDiscovery();
+        this.nearbyDiscovery = nearby;
+        if (Boolean(nearby) !== this.showingInteractionPrompt) {
+          this.showingInteractionPrompt = Boolean(nearby);
+          this.tweens.add({targets:this.interactionPrompt,alpha:nearby?1:0,duration:220,ease:"Sine.easeOut"});
+        }
       }
+      const nearby = this.nearbyDiscovery;
       if(nearby && this.interactionPrompt.text!==nearby.title+"  ·  INTERACT"){
         this.interactionPrompt.setText(nearby.title+"  ·  INTERACT");
       }else if(!nearby && this.interactionPrompt.text!=="A LANDMARK IS NEARBY"){
