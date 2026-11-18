@@ -296,11 +296,13 @@ export function createWorld(parent) {
 
     drawPath() {
       const g=this.add.graphics().setDepth(4);
+      // One connected trail network: the main route reaches the hut entrance,
+      // with continuous branches to the old arch, southern cove and pier.
       const paths=[
-        new Phaser.Curves.Path(430,730).lineTo(520,675).lineTo(610,620).lineTo(700,590).lineTo(790,540).lineTo(900,500).lineTo(1010,450).lineTo(1110,410),
-        new Phaser.Curves.Path(790,540).lineTo(760,470).lineTo(790,405).lineTo(850,350),
-        new Phaser.Curves.Path(700,590).lineTo(625,650).lineTo(590,730).lineTo(620,795),
-        new Phaser.Curves.Path(1010,450).lineTo(1110,505).lineTo(1200,565).lineTo(1285,635)
+        new Phaser.Curves.Path(420,742).lineTo(520,680).lineTo(635,620).lineTo(790,548).lineTo(920,495).lineTo(1032,438),
+        new Phaser.Curves.Path(790,548).lineTo(805,470).lineTo(820,405).lineTo(835,365),
+        new Phaser.Curves.Path(635,620).lineTo(600,690).lineTo(590,760).lineTo(625,812),
+        new Phaser.Curves.Path(790,548).lineTo(955,552).lineTo(1110,575).lineTo(1260,625).lineTo(1405,690)
       ];
       paths.forEach((path,i)=>{
         g.lineStyle(i===0?36:23,0x514e3d,.48);path.draw(g);
@@ -513,8 +515,26 @@ export function createWorld(parent) {
       add(this.add.rectangle(-24,-5,3,35,0x72583d));
       add(this.add.rectangle(25,-4,3,34,0x72583d));
       // Layered thatch roof with a broken, asymmetrical ridge.
-      add(this.add.triangle(0,-39,-73,24,74,24,5,-25,0x3e4034).setStrokeStyle(3,0x292f29));
-      add(this.add.triangle(-2,-43,-63,20,62,20,0,-23,0x66563d));
+      // Draw the roof in the hut's own local coordinate space. Using a
+      // single local polygon keeps both roof planes anchored to the walls.
+      const roof=this.add.graphics();
+      roof.fillStyle(0x292f29,1);
+      roof.fillPoints([
+        new Phaser.Geom.Point(-76,-15),new Phaser.Geom.Point(5,-69),
+        new Phaser.Geom.Point(77,-14),new Phaser.Geom.Point(69,-8),
+        new Phaser.Geom.Point(5,-58),new Phaser.Geom.Point(-68,-8)
+      ],true);
+      roof.fillStyle(0x66563d,1);
+      roof.fillPoints([
+        new Phaser.Geom.Point(-66,-17),new Phaser.Geom.Point(5,-62),
+        new Phaser.Geom.Point(67,-16),new Phaser.Geom.Point(5,-52)
+      ],true);
+      roof.lineStyle(2,0x292f29,.95);
+      roof.strokePoints([
+        new Phaser.Geom.Point(-76,-15),new Phaser.Geom.Point(5,-69),
+        new Phaser.Geom.Point(77,-14)
+      ],false);
+      add(roof);
       for(let i=0;i<9;i++){
         const px=-55+i*14;
         add(this.add.rectangle(px,-42+(i%3)*2,12,3,i%2?0x89734e:0x756344));
@@ -1317,6 +1337,34 @@ export function createWorld(parent) {
       }
     }
 
+    isWorldBlocked(x,y) {
+      // Collision footprints are placed at trunks and solid masonry, not at
+      // the decorative canopy tops, so the player can walk beneath tree crowns.
+      const circles=[
+        [470,390,13],[580,330,11],[1260,550,15],[1180,690,10],
+        [760,780,12],[390,620,10],[1370,430,11],[900,300,9],
+        [590,520,9],[1120,760,11],
+        [350,510,13],[430,460,11],[650,285,10],[735,345,11],
+        [930,330,10],[1160,520,14],[1320,600,14],[1240,750,12],
+        [920,820,13],[560,780,12],[330,680,13],[1040,760,12],
+        [1400,555,15],[1350,600,12],[1430,640,11],[1260,785,12],
+        [835-37,350,11],[835+37,350,11],
+        [1285,500,16]
+      ];
+      for (const [cx,cy,r] of circles) {
+        if (Phaser.Math.Distance.Between(x,y,cx,cy) < r+7) return true;
+      }
+
+      // Hut masonry blocks movement, while the front doorway remains open.
+      const inHutWall=x>990 && x<1110 && y>350 && y<397;
+      const inDoorway=x>1020 && x<1047 && y>374 && y<410;
+      if(inHutWall && !inDoorway) return true;
+
+      // The pier is solid timber; its landward approach remains walkable.
+      if(x>1380 && x<1440 && y>675 && y<704) return true;
+      return false;
+    }
+
     update() {
       if (!this.player?.body) return;
       const keys = this.keys;
@@ -1337,6 +1385,10 @@ export function createWorld(parent) {
         vx = 0;
         vy = 0;
       }
+      // Resolve axes independently so a blocked direction still allows the
+      // player to slide along a wall or around a tree instead of sticking.
+      if(vx && this.isWorldBlocked(nextX,this.player.y)) vx=0;
+      if(vy && this.isWorldBlocked(this.player.x,nextY)) vy=0;
       this.player.body.setVelocity(vx * speed, vy * speed);
       this.player.setDepth(this.player.y);
       this.playerShadow.setPosition(this.player.x, this.player.y + 13).setDepth(this.player.y - 1);
