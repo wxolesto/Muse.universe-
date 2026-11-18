@@ -28,6 +28,7 @@
         <button class="rail-item" data-view="inner"><span>☾</span><small>INNER WORLD</small></button>
         <button class="rail-item" data-view="music"><span>♫</span><small>MUSIC ROOM</small></button>
         <button class="rail-item" data-view="studio"><span>▧</span><small>STUDIO</small></button>
+        <button class="rail-item" data-view="library"><span>▣</span><small>LIBRARY</small></button>
         <div class="rail-spacer"></div>
         <button class="rail-item" id="settings-button"><span>⚙</span><small>SETTINGS</small></button>
       </aside>
@@ -48,6 +49,7 @@
           <button class="archive-card home-link" data-open-view="inner"><span class="archive-symbol">☾</span><small>03 / REFLECT</small><h2>Inner World</h2><p>A gentle record of how each day feels.</p><span class="card-foot">OPEN INNER WORLD ↗ <span class="home-count" id="home-inner-count">00</span></span></button>
           <button class="archive-card home-link" data-open-view="music"><span class="archive-symbol">♫</span><small>04 / LISTEN</small><h2>Music Room</h2><p>Songs, albums, playlists and their stories.</p><span class="card-foot">OPEN MUSIC ROOM ↗ <span class="home-count" id="home-music-count">00</span></span></button>
           <button class="archive-card home-link" data-open-view="studio"><span class="archive-symbol">▧</span><small>05 / CREATE</small><h2>Pixel Studio</h2><p>A small workshop for your pixel-art ideas.</p><span class="card-foot">OPEN STUDIO ↗ <span class="home-count" id="home-studio-count">00</span></span></button>
+          <button class="archive-card home-link" data-open-view="library"><span class="archive-symbol">▣</span><small>06 / EXPLORE</small><h2>Library</h2><p>Books, films and series worth keeping.</p><span class="card-foot">OPEN LIBRARY ↗ <span class="home-count" id="home-library-count">00</span></span></button>
         </div>
         <div class="home-footer-note"><span>✦</span><p>Your space doesn't need to be anything other than what you make of it.</p></div>
       </section>
@@ -123,6 +125,30 @@
         </form>
         <div class="music-library-head"><div><p class="eyebrow">YOUR PERSONAL SOUNDTRACK</p><h2>Saved tracks.</h2></div><span id="music-count">0 TRACKS</span></div>
         <div class="music-playlist-toolbar"><div><p class="eyebrow">CURATED BY YOU</p><strong>Your playlists</strong></div><select id="music-playlist-filter" aria-label="Filter by playlist"><option value="">ALL TRACKS</option></select><button type="button" class="secondary-button" id="music-create-playlist">＋ NEW PLAYLIST</button></div><section class="music-player-panel" aria-label="Music player"><div class="player-now"><div class="player-art" id="player-art">♫</div><div><p class="eyebrow">NOW PLAYING</p><h3 id="player-title">Choose a song from your library</h3><span id="player-artist">YOUR MUSIC, YOUR SPACE</span></div></div><audio id="music-player" controls preload="metadata"></audio><div class="player-queue-controls"><button type="button" id="player-prev" aria-label="Previous track">PREVIOUS</button><button type="button" id="player-shuffle" aria-pressed="false">SHUFFLE OFF</button><button type="button" id="player-next" aria-label="Next track">NEXT</button></div></section><div id="music-list" class="music-list"><p class="empty-state">The first song is waiting to be added.</p></div>
+      </section>
+
+
+      <section class="content-view hidden" id="library-view">
+        <div class="section-intro"><p class="eyebrow">A SHELF FOR STORIES THAT STAY</p><h1>Your <em>Library.</em></h1><p>Books, films and series — collected, remembered and reviewed in your own way.</p></div>
+        <div class="library-overview"><div><span>YOUR COLLECTION</span><strong id="library-total">00</strong></div><div><span>BOOKS</span><strong id="library-books-total">00</strong></div><div><span>SCREEN</span><strong id="library-screen-total">00</strong></div></div>
+        <form id="library-form" class="library-form">
+          <div class="library-form-heading"><div><p class="eyebrow">ADD TO YOUR SHELVES</p><h2>Keep a new story.</h2></div><span>PRIVATE · ON THIS DEVICE</span></div>
+          <div class="library-fields">
+            <label>TYPE<select id="library-type"><option value="book">BOOK</option><option value="movie">MOVIE</option><option value="series">SERIES</option></select></label>
+            <label class="library-title-field">TITLE<input id="library-title" maxlength="160" placeholder="Title of the book or screen story…" required></label>
+            <label>AUTHOR / DIRECTOR<input id="library-creator" maxlength="120" placeholder="Who created it?"></label>
+            <label>YEAR<input id="library-year" type="number" min="1" max="2200" placeholder="Release / publication year"></label>
+            <label>GENRE<input id="library-genre" maxlength="80" placeholder="Fantasy, drama, sci-fi…"></label>
+            <label>STATUS<select id="library-status"><option value="want">WANT TO READ / WATCH</option><option value="in-progress">IN PROGRESS</option><option value="finished">FINISHED</option><option value="paused">ON HOLD</option><option value="dropped">DROPPED</option></select></label>
+            <label>YOUR RATING<select id="library-rating"><option value="">NOT RATED</option><option value="1">1 / 5</option><option value="2">2 / 5</option><option value="3">3 / 5</option><option value="4">4 / 5</option><option value="5">5 / 5</option></select></label>
+            <label class="library-cover-field">COVER <span class="field-optional">OPTIONAL · IMAGE UP TO 5 MB</span><input id="library-cover" type="file" accept="image/png,image/jpeg,image/webp"></label>
+            <label class="library-note-field">YOUR NOTES <span class="field-optional">A REVIEW, QUOTE OR PERSONAL IMPRESSION</span><textarea id="library-note" rows="3" maxlength="3000" placeholder="What did this story leave with you?"></textarea></label>
+          </div>
+          <div class="library-form-foot"><span>YOUR COLLECTION, YOUR CRITERIA</span><button class="primary-button" type="submit">ADD TO LIBRARY ↗</button></div>
+        </form>
+        <div class="library-toolbar"><label class="library-search-label">SEARCH<input id="library-search" type="search" placeholder="Find a title, creator or note…"></label><label>SHOW<select id="library-filter"><option value="all">ALL ITEMS</option><option value="book">BOOKS</option><option value="movie">MOVIES</option><option value="series">SERIES</option></select></label><label>STATUS<select id="library-status-filter"><option value="all">ANY STATUS</option><option value="want">WANT TO READ / WATCH</option><option value="in-progress">IN PROGRESS</option><option value="finished">FINISHED</option><option value="paused">ON HOLD</option><option value="dropped">DROPPED</option></select></label></div>
+        <div class="library-list-heading"><div><p class="eyebrow">SAVED STORIES</p><h2>Your shelves.</h2></div><span id="library-results-count">0 ITEMS</span></div>
+        <div id="library-list" class="library-list"><p class="empty-state">Your first story is waiting to be added.</p></div>
       </section>
 
       <section class="content-view hidden" id="studio-view">
