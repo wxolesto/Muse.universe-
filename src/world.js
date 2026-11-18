@@ -24,6 +24,7 @@ export function createWorld(parent) {
       this.createCinematicLighting();
       this.createWeather();
       this.createInteractionPrompt();
+      this.scale.on("resize", this.handleWorldResize, this);
       this.cameras.main.startFollow(this.player, true, 0.075, 0.075);
       this.cameras.main.setZoom(1.08);
       this.cameras.main.setDeadzone(110, 70);
@@ -46,6 +47,8 @@ export function createWorld(parent) {
         this.game.events.off("builder:delete", this.deleteSelectedObject, this);
         this.game.events.off("builder:transform", this.transformSelectedObject, this);
         this.input.off("pointerdown", this.handleBuildPointer, this);
+        this.scale.off("resize", this.handleWorldResize, this);
+        this.lightingTween?.stop();
       });
       this.updateLighting();
       this.time.addEvent({ delay: 60000, loop: true, callback: () => this.updateLighting() });
@@ -814,28 +817,32 @@ export function createWorld(parent) {
         C:"#53665a", c:"#788a70", T:"#c1aa83", t:"#e0c99d",
         P:"#343d3b", B:"#242b2a", R:"#a96f68", r:"#d19a83"
       };
-      const texture = this.textures.createCanvas("muse-wanderer", 32, 24);
-      const context = texture.getContext();
-      context.imageSmoothingEnabled = false;
-      frames.forEach((rows, frameIndex) => {
-        rows.forEach((row, y) => {
-          [...row].forEach((pixel, x) => {
-            if (colors[pixel]) {
-              context.fillStyle = colors[pixel];
-              context.fillRect(frameIndex * 16 + x, y, 1, 1);
-            }
+      if (!this.textures.exists("muse-wanderer")) {
+        const texture = this.textures.createCanvas("muse-wanderer", 32, 24);
+        const context = texture.getContext();
+        context.imageSmoothingEnabled = false;
+        frames.forEach((rows, frameIndex) => {
+          rows.forEach((row, y) => {
+            [...row].forEach((pixel, x) => {
+              if (colors[pixel]) {
+                context.fillStyle = colors[pixel];
+                context.fillRect(frameIndex * 16 + x, y, 1, 1);
+              }
+            });
           });
         });
-      });
-      texture.add("idle", 0, 0, 0, 16, 24);
-      texture.add("step", 0, 16, 0, 16, 24);
-      texture.refresh();
-      this.anims.create({
-        key:"wanderer-walk",
-        frames:[{key:"muse-wanderer",frame:"idle"},{key:"muse-wanderer",frame:"step"}],
-        frameRate:7,
-        repeat:-1
-      });
+        texture.add("idle", 0, 0, 0, 16, 24);
+        texture.add("step", 0, 16, 0, 16, 24);
+        texture.refresh();
+      }
+      if (!this.anims.exists("wanderer-walk")) {
+        this.anims.create({
+          key:"wanderer-walk",
+          frames:[{key:"muse-wanderer",frame:"idle"},{key:"muse-wanderer",frame:"step"}],
+          frameRate:7,
+          repeat:-1
+        });
+      }
 
       this.playerShadow = this.add.ellipse(820, 620, 27, 9, 0x17251e, 0.48).setDepth(619);
       this.player = this.add.sprite(820, 620, "muse-wanderer", "idle");
@@ -875,12 +882,14 @@ export function createWorld(parent) {
         texture.add("flap",0,16,0,16,16);
         texture.refresh();
       }
-      this.anims.create({
-        key:"myna-flight",
-        frames:[{key:"muse-myna",frame:"glide"},{key:"muse-myna",frame:"flap"}],
-        frameRate:5,
-        repeat:-1
-      });
+      if (!this.anims.exists("myna-flight")) {
+        this.anims.create({
+          key:"myna-flight",
+          frames:[{key:"muse-myna",frame:"glide"},{key:"muse-myna",frame:"flap"}],
+          frameRate:5,
+          repeat:-1
+        });
+      }
       this.birds=[];
       for(let i=0;i<2;i++){
         const x=650+i*300,y=390+i*90;
@@ -909,7 +918,7 @@ export function createWorld(parent) {
         SUMMER: [0xe0bd79, .035],
         AUTUMN: [0xc68e5d, .075]
       }[season];
-      this.add.rectangle(0, 0, 2400, 1600, seasonalTint[0], seasonalTint[1])
+      this.seasonalTintOverlay = this.add.rectangle(0, 0, this.scale.width, this.scale.height, seasonalTint[0], seasonalTint[1])
         .setOrigin(0).setScrollFactor(0).setDepth(1900)
         .setBlendMode(Phaser.BlendModes.MULTIPLY);
       const weatherRoll = Math.abs(Math.sin(daySeed * 12.9898) * 43758.5453) % 1;
@@ -1068,7 +1077,7 @@ export function createWorld(parent) {
         gradient.addColorStop(1,"rgba(5,14,18,0.28)");
         ctx.fillStyle=gradient;ctx.fillRect(0,0,160,90);texture.refresh();
       }
-      this.add.image(0,0,"muse-vignette").setOrigin(0).setScrollFactor(0)
+      this.vignetteOverlay = this.add.image(0,0,"muse-vignette").setOrigin(0).setScrollFactor(0)
         .setDisplaySize(this.scale.width,this.scale.height).setAlpha(.62).setDepth(1950);
     }
 
@@ -1077,8 +1086,14 @@ export function createWorld(parent) {
         fontFamily:"monospace",fontSize:"9px",color:"#e8dfc3",
         backgroundColor:"#172521d9",padding:{x:12,y:8},letterSpacing:1
       }).setOrigin(.5).setScrollFactor(0).setDepth(2200).setAlpha(0);
-      this.scale.on("resize",size=>this.interactionPrompt?.setPosition(size.width/2,66));
       this.showingInteractionPrompt=false;
+    }
+
+    handleWorldResize(size) {
+      if (!size) return;
+      this.interactionPrompt?.setPosition(size.width / 2, 66);
+      this.seasonalTintOverlay?.setSize(size.width, size.height);
+      this.vignetteOverlay?.setDisplaySize(size.width, size.height);
     }
 
 
@@ -1271,8 +1286,11 @@ export function createWorld(parent) {
       let vx = (right ? 1 : 0) - (left ? 1 : 0);
       let vy = (down ? 1 : 0) - (up ? 1 : 0);
       if (vx && vy) { vx *= 0.707; vy *= 0.707; }
-      const nextX = this.player.x + vx * speed * (this.game.loop.delta / 1000);
-      const nextY = this.player.y + vy * speed * (this.game.loop.delta / 1000);
+      // Clamp unusually long frames (e.g. after app backgrounding) so the
+      // player cannot jump across the island boundary in a single update.
+      const frameSeconds = Math.min(this.game.loop.delta / 1000, 1 / 30);
+      const nextX = this.player.x + vx * speed * frameSeconds;
+      const nextY = this.player.y + vy * speed * frameSeconds;
       if (!Phaser.Geom.Polygon.Contains(this.landPolygon, nextX, nextY)) {
         vx = 0;
         vy = 0;
