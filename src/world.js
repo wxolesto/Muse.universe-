@@ -1380,7 +1380,7 @@ export function createWorld(parent) {
   }
 
   const config = {
-    type: Phaser.AUTO,
+    type: Phaser.CANVAS,
     parent,
     width: 960,
     height: 540,
