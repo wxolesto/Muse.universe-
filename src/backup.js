@@ -9,7 +9,8 @@ const KEYS = {
   worldObjects:"muse.world.objects.v1",
   innerCheckins:"muse.inner.checkins.v1",
   musicTracks:"muse.music.tracks.v1",
-  musicPlaylists:"muse.music.playlists.v1"
+  musicPlaylists:"muse.music.playlists.v1",
+  libraryItems:"muse.library.items.v1"
 };
 
 export async function exportBackup() {
@@ -26,6 +27,7 @@ export async function exportBackup() {
     innerCheckins:readJSON(KEYS.innerCheckins,[]),
     musicTracks:readJSON(KEYS.musicTracks,[]),
     musicPlaylists:readJSON(KEYS.musicPlaylists,[]),
+    libraryItems:readJSON(KEYS.libraryItems,[]),
     musicAudio:audioFiles
   };
   const blob = new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
@@ -56,6 +58,7 @@ export async function importBackup(file) {
   const nextInnerCheckins = mergeById(readJSON(KEYS.innerCheckins,[]),incoming.innerCheckins);
   const nextMusicTracks = mergeById(readJSON(KEYS.musicTracks,[]),incoming.musicTracks);
   const nextMusicPlaylists = mergePlaylists(readJSON(KEYS.musicPlaylists,[]),incoming.musicPlaylists);
+  const nextLibraryItems = mergeById(readJSON(KEYS.libraryItems,[]),incoming.libraryItems);
 
   try {
     for (const item of incoming.musicAudio) {
@@ -69,7 +72,8 @@ export async function importBackup(file) {
       [KEYS.worldObjects]:nextWorldObjects,
       [KEYS.innerCheckins]:nextInnerCheckins,
       [KEYS.musicTracks]:nextMusicTracks,
-      [KEYS.musicPlaylists]:nextMusicPlaylists
+      [KEYS.musicPlaylists]:nextMusicPlaylists,
+      [KEYS.libraryItems]:nextLibraryItems
     };
     for (const [key,value] of Object.entries(nextValues)) localStorage.setItem(key,JSON.stringify(value));
   } catch (error) {
@@ -86,6 +90,7 @@ export async function importBackup(file) {
     musicTracks:incoming.musicTracks.length,
     musicAudioFiles:incoming.musicAudio.length,
     musicPlaylists:incoming.musicPlaylists.length,
+    libraryItems:incoming.libraryItems.length,
     mode:"merged"
   };
 }
