@@ -3,6 +3,7 @@ import { initPixelStudio } from "./pixel-studio.js";
 import { initArchive } from "./archive.js";
 import { exportBackup, importBackup } from "./backup.js";
 import { initInnerWorld } from "./inner-world.js";
+import { initLibrary } from "./library.js";
 
 const $ = (selector) => document.querySelector(selector);
 const toast = (message) => {
@@ -13,7 +14,7 @@ const toast = (message) => {
   toast.timer = setTimeout(() => node.classList.remove("show"), 2200);
 };
 
-const views = ["home", "journal", "archive", "inner", "music", "studio"];
+const views = ["home", "journal", "archive", "inner", "music", "studio", "library"];
 document.querySelectorAll(".rail-item[data-view]").forEach(button => {
   button.addEventListener("click", () => {
     const target = button.dataset.view;
@@ -32,6 +33,7 @@ setInterval(updateClock, 15000);
 initPixelStudio();
 initArchive();
 initInnerWorld();
+initLibrary();
 
 document.querySelectorAll("[data-open-view]").forEach(button => {
   button.addEventListener("click", () => openView(button.dataset.openView));
@@ -110,11 +112,13 @@ async function updateHomeStats() {
     const moodCount = JSON.parse(localStorage.getItem("muse.inner.checkins.v1") || "[]").length;
     const musicCount = JSON.parse(localStorage.getItem("muse.music.tracks.v1") || "[]").length;
     const artCount = JSON.parse(localStorage.getItem("muse.pixel.gallery.v1") || "[]").length;
+    const libraryCount = JSON.parse(localStorage.getItem("muse.library.items.v1") || "[]").length;
     $("#home-journal-count").textContent = String(entries.length).padStart(2,"0");
     $("#home-archive-count").textContent = String(archiveCount).padStart(2,"0");
     $("#home-inner-count").textContent = String(moodCount).padStart(2,"0");
     $("#home-music-count").textContent = String(musicCount).padStart(2,"0");
     $("#home-studio-count").textContent = String(artCount).padStart(2,"0");
+    $("#home-library-count").textContent = String(libraryCount).padStart(2,"0");
   } catch (error) {
     console.warn("MUSE overview counts could not be refreshed:", error);
   }
