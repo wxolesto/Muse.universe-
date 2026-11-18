@@ -8,12 +8,20 @@ export function initPixelStudio() {
   const sizeSelect = document.querySelector("#pixel-size");
   const colorInput = document.querySelector("#pixel-color");
   const status = document.querySelector("#pixel-status");
+  const stage = document.querySelector("#pixel-stage");
+  const zoomOut = document.querySelector("#pixel-zoom-out");
+  const zoomIn = document.querySelector("#pixel-zoom-in");
+  const zoomFit = document.querySelector("#pixel-zoom-fit");
+  const zoomLabel = document.querySelector("#pixel-zoom-level");
   const gallery = document.querySelector("#pixel-gallery");
   let size = 32;
   let pixels = Array(size * size).fill(null);
   let color = colorInput.value;
   let tool = "pencil";
   let drawing = false;
+  let zoom = 1;
+  let pointers = new Map();
+  let pinchStart = null;
   let undoStack = [];
   let redoStack = [];
 
@@ -22,6 +30,22 @@ export function initPixelStudio() {
     undoStack.push(snapshot());
     if (undoStack.length > 80) undoStack.shift();
     redoStack = [];
+  };
+  const updateZoom = () => {
+    const available = Math.max(160, stage.clientWidth - 40);
+    const base = Math.min(512, available);
+    const displaySize = Math.round(base * zoom);
+    canvas.style.width = displaySize + "px";
+    canvas.style.height = displaySize + "px";
+    zoomLabel.textContent = Math.round(zoom * 100) + "%";
+    zoomOut.disabled = zoom <= 1;
+    zoomIn.disabled = zoom >= 4;
+  };
+  const setZoom = next => {
+    const previous = zoom;
+    zoom = Math.max(1, Math.min(4, Math.round(next * 4) / 4));
+    if (zoom === previous) return;
+    updateZoom();
   };
   const render = () => {
     const cell = canvas.width / size;
@@ -116,15 +140,46 @@ export function initPixelStudio() {
   colorInput.addEventListener("input",()=>{color=colorInput.value;selectPalette(color);});
   sizeSelect.addEventListener("change",()=>setSize(Number(sizeSelect.value)));
   canvas.addEventListener("pointerdown",event=>{
-    event.preventDefault();drawing=true;canvas.setPointerCapture(event.pointerId);remember();
+    event.preventDefault();
+    pointers.set(event.pointerId,{x:event.clientX,y:event.clientY});
+    canvas.setPointerCapture(event.pointerId);
+    if(pointers.size===2){
+      drawing=false;
+      const points=[...pointers.values()];
+      pinchStart={distance:Math.hypot(points[0].x-points[1].x,points[0].y-points[1].y),zoom};
+      return;
+    }
+    if(pointers.size>2)return;
+    drawing=true;remember();
     const {x,y}=coords(event);paint(x,y);
   });
   canvas.addEventListener("pointermove",event=>{
+    if(!pointers.has(event.pointerId))return;
+    pointers.set(event.pointerId,{x:event.clientX,y:event.clientY});
+    if(pointers.size>=2&&pinchStart){
+      const points=[...pointers.values()];
+      const distance=Math.hypot(points[0].x-points[1].x,points[0].y-points[1].y);
+      setZoom(pinchStart.zoom*(distance/pinchStart.distance));
+      return;
+    }
     if(!drawing||tool==="fill"||tool==="eyedropper")return;
     const {x,y}=coords(event);pixels[indexAt(x,y)]=tool==="eraser"?null:color;render();
   });
-  const stop=()=>{drawing=false;};
+  const stop=event=>{
+    if(event?.pointerId!==undefined)pointers.delete(event.pointerId);
+    if(pointers.size<2)pinchStart=null;
+    if(pointers.size===0)drawing=false;
+  };
   canvas.addEventListener("pointerup",stop);canvas.addEventListener("pointercancel",stop);canvas.addEventListener("lostpointercapture",stop);
+  zoomOut.addEventListener("click",()=>setZoom(zoom-.25));
+  zoomIn.addEventListener("click",()=>setZoom(zoom+.25));
+  zoomFit.addEventListener("click",()=>{zoom=1;updateZoom();stage.scrollTo({left:0,top:0,behavior:"smooth"});});
+  stage.addEventListener("wheel",event=>{
+    if(!event.ctrlKey&&!event.metaKey)return;
+    event.preventDefault();setZoom(zoom+(event.deltaY<0?.25:-.25));
+  },{passive:false});
+  if(typeof ResizeObserver!=="undefined")new ResizeObserver(updateZoom).observe(stage);
+  else window.addEventListener("resize",updateZoom);
   document.querySelector("#pixel-undo").addEventListener("click",()=>{
     if(!undoStack.length)return;redoStack.push(snapshot());pixels=undoStack.pop();render();
   });
@@ -145,5 +200,5 @@ export function initPixelStudio() {
     items.unshift({id:globalThis.crypto?.randomUUID?.()||String(Date.now()),title:title.trim(),image:out.toDataURL("image/png"),createdAt:Date.now(),size});
     try{localStorage.setItem(STORAGE_KEY,JSON.stringify(items.slice(0,24)));loadGallery();status.textContent="SAVED TO YOUR LOCAL GALLERY";}catch{status.textContent="GALLERY STORAGE FULL — EXPORT PNG INSTEAD";}
   });
-  render();loadGallery();
+  updateZoom();render();loadGallery();
 }
