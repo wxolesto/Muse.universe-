@@ -321,3 +321,5 @@ body.world-immersive .touch-pad{bottom:14px;left:14px}
 .home-footer-note p{margin:0}
 @media(max-width:800px){.home-panel .world-heading{align-items:flex-start}.home-welcome{padding:22px}.home-welcome-mark{width:62px;height:62px;flex-basis:62px;font-size:39px}}
 @media(max-width:520px){.home-welcome{padding:18px;gap:10px}.home-welcome-mark{width:46px;height:46px;flex-basis:46px;font-size:30px}.home-welcome p:last-child{font-size:10px}.home-grid{grid-template-columns:1fr}.home-section-heading{font-size:7px}.home-link{min-height:165px}}
+
+.home-count{display:inline-block;margin-left:7px;color:#d0d8c4;font:8px var(--mono);letter-spacing:.08em}
