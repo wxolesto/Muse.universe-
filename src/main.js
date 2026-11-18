@@ -25,8 +25,6 @@ document.querySelectorAll(".rail-item[data-view]").forEach(button => {
 function updateClock() {
   const now = new Date();
   $("#world-clock").textContent = new Intl.DateTimeFormat(undefined, {hour:"2-digit",minute:"2-digit",hour12:false}).format(now);
-  const hour = now.getHours();
-  const phase = hour < 5 ? "NIGHT" : hour < 8 ? "DAWN" : hour < 17 ? "DAYLIGHT" : hour < 20 ? "DUSK" : "NIGHT";
 }
 updateClock();
 setInterval(updateClock, 15000);
