@@ -547,7 +547,7 @@ export function createWorld(parent) {
       for(let i=0;i<4;i++){
         const stone=this.add.rectangle(4+i*15,43+(i%2)*3,12,4,i%2?0x77745e:0x9b9070,.82);
         stone.setRotation(-.06);
-        this.add(stone);
+        add(stone);
       }
       this.tweens.add({targets:hut,y:y-1,duration:4200,yoyo:true,repeat:-1,ease:"Sine.easeInOut"});
       return hut;
