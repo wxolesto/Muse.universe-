@@ -1,26 +1,18 @@
-# MUSE — The World of You
+# MUSE — A Space of Your Own
 
-A private, expandable digital universe: a richly atmospheric pixel-art world connected to a modern personal archive and creative workspace.
+MUSE is a private, local-first creative space for writing, collecting memories, keeping music, reflecting and making pixel art. Its visual identity stays atmospheric and editorial: a dark interface, quiet colours, thoughtful typography and a compact navigation rail.
 
-## Current foundation
+## Current spaces
 
-### World Mode
-- Phaser 3 world engine with a large first-island prototype, camera follow and movement.
-- Keyboard controls (WASD / arrow keys), sprint and mobile touch controls.
-- Layered shoreline with a masked, hand-seeded pixel terrain texture, beach bands, animated water glints, grass, ferns, boulders, driftwood, tide pools, an ancient marker, a wayfarer hut and pier.
-- Mina and Toto appear as original pixel-art myna sprites with animated wings and independent flight paths.
-- Four discoverable landmarks with local progress tracking and map markers.
-- Procedural ocean-and-wind ambience with a master toggle and volume control (starts only after user interaction).
-- Real-device-clock day/night lighting.
-- A live archipelago map with a player-location marker and unexplored island silhouettes.
-- Seasonal weather pass with rain, snow, fog and autumn leaves. Weather is currently a deterministic game-world simulation, not a live weather forecast.
+- **Home** — a calm overview and shortcuts to every part of MUSE.
+- **Journal** — private pages and everyday thoughts, stored on the device.
+- **Archive** — collections for Soundtrack, People, Curiosities and Memories.
+- **Inner World** — optional mood check-ins, a calendar and a personal history.
+- **Music Room** — saved tracks, album art, audio files, playlists and personal notes.
+- **Pixel Studio** — a pixel-art workspace with 16×16, 32×32 and 64×64 canvases, pencil, eraser, fill, eyedropper, palette, undo/redo, PNG export and a local gallery.
+- **Settings** — JSON backup and restore.
 
-### Library Mode
-- Private local journal with IndexedDB storage and localStorage fallback.
-- Archive collections for Soundtrack, People, Curiosities and Memories.
-- Interactive Pixel Studio: 16×16, 32×32 and 64×64 canvases, pencil, eraser, fill, eyedropper, palette, undo/redo, PNG export and local gallery.
-- Local JSON backup and restore for journal entries, archive collections and pixel artwork.
-- Responsive editorial interface designed to complement the pixel-art world.
+The former explorable island/game mode has been removed from the app experience. Existing backup compatibility is retained for older MUSE backup files, including legacy world fields, so restoring an older backup does not fail simply because it contains those fields.
 
 ## Run locally
 
@@ -36,6 +28,7 @@ Open the local URL printed by Vite (usually http://localhost:5173).
 Create a production build:
 
 ```bash
+npm test
 npm run build
 npm run preview
 ```
@@ -50,8 +43,8 @@ MUSE uses Capacitor to package the Vite app as an installable Android applicatio
 2. Select **Build MUSE Android APK**.
 3. Press **Run workflow** and confirm the `main` branch.
 4. Wait for the workflow to finish successfully.
-5. Open that workflow run, scroll to **Artifacts**, and download `MUSE-Android-APK`.
-6. Extract the ZIP and install `app-debug.apk` on your Android phone.
+5. Open that workflow run, scroll to **Artifacts**, and download the MUSE APK artifact.
+6. Extract the ZIP and install the APK on your Android phone.
 
 The workflow runs automated tests, builds the web app, generates the Android project and creates an APK. If stable release-signing secrets are configured, it creates a signed release APK; otherwise it creates a debug APK for testing. Artifacts are retained by GitHub for 14 days. See [Android release signing](./docs/ANDROID_SIGNING.md) to configure a stable signing key for in-place updates.
 
@@ -79,30 +72,14 @@ The APK will be at `android/app/build/outputs/apk/debug/app-debug.apk`.
 
 ## Privacy and data
 
-MUSE currently stores journal entries, archive records and pixel-art gallery data in the browser on the device where they were created. No app account or server sync is implemented.
+MUSE stores journal entries, archive records, mood check-ins, music metadata, audio files and pixel-art gallery data locally on the device. No app account or server sync is implemented.
 
 Important limitations:
-- Local browser storage is not encrypted in this prototype.
+- Local browser storage is not encrypted.
 - Clearing site data or changing browser/device can remove or strand local content.
-- JSON backup and restore are now available from Settings, but backups are not encrypted.
+- JSON backups are not encrypted.
 - Do not use the current prototype as a secure vault for highly sensitive information.
 
-## Quality direction
+## Product direction
 
-MUSE aims for handcrafted pixel-art environments with strong silhouettes, layered depth, original sprite work, environmental animation and detailed sound design. The current island is a functional art-direction prototype; it is not yet the final high-detail production art pass.
-
-See [docs/ART_DIRECTION.md](./docs/ART_DIRECTION.md).
-
-## Roadmap
-
-1. First Shore and core world engine — prototype.
-2. Higher-resolution handcrafted tile sets, richer character sprite sheets, collision layers and environmental animation.
-3. Avatar creator and deeper companion behaviour for Mina and Toto.
-4. Robust season, weather, time and ambient sound systems.
-5. Expandable island/region editor and world interactions.
-6. Rich journal, memory timeline, people and culture libraries.
-7. Pixel Studio layers, selection tools, palettes and project files.
-8. Encrypted backups, import/export, restore and data migration.
-9. Performance profiling, accessibility, mobile packaging and regression testing.
-
-MUSE is intentionally split into two connected experiences: **World Mode** for exploration and **Library Mode** for writing, creating and organizing. Both will share a common local-first data layer.
+MUSE is a personal workspace, not a game. Future development should deepen its writing, archive, music, reflection and creative tools while preserving the existing visual language, mobile usability, local-first storage and reliable backup/restore.
