@@ -257,7 +257,6 @@ body.world-immersive .world-expand-button{top:12px;right:12px}
   transform:none;
   width:140px;
   height:140px;
-  display:grid;
   grid-template-columns:repeat(3,44px);
   grid-template-rows:repeat(3,44px);
   gap:3px;
