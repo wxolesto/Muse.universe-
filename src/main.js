@@ -91,7 +91,7 @@ $("#backup-file").addEventListener("change", async event => {
   if (!file) return;
   try {
     const summary = await importBackup(file);
-    toast(`MERGED ${summary.journal + summary.archive + summary.artwork + (summary.innerCheckins || 0) + (summary.musicTracks || 0) + (summary.musicAudioFiles || 0) + (summary.musicPlaylists || 0)} ITEMS — RELOADING`);
+    toast(`MERGED ${summary.journal + summary.archive + summary.artwork + (summary.innerCheckins || 0) + (summary.musicTracks || 0) + (summary.musicAudioFiles || 0) + (summary.musicPlaylists || 0) + (summary.libraryItems || 0)} ITEMS — RELOADING`);
     setTimeout(() => window.location.reload(), 900);
   } catch (error) {
     toast(error.message || "BACKUP COULD NOT BE RESTORED");
