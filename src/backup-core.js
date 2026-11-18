@@ -123,6 +123,17 @@ export function validateBackupPayload(payload) {
     if (!Array.isArray(item.trackIds) || item.trackIds.some(id => typeof id !== "string")) throw new Error("Invalid playlist track references.");
     timestamp(item.createdAt, "musicPlaylists.createdAt");
   });
+  const libraryItems = recordArray(payload.libraryItems, "libraryItems", item => {
+    requiredString(item.id, "libraryItems.id");
+    requiredString(item.title, "libraryItems.title");
+    if (!["book", "movie", "series"].includes(item.type)) throw new Error("Invalid library item type.");
+    if (item.status !== undefined && !["want", "in-progress", "finished", "paused", "dropped"].includes(item.status)) throw new Error("Invalid library item status.");
+    for (const field of ["creator", "genre", "note"]) optionalString(item[field], "libraryItems." + field);
+    if (item.year !== undefined && item.year !== null && (!Number.isInteger(item.year) || item.year < 1 || item.year > 2200)) throw new Error("Invalid library item year.");
+    if (item.rating !== undefined && item.rating !== null && (!Number.isInteger(item.rating) || item.rating < 1 || item.rating > 5)) throw new Error("Invalid library item rating.");
+    validateImageData(item.cover, "libraryItems.cover", true);
+    timestamp(item.createdAt, "libraryItems.createdAt");
+  });
   const musicAudio = recordArray(payload.musicAudio, "musicAudio", item => {
     requiredString(item.id, "musicAudio.id");
     requiredString(item.name, "musicAudio.name");
@@ -137,7 +148,7 @@ export function validateBackupPayload(payload) {
   }, 0);
   if (totalAudioBytes > MAX_TOTAL_AUDIO_BYTES) throw new Error("The backup contains more than 100 MB of audio. Split it into smaller backups.");
 
-  return { journal, archive, pixelGallery, discoveries, worldObjects, innerCheckins, musicTracks, musicPlaylists, musicAudio };
+  return { journal, archive, pixelGallery, discoveries, worldObjects, innerCheckins, musicTracks, musicPlaylists, musicAudio, libraryItems };
 }
 
 export function mergeById(existing = [], incoming = []) {
