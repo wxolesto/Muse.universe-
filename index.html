@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#11151b" />
-  <meta name="description" content="MUSE — a private, living universe." />
-  <title>MUSE — The World of You</title>
+  <meta name="description" content="MUSE — a private creative space." />
+  <title>MUSE — A Space of Your Own</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
@@ -17,13 +17,12 @@
   <div class="app-shell">
     <header class="topbar">
       <a class="brand" href="#" aria-label="MUSE home"><span class="brand-mark">M</span><span>MUSE</span><small>THE WORLD OF YOU</small></a>
-      <div class="top-meta"><span class="live-dot"></span><span id="world-clock">--:--</span><span class="meta-divider"></span><span id="weather-label">CLEAR SKIES</span></div>
-      <button class="icon-button" id="sound-toggle" aria-label="Toggle ambient sound" title="Ambient sound">♫</button>
+      <div class="top-meta"><span class="live-dot"></span><span id="world-clock">--:--</span><span class="meta-divider"></span><span>PRIVATE WORKSPACE</span></div>
     </header>
 
     <main class="main-layout">
       <aside class="rail">
-        <button class="rail-item active" data-view="world"><span>⌘</span><small>WORLD</small></button>
+        <button class="rail-item active" data-view="home"><span>⌂</span><small>HOME</small></button>
         <button class="rail-item" data-view="journal"><span>▤</span><small>JOURNAL</small></button>
         <button class="rail-item" data-view="archive"><span>◇</span><small>ARCHIVE</small></button>
         <button class="rail-item" data-view="inner"><span>☾</span><small>INNER WORLD</small></button>
@@ -33,25 +32,24 @@
         <button class="rail-item" id="settings-button"><span>⚙</span><small>SETTINGS</small></button>
       </aside>
 
-      <section class="world-panel" id="world-view">
+      <section class="content-view home-panel" id="home-view">
         <div class="world-heading">
-          <div><p class="eyebrow">YOUR PRIVATE UNIVERSE <span class="eyebrow-line"></span></p><h1>A world of <em>your own.</em></h1><p class="subheading">Somewhere between memory and imagination.</p></div>
-          <div class="island-status"><span class="status-label">CURRENT LOCATION</span><strong>01 / The First Shore</strong><span class="status-coords">THE ARCHIPELAGO · UNKNOWN SEA</span></div>
+          <div><p class="eyebrow">YOUR PRIVATE UNIVERSE <span class="eyebrow-line"></span></p><h1>A space of <em>your own.</em></h1><p class="subheading">A home for your thoughts, memories, music and creations.</p></div>
+          <div class="island-status"><span class="status-label">MUSE / PERSONAL SPACE</span><strong>PRIVATE · ON THIS DEVICE</strong><span class="status-coords">A LITTLE UNIVERSE, ALL YOURS</span></div>
         </div>
-        <div class="game-frame">
-          <div class="game-vignette"></div>
-          <div id="game-container" aria-label="MUSE explorable pixel-art island"></div>
-          <button type="button" id="world-expand-button" class="world-expand-button" aria-label="Expand world view">⛶ EXPAND</button>
-          <div class="game-top-label"><span class="tiny-orb"></span> WORLD SIMULATION <span class="label-separator">/</span> <span id="season-label">LATE AUTUMN</span></div>
-          <div class="game-location"><span class="location-cross">✳</span><span><strong>THE FIRST SHORE</strong><small>A quiet beginning</small></span></div>
-          <div class="game-hint"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><span>TO EXPLORE</span><i></i><span>OR USE ARROW KEYS</span><i></i><kbd>E</kbd><span>TO INTERACT</span></div>
-          <div class="touch-pad" aria-label="Movement controls"><button data-dir="up">↑</button><div><button data-dir="left">←</button><button data-dir="down">↓</button><button data-dir="right">→</button></div></div>
-          <div class="game-actions"><button id="map-button">◎ <span>WORLD MAP</span></button><button id="field-notes-button">✧ <span>FIELD NOTES</span></button><button id="world-builder-button">✚ <span>BUILD</span></button><button id="inspect-button">⌕ <span>INTERACT</span></button></div>
+        <section class="home-welcome">
+          <div><p class="eyebrow">WELCOME BACK</p><h2>Everything that makes your universe <em>yours.</em></h2><p>Keep a thought, collect a memory, save a song, or make something new. There is room for all of it here.</p></div>
+          <span class="home-welcome-mark">M</span>
+        </section>
+        <div class="home-section-heading"><span>YOUR SPACES</span><span>CHOOSE WHERE TO BEGIN</span></div>
+        <div class="home-grid">
+          <button class="archive-card home-link" data-open-view="journal"><span class="archive-symbol">▤</span><small>01 / WRITE</small><h2>Journal</h2><p>Your thoughts, pages and everyday moments.</p><span class="card-foot">OPEN JOURNAL ↗</span></button>
+          <button class="archive-card home-link" data-open-view="archive"><span class="archive-symbol">◇</span><small>02 / COLLECT</small><h2>Archive</h2><p>People, memories, curiosities and soundtracks.</p><span class="card-foot">OPEN ARCHIVE ↗</span></button>
+          <button class="archive-card home-link" data-open-view="inner"><span class="archive-symbol">☾</span><small>03 / REFLECT</small><h2>Inner World</h2><p>A gentle record of how each day feels.</p><span class="card-foot">OPEN INNER WORLD ↗</span></button>
+          <button class="archive-card home-link" data-open-view="music"><span class="archive-symbol">♫</span><small>04 / LISTEN</small><h2>Music Room</h2><p>Songs, albums, playlists and their stories.</p><span class="card-foot">OPEN MUSIC ROOM ↗</span></button>
+          <button class="archive-card home-link" data-open-view="studio"><span class="archive-symbol">▧</span><small>05 / CREATE</small><h2>Pixel Studio</h2><p>A small workshop for your pixel-art ideas.</p><span class="card-foot">OPEN STUDIO ↗</span></button>
         </div>
-        <div class="below-world">
-          <div class="world-note"><span class="note-icon">✦</span><div><strong>A place to begin.</strong><p>This is your first shore. The rest of the world is waiting to be imagined.</p></div></div>
-          <div class="world-stats"><div><small>DISCOVERED</small><strong id="discovery-count">00 <i>/ 04</i></strong></div><div><small>WORLD TIME</small><strong id="day-phase">EVENING</strong></div><div><small>COMPANIONS</small><strong>02 <i>in the skies</i></strong></div></div>
-        </div>
+        <div class="home-footer-note"><span>✦</span><p>Your space doesn't need to be anything other than what you make of it.</p></div>
       </section>
 
       <section class="content-view hidden" id="journal-view">
@@ -141,56 +139,11 @@
         <div class="gallery-heading"><span>YOUR CREATIONS</span><span>LOCAL GALLERY</span></div><div id="pixel-gallery" class="pixel-gallery"></div>
       </section>
     </main>
-    <footer class="app-footer"><span> MUSE <i>·</i> A PRIVATE DIGITAL UNIVERSE</span><span>YOUR WORLD. YOUR RULES.</span></footer>
+    <footer class="app-footer"><span> MUSE <i>·</i> A PRIVATE CREATIVE SPACE</span><span>YOUR SPACE. YOUR RULES.</span></footer>
   </div>
-  <dialog class="map-dialog" id="map-dialog">
-    <div class="dialog-head"><div><p class="eyebrow">MUSE / CARTOGRAPHY</p><h2>The Archipelago.</h2></div><button id="map-close" aria-label="Close map">×</button></div>
-    <div class="map-canvas">
-      <svg viewBox="0 0 720 420" role="img" aria-label="Map of the MUSE archipelago">
-        <defs><pattern id="sea-grid" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M28 0H0V28" fill="none" stroke="#9ab0a0" stroke-opacity=".08" stroke-width="1"/></pattern></defs>
-        <rect width="720" height="420" fill="url(#sea-grid)"/>
-        <path class="map-island active-island" d="M122 184l24-45 55-28 62-8 52 18 45-21 67 22 45 38 37 28 13 49-30 44-55 25-65 3-52-19-53 20-67-22-48-34-28-43z"/>
-        <path class="map-island locked-island" d="M475 78l22-29 48-9 41 18 13 31-20 28-52 6-40-18z"/>
-        <path class="map-island locked-island" d="M560 285l27-31 49 1 38 25-8 35-48 18-42-14z"/>
-        <path class="map-island locked-island" d="M74 65l20-25 43 3 28 22-13 30-42 12-33-17z"/>
-        <path class="map-path" d="M205 270Q300 240 355 208T490 93"/>
-        <g class="map-location"><circle cx="360" cy="210" r="19"/><circle cx="360" cy="210" r="5"/></g>
-        <g class="map-discovery" data-map-discovery="wayfarer"><circle cx="442" cy="154" r="5"/><text x="451" y="151">WAYFARER</text></g>
-        <g class="map-discovery" data-map-discovery="marker"><circle cx="309" cy="184" r="5"/><text x="278" y="174">MARKER</text></g>
-        <g class="map-discovery" data-map-discovery="low-tide"><circle cx="563" cy="253" r="5"/><text x="570" y="250">LOW TIDE</text></g>
-        <g class="map-discovery" data-map-discovery="quiet-grove"><circle cx="335" cy="290" r="5"/><text x="274" y="306">QUIET GROVE</text></g>
-        <circle id="map-player-marker" class="map-player" cx="360" cy="210" r="7"/>
-        <text x="276" y="322" class="map-label">THE FIRST SHORE</text>
-        <text x="500" y="35" class="map-muted">???</text><text x="595" y="365" class="map-muted">UNMAPPED</text>
-        <text x="86" y="28" class="map-muted">THE UNKNOWN SEA</text>
-      </svg>
-      <div class="map-legend"><span><i class="legend-dot discovered"></i> DISCOVERED</span><span><i class="legend-dot player-dot"></i> YOU ARE HERE</span><span><i class="legend-dot locked"></i> UNEXPLORED</span></div>
-    </div>
-    <p class="map-footnote">The world is larger than this map. New shores will appear as your universe grows.</p>
-  </dialog>
-
-  <dialog class="builder-dialog" id="builder-dialog">
-    <div class="dialog-head"><div><p class="eyebrow">MUSE / WORLDCRAFT</p><h2>Shape your shore.</h2></div><button id="builder-close" aria-label="Close world builder">×</button></div>
-    <p class="dialog-copy">Add small details to your island. Choose an object, then tap an open patch of land in the world to place it. Your creations stay on this device.</p>
-    <div class="builder-tools">
-      <button class="builder-tool" data-build-item="tree"><span class="builder-preview tree-preview">♣</span><strong>Grove tree</strong><small>ANCIENT GREEN</small></button>
-      <button class="builder-tool" data-build-item="lantern"><span class="builder-preview lantern-preview">✧</span><strong>Shore lantern</strong><small>WARM LIGHT</small></button>
-      <button class="builder-tool" data-build-item="flowers"><span class="builder-preview flower-preview">✿</span><strong>Wildflowers</strong><small>SOFT COLOUR</small></button>
-      <button class="builder-tool" data-build-item="stone"><span class="builder-preview stone-preview">◈</span><strong>Mossy stone</strong><small>OLD FRAGMENTS</small></button>
-    </div>
-    <div class="builder-footer"><span id="builder-status">0 CUSTOM OBJECTS · FIRST SHORE</span><div class="builder-footer-actions"><button class="secondary-button" id="builder-edit">EDIT OBJECTS</button><button class="secondary-button" id="builder-delete" disabled>DELETE SELECTED</button><button class="secondary-button" id="builder-finish">DONE</button></div></div>
-  </dialog>
-  <dialog class="field-notes-dialog" id="field-notes-dialog">
-    <div class="dialog-head"><div><p class="eyebrow">MUSE / EXPLORER'S LOG</p><h2>Field Notes.</h2></div><button id="field-notes-close" aria-label="Close field notes">×</button></div>
-    <p class="dialog-copy">A record of the places you've found, and the small stories the island has kept.</p>
-    <div class="field-notes-progress"><span id="field-notes-progress">0 OF 4 LANDMARKS FOUND</span><span>THE FIRST SHORE</span></div>
-    <div class="field-notes-list" id="field-notes-list"><div class="field-notes-empty"><span>✧</span><strong>Nothing in the log. Yet.</strong><p>Wander the island and look for places that seem to hold a story. Press E or use INTERACT when you find one.</p></div></div>
-  </dialog>
-  <div id="world-edit-toolbar" class="world-edit-toolbar" hidden><span>WORLD EDITOR · SELECTED OBJECT</span><button id="world-edit-rotate-left" type="button" aria-label="Rotate object left">↶ 15°</button><button id="world-edit-rotate-right" type="button" aria-label="Rotate object right">↷ 15°</button><button id="world-edit-smaller" type="button" aria-label="Make object smaller">− SIZE</button><button id="world-edit-larger" type="button" aria-label="Make object larger">+ SIZE</button><button id="world-edit-delete" type="button">DELETE</button><button id="world-edit-exit" type="button">FINISH</button></div>
   <dialog class="settings-dialog" id="settings-dialog">
-    <div class="dialog-head"><div><p class="eyebrow">MUSE / WORLD SETTINGS</p><h2>Your universe, protected.</h2></div><button id="settings-close" aria-label="Close settings">×</button></div>
-    <p class="dialog-copy">Create a portable backup of your journal, mood check-ins, music collection, archive, world decorations and pixel artworks, or restore a previous backup on this device.</p>
-    <label class="ambience-volume" for="ambience-volume"><span>SHORE AMBIENCE <small>VOLUME</small></span><input id="ambience-volume" type="range" min="0" max="1" step="0.01" value="0.32"></label>
+    <div class="dialog-head"><div><p class="eyebrow">MUSE / SETTINGS</p><h2>Your universe, protected.</h2></div><button id="settings-close" aria-label="Close settings">×</button></div>
+    <p class="dialog-copy">Create a portable backup of your journal, mood check-ins, music collection, archive and pixel artworks, or restore a previous backup on this device.</p>
     <div class="backup-actions"><button class="primary-button" id="backup-export">EXPORT MY UNIVERSE ↓</button><button class="secondary-button" id="backup-import">RESTORE FROM BACKUP ↑</button><input id="backup-file" type="file" accept="application/json,.json" hidden></div>
     <p class="privacy-warning">BACKUPS ARE CURRENTLY UNENCRYPTED JSON FILES. Keep them somewhere private. Encryption and password-protected recovery are planned.</p>
   </dialog>
