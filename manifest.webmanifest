@@ -1,7 +1,7 @@
 {
-  "name": "MUSE — The World of You",
+  "name": "MUSE — A Space of Your Own",
   "short_name": "MUSE",
-  "description": "A private, living digital universe.",
+  "description": "A private creative space for your thoughts, memories, music and art.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
@@ -9,6 +9,11 @@
   "theme_color": "#11161a",
   "orientation": "any",
   "icons": [
-    { "src": "./assets/muse-mark.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+    {
+      "src": "./assets/muse-mark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
   ]
 }
