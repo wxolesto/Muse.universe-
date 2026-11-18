@@ -1,26 +1,28 @@
-# MUSE — Art Direction
+# MUSE — Visual Direction
 
 ## North star
-MUSE is an intimate, atmospheric exploration game with an original visual identity. Its pixel-art environments should feel handcrafted, layered and quietly alive — never like a generic tile-map demo.
-
-Blasphemous is a quality reference for deliberate pixel placement, silhouette, environmental storytelling and atmospheric composition. MUSE must not copy its characters, iconography, settings, palettes or assets.
+MUSE is a private personal workspace: a place to write, collect memories, keep music, reflect and make things. The interface should feel atmospheric and considered without feeling like a game dashboard or a generic productivity app.
 
 ## Visual language
-- High-resolution pixel-art presentation with crisp nearest-neighbour rendering.
-- Rich environmental silhouettes: layered canopies, rock formations, architecture, shorelines and distant landforms.
-- Controlled palette: deep sea greens, weathered stone, moss, muted gold, dusk blue and warm window light.
-- Strong foreground / midground / background separation.
-- Small animated details: foliage, water glints, drifting motes, birds, weather and light.
-- Modern editorial interface outside the game viewport; restrained typography and generous negative space.
+- A quiet dark palette built from deep charcoal, muted green, warm stone and restrained gold.
+- Editorial typography pairing a literary serif with a clear sans-serif and compact mono labels.
+- Generous negative space, calm hierarchy and carefully composed cards.
+- Subtle borders, soft gradients and restrained motion; visual effects should never compete with the content.
+- Pixel art belongs in the creative tools and personal collections, not as a required game environment.
+- Responsive layouts should preserve the same visual identity on mobile and desktop.
 
-## Current prototype note
-The First Shore is currently drawn from procedural Phaser shapes. It establishes camera, movement, world scale, lighting hooks and layout. It is a functional greybox/art-direction prototype, **not the final handcrafted art pass**. Replace placeholder geometry with original sprite sheets, tile sets, animated environmental assets and carefully authored collision layers as the art pipeline matures.
+## Interaction principles
+- Every section should feel like a room in the same personal space.
+- Navigation stays compact and predictable.
+- Personal content should be easy to create, revisit, edit and export.
+- Local-first storage and clear backup/restore behaviour are core product requirements.
+- Respect reduced-motion preferences and keep controls usable on touch screens.
 
-## Asset quality gate
-A region is not considered finished until it has:
-1. A cohesive tile set and environment palette.
-2. Distinct foreground, playable layer and background depth.
-3. Character and creature animations with consistent pixel scale.
-4. Ambient animation and weather variants.
-5. Collision boundaries and tested navigation.
-6. Mobile readability and stable frame rate.
+## Quality gate
+A section is ready when it has:
+1. A clear purpose and consistent visual hierarchy.
+2. Responsive behaviour on narrow mobile screens and desktop.
+3. Keyboard-accessible controls and visible focus states.
+4. Reliable local persistence and graceful empty states.
+5. Backup/restore compatibility where it stores user-created content.
+6. Automated tests for important data transformations and validation.
