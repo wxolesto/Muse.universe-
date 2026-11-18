@@ -224,3 +224,14 @@
 #pixel-zoom-fit{font-size:9px;padding:0 9px}
 .pixel-zoom-controls small{margin-left:8px;color:var(--dim);font:8px var(--mono)}
 @media(max-width:600px){.pixel-stage{justify-content:flex-start;min-height:280px;padding:16px 10px}.pixel-zoom-controls{justify-content:center;flex-wrap:wrap}.pixel-zoom-controls small{width:100%;text-align:center;margin:2px 0 0}}
+
+/* Inline editing actions for Journal, Archive and Library */
+.entry-actions,.collection-item-actions,.library-item-actions>div,.form-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.entry-actions{margin-top:12px}
+.entry-actions button,.collection-item-actions button{padding:0;border:0;background:none;color:#9ca99a;font:7px var(--mono);letter-spacing:.08em;cursor:pointer}
+.entry-actions button:hover,.collection-item-actions button:hover,.library-item-actions [data-library-edit]:hover{color:#d1d9c5}
+.collection-item-actions{margin-top:10px}
+.collection-item-actions button+button,.library-item-actions [data-library-delete]{color:#a98f86}
+.edit-cancel[hidden]{display:none}
+.form-actions{justify-content:flex-end}
+@media(max-width:560px){.form-actions{width:100%}.form-actions button{flex:1}.library-item-actions>div{gap:10px}}

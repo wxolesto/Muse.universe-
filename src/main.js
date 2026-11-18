@@ -45,16 +45,27 @@ function openView(target) {
   document.querySelectorAll(".rail-item[data-view]").forEach(item => item.classList.toggle("active", item.dataset.view === target));
 }
 
+let editingEntryId = null;
+const entrySubmit = $("#entry-form button[type=submit]");
+const entryCancel = $("#entry-edit-cancel");
+function cancelEntryEdit() {
+  editingEntryId = null;
+  $("#entry-form").reset();
+  entrySubmit.innerHTML = 'SAVE PAGE <span>↗</span>';
+  entryCancel.hidden = true;
+}
+entryCancel.addEventListener("click", cancelEntryEdit);
 $("#entry-form").addEventListener("submit", async event => {
   event.preventDefault();
   const title = $("#entry-title").value.trim();
   const body = $("#entry-body").value.trim();
   if (!title || !body) return;
-  await saveEntry({ id:createId(), title, body, createdAt:Date.now() });
-  $("#entry-title").value = "";
-  $("#entry-body").value = "";
+  const wasEditing = Boolean(editingEntryId);
+  const existing = wasEditing ? (await getEntries()).find(item => item.id === editingEntryId) : null;
+  await saveEntry({ id:editingEntryId || createId(), title, body, createdAt:existing?.createdAt || Date.now(), ...(wasEditing ? {updatedAt:Date.now()} : {}) });
+  cancelEntryEdit();
   await renderEntries();
-  toast("PAGE SAVED TO YOUR PRIVATE JOURNAL");
+  toast(wasEditing ? "PAGE UPDATED" : "PAGE SAVED TO YOUR PRIVATE JOURNAL");
 });
 
 async function renderEntries() {
@@ -65,8 +76,19 @@ async function renderEntries() {
     <article class="entry-card" data-id="${escapeHTML(entry.id)}">
       <time>${new Date(entry.createdAt).toLocaleDateString()}</time>
       <h3>${escapeHTML(entry.title)}</h3><p>${escapeHTML(entry.body)}</p>
-      <button class="delete-entry" data-delete="${escapeHTML(entry.id)}" style="background:none;border:0;color:#a1aa9c;font:9px monospace;cursor:pointer">DELETE PAGE ×</button>
+      <div class="entry-actions"><button class="edit-entry" data-edit-entry="${escapeHTML(entry.id)}" type="button">EDIT PAGE ↗</button><button class="delete-entry" data-delete="${escapeHTML(entry.id)}" type="button">DELETE PAGE ×</button></div>
     </article>`).join("") : '<p style="font-size:11px;color:#79847d">Your first page is waiting to be written.</p>';
+  document.querySelectorAll("[data-edit-entry]").forEach(button => button.addEventListener("click", async () => {
+    const entry = (await getEntries()).find(item => item.id === button.dataset.editEntry);
+    if (!entry) return;
+    editingEntryId = entry.id;
+    $("#entry-title").value = entry.title;
+    $("#entry-body").value = entry.body;
+    entrySubmit.innerHTML = 'UPDATE PAGE <span>↗</span>';
+    entryCancel.hidden = false;
+    $("#entry-title").focus();
+    $("#entry-form").scrollIntoView({behavior:"smooth",block:"center"});
+  }));
   document.querySelectorAll("[data-delete]").forEach(button => button.addEventListener("click", async () => {
     await deleteEntry(button.dataset.delete);
     await renderEntries();

@@ -48,19 +48,37 @@ function render() {
         ${item.genre ? `<span class="library-genre">${escapeHTML(item.genre)}</span>` : ""}
         ${item.rating ? `<span class="library-rating" aria-label="Rating">${"★".repeat(item.rating)}${"☆".repeat(5-item.rating)}</span>` : ""}
         ${item.note ? `<p class="library-note">${escapeHTML(item.note)}</p>` : ""}
-        <div class="library-item-actions"><button type="button" data-library-delete="${escapeHTML(item.id)}">REMOVE FROM LIBRARY ×</button><time>${new Date(item.createdAt).toLocaleDateString()}</time></div>
+        <div class="library-item-actions"><div><button type="button" data-library-edit="${escapeHTML(item.id)}">EDIT ITEM ↗</button><button type="button" data-library-delete="${escapeHTML(item.id)}">REMOVE FROM LIBRARY ×</button></div><time>${new Date(item.createdAt).toLocaleDateString()}</time></div>
       </div>
     </article>`).join("") : '<p class="empty-state">No stories match this shelf yet. Try another filter or add a new one.</p>';
   updateOverview();
+  document.querySelectorAll("[data-library-edit]").forEach(button => button.addEventListener("click", () => {
+    const item=items.find(entry=>entry.id===button.dataset.libraryEdit);
+    if(!item)return;
+    editingId=item.id;
+    $("#library-type").value=item.type;$("#library-title").value=item.title;$("#library-creator").value=item.creator||"";
+    $("#library-year").value=item.year||"";$("#library-genre").value=item.genre||"";$("#library-status").value=item.status||"want";
+    $("#library-rating").value=item.rating||"";$("#library-note").value=item.note||"";$("#library-cover").value="";
+    librarySubmit.textContent="UPDATE LIBRARY ITEM ↗";libraryCancel.hidden=false;
+    $("#library-title").focus();$("#library-form").scrollIntoView({behavior:"smooth",block:"center"});
+  }));
   document.querySelectorAll("[data-library-delete]").forEach(button => button.addEventListener("click", () => {
     items = items.filter(item => item.id !== button.dataset.libraryDelete);
     saveItems(); render();
     window.dispatchEvent(new CustomEvent("muse:toast", { detail:"REMOVED FROM YOUR LIBRARY" }));
   }));
 }
+let editingId=null;
+let librarySubmit;
+let libraryCancel;
+function cancelLibraryEdit(){editingId=null;$("#library-form").reset();librarySubmit.textContent="ADD TO LIBRARY ↗";libraryCancel.hidden=true;}
 export function getLibraryItems() { return items; }
 export function setLibraryItems(next) { items = Array.isArray(next) ? next : []; saveItems(); render(); }
 export function initLibrary() {
+  librarySubmit=$("#library-form button[type=submit]");
+  libraryCancel=document.createElement("button");libraryCancel.type="button";libraryCancel.className="secondary-button edit-cancel";libraryCancel.textContent="CANCEL EDIT";libraryCancel.hidden=true;
+  $("#library-form .library-form-foot").append(libraryCancel);
+  libraryCancel.addEventListener("click",cancelLibraryEdit);
   $("#library-form").addEventListener("submit", async event => {
     event.preventDefault();
     const title = $("#library-title").value.trim();
@@ -74,16 +92,17 @@ export function initLibrary() {
       const type = $("#library-type").value;
       const yearValue = $("#library-year").value;
       const ratingValue = $("#library-rating").value;
+      const previous=editingId ? items.find(entry=>entry.id===editingId) : null;
       const item = {
-        id:makeId(), type, title, creator:$("#library-creator").value.trim(),
+        id:editingId || makeId(), type, title, creator:$("#library-creator").value.trim(),
         year:yearValue ? Number(yearValue) : null, genre:$("#library-genre").value.trim(),
         status:$("#library-status").value, rating:ratingValue ? Number(ratingValue) : null,
-        note:$("#library-note").value.trim(), cover:file ? await fileAsDataURL(file) : "",
-        createdAt:Date.now()
+        note:$("#library-note").value.trim(), cover:file ? await fileAsDataURL(file) : (previous?.cover || ""),
+        createdAt:previous?.createdAt || Date.now(), ...(editingId ? {updatedAt:Date.now()} : {})
       };
-      items.unshift(item); saveItems();
-      event.target.reset(); render();
-      window.dispatchEvent(new CustomEvent("muse:toast", { detail:"SAVED TO YOUR LIBRARY" }));
+      if(editingId)items=items.map(entry=>entry.id===editingId?item:entry);else items.unshift(item);
+      saveItems();cancelLibraryEdit();render();
+      window.dispatchEvent(new CustomEvent("muse:toast", { detail:previous ? "LIBRARY ITEM UPDATED" : "SAVED TO YOUR LIBRARY" }));
     } catch (error) {
       window.dispatchEvent(new CustomEvent("muse:toast", { detail:error.message || "LIBRARY ITEM COULD NOT BE SAVED" }));
     }
