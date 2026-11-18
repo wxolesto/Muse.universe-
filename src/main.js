@@ -191,12 +191,16 @@ soundButton.addEventListener("click", async () => {
 $("#ambience-volume").addEventListener("input",event=>ambience.setVolume(event.target.value));
 
 document.querySelectorAll(".touch-pad button").forEach(button => {
-  const start = event => { event.preventDefault(); game?.events.emit("touch-move", button.dataset.dir, true); };
+  const start = event => {
+    event.preventDefault();
+    button.setPointerCapture?.(event.pointerId);
+    game?.events.emit("touch-move", button.dataset.dir, true);
+  };
   const stop = () => game?.events.emit("touch-move", button.dataset.dir, false);
   button.addEventListener("pointerdown", start);
   button.addEventListener("pointerup", stop);
-  button.addEventListener("pointerleave", stop);
   button.addEventListener("pointercancel", stop);
+  button.addEventListener("lostpointercapture", stop);
 });
 
 window.addEventListener("muse:toast", event => toast(event.detail));
