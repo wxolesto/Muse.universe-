@@ -2,7 +2,6 @@ import { getEntries, saveEntry, deleteEntry, createId } from "./storage.js";
 import { initPixelStudio } from "./pixel-studio.js";
 import { initArchive } from "./archive.js";
 import { exportBackup, importBackup } from "./backup.js";
-import { createShoreAmbience } from "./ambience.js";
 import { initInnerWorld } from "./inner-world.js";
 
 const $ = (selector) => document.querySelector(selector);
@@ -14,7 +13,7 @@ const toast = (message) => {
   toast.timer = setTimeout(() => node.classList.remove("show"), 2200);
 };
 
-const views = ["world", "journal", "archive", "inner", "music", "studio"];
+const views = ["home", "journal", "archive", "inner", "music", "studio"];
 document.querySelectorAll(".rail-item[data-view]").forEach(button => {
   button.addEventListener("click", () => {
     const target = button.dataset.view;
@@ -28,8 +27,6 @@ function updateClock() {
   $("#world-clock").textContent = new Intl.DateTimeFormat(undefined, {hour:"2-digit",minute:"2-digit",hour12:false}).format(now);
   const hour = now.getHours();
   const phase = hour < 5 ? "NIGHT" : hour < 8 ? "DAWN" : hour < 17 ? "DAYLIGHT" : hour < 20 ? "DUSK" : "NIGHT";
-  $("#day-phase").textContent = phase;
-  $("#season-label").textContent = ["WINTER","SPRING","SUMMER","AUTUMN"][Math.floor((now.getMonth()+1)%12/3)];
 }
 updateClock();
 setInterval(updateClock, 15000);
@@ -38,31 +35,15 @@ initPixelStudio();
 initArchive();
 initInnerWorld();
 
-let game;
-let worldPromise;
-function ensureWorld() {
-  if (game) return Promise.resolve(game);
-  if (!worldPromise) {
-    const container = $("#game-container");
-    container.setAttribute("aria-busy", "true");
-    worldPromise = import("./world.js").then(({createWorld}) => {
-      game = createWorld("game-container");
-      container.removeAttribute("aria-busy");
-      return game;
-    }).catch(error => {
-      worldPromise = null;
-      console.error("MUSE world could not start:", error);
-      container.removeAttribute("aria-busy");
-      container.innerHTML = '<div style="padding:24px;color:#e8e4d9;font:12px monospace">The world engine could not start. Please refresh this page.</div>';
-      throw error;
-    });
-  }
-  return worldPromise;
+document.querySelectorAll("[data-open-view]").forEach(button => {
+  button.addEventListener("click", () => openView(button.dataset.openView));
+});
+
+function openView(target) {
+  if (!views.includes(target)) return;
+  views.forEach(view => $(`#${view}-view`).classList.toggle("hidden", view !== target));
+  document.querySelectorAll(".rail-item[data-view]").forEach(item => item.classList.toggle("active", item.dataset.view === target));
 }
-function emitWorldEvent(name, ...args) {
-  ensureWorld().then(world => world.events.emit(name, ...args)).catch(() => {});
-}
-ensureWorld().catch(() => {});
 
 $("#entry-form").addEventListener("submit", async event => {
   event.preventDefault();
@@ -79,6 +60,7 @@ $("#entry-form").addEventListener("submit", async event => {
 async function renderEntries() {
   const entries = await getEntries();
   $("#entry-count").textContent = `${entries.length} ENTR${entries.length === 1 ? "Y" : "IES"}`;
+  $("#home-journal-count").textContent = String(entries.length).padStart(2,"0");
   $("#entries-list").innerHTML = entries.length ? entries.map(entry => `
     <article class="entry-card" data-id="${escapeHTML(entry.id)}">
       <time>${new Date(entry.createdAt).toLocaleDateString()}</time>
@@ -96,61 +78,6 @@ function escapeHTML(value) {
 }
 renderEntries();
 
-const mapDialog = $("#map-dialog");
-$("#map-button").addEventListener("click", () => mapDialog.showModal());
-$("#map-close").addEventListener("click", () => mapDialog.close());
-mapDialog.addEventListener("click", event => { if (event.target === mapDialog) mapDialog.close(); });
-window.addEventListener("muse:position", event => {
-  const {x,y} = event.detail;
-  const marker = $("#map-player-marker");
-  marker.setAttribute("cx", 122 + ((x - 180) / 1355) * 498);
-  marker.setAttribute("cy", 95 + ((y - 185) / 715) * 235);
-});
-$("#inspect-button").addEventListener("click", () => emitWorldEvent("interact"));
-
-const worldExpandButton=$("#world-expand-button");
-function setWorldImmersive(active){
-  document.body.classList.toggle("world-immersive",active);
-  worldExpandButton.textContent=active?"× EXIT":"⛶ EXPAND";
-  worldExpandButton.setAttribute("aria-label",active?"Exit expanded world view":"Expand world view");
-  requestAnimationFrame(()=>window.dispatchEvent(new Event("resize")));
-}
-worldExpandButton.addEventListener("click",()=>setWorldImmersive(!document.body.classList.contains("world-immersive")));
-
-const builderDialog=$("#builder-dialog");
-const builderStatus=$("#builder-status");
-function updateBuilderStatus(){
-  let count=0;
-  try{const data=JSON.parse(localStorage.getItem("muse.world.objects.v1")||"[]");count=Array.isArray(data)?data.length:0;}catch{}
-  builderStatus.textContent=`${count} CUSTOM OBJECTS · FIRST SHORE`;
-}
-$("#world-builder-button").addEventListener("click",()=>{updateBuilderStatus();builderDialog.showModal();});
-$("#builder-edit").addEventListener("click",()=>{builderDialog.close();emitWorldEvent("builder:edit");});
-$("#builder-delete").addEventListener("click",()=>emitWorldEvent("builder:delete"));
-window.addEventListener("muse:builder-selection",event=>{$("#builder-delete").disabled=!event.detail?.selected;$("#builder-delete").textContent=event.detail?.selected?"DELETE SELECTED":"DELETE SELECTED";});
-const worldEditToolbar=$("#world-edit-toolbar");
-$("#world-edit-delete").addEventListener("click",()=>emitWorldEvent("builder:delete"));
-$("#world-edit-rotate-left").addEventListener("click",()=>emitWorldEvent("builder:transform",{rotationDelta:-15}));
-$("#world-edit-rotate-right").addEventListener("click",()=>emitWorldEvent("builder:transform",{rotationDelta:15}));
-$("#world-edit-smaller").addEventListener("click",()=>emitWorldEvent("builder:transform",{scaleDelta:-.1}));
-$("#world-edit-larger").addEventListener("click",()=>emitWorldEvent("builder:transform",{scaleDelta:.1}));
-$("#world-edit-exit").addEventListener("click",()=>{worldEditToolbar.hidden=true;emitWorldEvent("builder:cancel");});
-window.addEventListener("muse:builder-selection",event=>{worldEditToolbar.hidden=!event.detail?.selected;});
-window.addEventListener("muse:builder-mode",event=>{if(!event.detail?.active)worldEditToolbar.hidden=true;});
-$("#builder-close").addEventListener("click",()=>{builderDialog.close();emitWorldEvent("builder:cancel");});
-$("#builder-finish").addEventListener("click",()=>{builderDialog.close();game?.events.emit("builder:cancel");});
-builderDialog.addEventListener("click",event=>{if(event.target===builderDialog){builderDialog.close();game?.events.emit("builder:cancel");}});
-document.querySelectorAll("[data-build-item]").forEach(button=>button.addEventListener("click",()=>{
-  document.querySelectorAll("[data-build-item]").forEach(item=>item.classList.toggle("selected",item===button));
-  builderDialog.close();
-  emitWorldEvent("builder:start",button.dataset.buildItem);
-  window.dispatchEvent(new CustomEvent("muse:builder-mode",{detail:{active:true,type:button.dataset.buildItem}}));
-}));
-window.addEventListener("muse:object-placed",event=>{
-  updateBuilderStatus();
-  toast(`${event.detail.type.toUpperCase()} ADDED TO YOUR SHORE`);
-});
-
 const settingsDialog = $("#settings-dialog");
 $("#settings-button").addEventListener("click", () => settingsDialog.showModal());
 $("#settings-close").addEventListener("click", () => settingsDialog.close());
@@ -164,7 +91,7 @@ $("#backup-file").addEventListener("change", async event => {
   if (!file) return;
   try {
     const summary = await importBackup(file);
-    toast(`MERGED ${summary.journal + summary.archive + summary.artwork + (summary.discoveries || 0) + (summary.worldObjects || 0) + (summary.innerCheckins || 0) + (summary.musicTracks || 0) + (summary.musicAudioFiles || 0) + (summary.musicPlaylists || 0)} ITEMS — RELOADING`);
+    toast(`MERGED ${summary.journal + summary.archive + summary.artwork + (summary.innerCheckins || 0) + (summary.musicTracks || 0) + (summary.musicAudioFiles || 0) + (summary.musicPlaylists || 0)} ITEMS — RELOADING`);
     setTimeout(() => window.location.reload(), 900);
   } catch (error) {
     toast(error.message || "BACKUP COULD NOT BE RESTORED");
@@ -173,92 +100,25 @@ $("#backup-file").addEventListener("change", async event => {
 settingsDialog.addEventListener("click", event => {
   if (event.target === settingsDialog) settingsDialog.close();
 });
-const ambience = createShoreAmbience();
-const soundButton = $("#sound-toggle");
-soundButton.setAttribute("aria-pressed","false");
-soundButton.addEventListener("click", async () => {
-  try {
-    const enabled = await ambience.toggle();
-    soundButton.classList.toggle("sound-on",enabled);
-    soundButton.setAttribute("aria-pressed",String(enabled));
-    soundButton.title = enabled ? "Mute shore ambience" : "Enable shore ambience";
-    toast(enabled ? "THE SHORE IS ALIVE WITH SOUND" : "AMBIENT SOUND MUTED");
-  } catch (error) {
-    console.warn("MUSE ambience unavailable:",error);
-    toast("AUDIO COULD NOT START IN THIS BROWSER");
-  }
-});
-$("#ambience-volume").addEventListener("input",event=>ambience.setVolume(event.target.value));
-
-document.querySelectorAll(".touch-pad button").forEach(button => {
-  const start = event => {
-    event.preventDefault();
-    button.setPointerCapture?.(event.pointerId);
-    game?.events.emit("touch-move", button.dataset.dir, true);
-  };
-  const stop = () => game?.events.emit("touch-move", button.dataset.dir, false);
-  button.addEventListener("pointerdown", start);
-  button.addEventListener("pointerup", stop);
-  button.addEventListener("pointercancel", stop);
-  button.addEventListener("lostpointercapture", stop);
-});
-
 window.addEventListener("muse:toast", event => toast(event.detail));
 
 
-const discoveryKey = "muse.discoveries.v1";
-const fieldNotesDialog = $("#field-notes-dialog");
-$("#field-notes-button").addEventListener("click", () => { renderFieldNotes(); fieldNotesDialog.showModal(); });
-$("#field-notes-close").addEventListener("click", () => fieldNotesDialog.close());
-fieldNotesDialog.addEventListener("click", event => { if (event.target === fieldNotesDialog) fieldNotesDialog.close(); });
-function readDiscoveries() {
-  try {
-    const value = JSON.parse(localStorage.getItem(discoveryKey) || "[]");
-    return Array.isArray(value) ? value : [];
-  } catch { return []; }
-}
-function updateDiscoveryCount() {
-  const node = $("#discovery-count");
-  if (!node) return;
-  const count = readDiscoveries().length;
-  node.innerHTML = `${String(count).padStart(2,"0")} <i>/ 04</i>`;
-  const progress = $("#field-notes-progress");
-  if (progress) progress.textContent = `${count} OF 4 LANDMARKS FOUND`;
-  document.querySelectorAll("[data-map-discovery]").forEach(marker => marker.classList.toggle("found", readDiscoveries().some(item => item.id === marker.dataset.mapDiscovery)));
-}
-updateDiscoveryCount();
-window.addEventListener("muse:discovery", event => {
-  const item = event.detail;
-  if (!item?.id || !item?.title) return;
-  const discoveries = readDiscoveries();
-  if (discoveries.some(saved => saved.id === item.id)) {
-    toast(item.description || item.title);
-    return;
-  }
-  discoveries.push({id:item.id,title:item.title,description:item.description,lore:item.lore,discoveredAt:Date.now()});
-  try { localStorage.setItem(discoveryKey, JSON.stringify(discoveries)); }
-  catch { toast("DISCOVERY FOUND — STORAGE IS FULL"); return; }
-  updateDiscoveryCount();
-  renderFieldNotes();
-  toast(`NEW DISCOVERY · ${item.title}`);
-});
 
-function renderFieldNotes() {
-  const list = $("#field-notes-list");
-  if (!list) return;
-  const discoveries = readDiscoveries();
-  const escape = value => String(value || "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
-  if (!discoveries.length) {
-    list.innerHTML = '<div class="field-notes-empty"><span>✧</span><strong>Nothing in the log. Yet.</strong><p>Wander the island and look for places that seem to hold a story. Press E or use INTERACT when you find one.</p></div>';
-    return;
+async function updateHomeStats() {
+  try {
+    const entries = await getEntries();
+    const archive = JSON.parse(localStorage.getItem("muse.archive.entries.v1") || "{}");
+    const archiveCount = Object.values(archive).reduce((total, items) => total + (Array.isArray(items) ? items.length : 0), 0);
+    const moodCount = JSON.parse(localStorage.getItem("muse.inner.checkins.v1") || "[]").length;
+    const musicCount = JSON.parse(localStorage.getItem("muse.music.tracks.v1") || "[]").length;
+    const artCount = JSON.parse(localStorage.getItem("muse.pixel.gallery.v1") || "[]").length;
+    $("#home-journal-count").textContent = String(entries.length).padStart(2,"0");
+    $("#home-archive-count").textContent = String(archiveCount).padStart(2,"0");
+    $("#home-inner-count").textContent = String(moodCount).padStart(2,"0");
+    $("#home-music-count").textContent = String(musicCount).padStart(2,"0");
+    $("#home-studio-count").textContent = String(artCount).padStart(2,"0");
+  } catch (error) {
+    console.warn("MUSE overview counts could not be refreshed:", error);
   }
-  list.innerHTML = discoveries.map((item,index) => `
-    <article class="field-note-card">
-      <div class="field-note-index">0${index+1}</div>
-      <div class="field-note-content"><div class="field-note-meta">LANDMARK DISCOVERED · ${item.discoveredAt ? new Date(item.discoveredAt).toLocaleDateString() : "DATE UNKNOWN"}</div>
-        <h3>${escape(item.title)}</h3><p class="field-note-summary">${escape(item.description)}</p>
-        <p class="field-note-lore">${escape(item.lore || item.description).replace(/\n\n/g,"</p><p class=\"field-note-lore\">")}</p>
-      </div>
-    </article>`).join("");
 }
-renderFieldNotes();
+updateHomeStats();
