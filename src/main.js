@@ -4,6 +4,7 @@ import { initArchive } from "./archive.js";
 import { exportBackup, importBackup } from "./backup.js";
 import { initInnerWorld } from "./inner-world.js";
 import { initLibrary } from "./library.js";
+import { initMusic } from "./music.js";
 
 const $ = (selector) => document.querySelector(selector);
 const toast = (message) => {
@@ -34,6 +35,7 @@ initPixelStudio();
 initArchive();
 initInnerWorld();
 initLibrary();
+initMusic();
 
 document.querySelectorAll("[data-open-view]").forEach(button => {
   button.addEventListener("click", () => openView(button.dataset.openView));

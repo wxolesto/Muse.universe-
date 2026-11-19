@@ -235,3 +235,20 @@
 .edit-cancel[hidden]{display:none}
 .form-actions{justify-content:flex-end}
 @media(max-width:560px){.form-actions{width:100%}.form-actions button{flex:1}.library-item-actions>div{gap:10px}}
+
+/* Music Room editing and collection controls */
+.music-form-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.music-form-actions [hidden],.music-playlist-toolbar [hidden],.music-playlist-create-form[hidden]{display:none}
+.music-remove-audio{display:flex;align-items:center;gap:8px;margin-top:12px;color:#a98f86;font:7px var(--mono);letter-spacing:.08em}
+.music-remove-audio input{accent-color:#a98f86}
+.music-playlist-create-form{display:flex;gap:9px;align-items:center;padding:12px;margin:-2px 0 15px;background:#172326;border:1px solid var(--line)}
+.music-playlist-create-form input,.music-search-row input{min-width:0;padding:10px 12px;background:#111b1d;border:1px solid var(--line);color:#e0e4d8;font:11px var(--sans)}
+.music-playlist-create-form input{flex:1}
+.music-search-row{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:17px 0 12px}
+.music-search-row label{display:flex;flex-direction:column;gap:7px;flex:1;color:#aeb9aa;font:7px var(--mono);letter-spacing:.1em}
+.music-search-row span{color:#819087;font:7px var(--mono);letter-spacing:.08em}
+.music-search-row input:focus,.music-playlist-create-form input:focus{outline:none;border-color:#91a58a}
+.music-edit-button{padding:0;border:0;background:none;color:#9ca99a;font:7px var(--mono);letter-spacing:.08em;cursor:pointer}
+.music-edit-button:hover{color:#e0c3ae}
+.track-actions .track-delete{padding:0;border:0;background:none;color:#a98f86;font-size:16px}
+@media(max-width:560px){.music-form-actions{width:100%}.music-form-actions button{flex:1}.music-playlist-create-form{flex-wrap:wrap}.music-playlist-create-form input{flex-basis:100%}.music-playlist-create-form button{flex:1}.music-search-row{align-items:flex-start;flex-direction:column}.music-search-row label{width:100%}}
