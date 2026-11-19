@@ -79,6 +79,7 @@ jobs:
             mkdir -p "android/app/src/main/res/mipmap-${density}"
             rm -f "android/app/src/main/res/mipmap-${density}/ic_launcher.png" "android/app/src/main/res/mipmap-${density}/ic_launcher_round.png"
             cp assets/muse-icon.jpg "android/app/src/main/res/mipmap-${density}/ic_launcher.jpg"
+            cp assets/muse-icon.jpg "android/app/src/main/res/mipmap-${density}/ic_launcher_round.jpg"
           done
           rm -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml
 
